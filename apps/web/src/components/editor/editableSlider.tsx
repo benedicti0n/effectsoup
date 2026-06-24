@@ -115,9 +115,9 @@ export function EditableSlider({
   );
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs text-mute">
-        <label id={labelId} htmlFor={id} className="font-mono">
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between text-sm">
+        <label id={labelId} htmlFor={id} className="font-medium text-ink">
           {label}
         </label>
         {isEditing ? (
@@ -130,7 +130,7 @@ export function EditableSlider({
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             aria-label={`Edit ${label.toLowerCase()} value`}
-            className="w-16 rounded-sm border border-ink bg-canvas px-1 py-0.5 text-right font-mono text-xs text-ink outline-none"
+            className="w-16 rounded-sm border border-hairline bg-canvas px-1.5 py-0.5 text-right text-sm text-ink outline-none focus:border-ink-primary"
           />
         ) : (
           <button
@@ -141,7 +141,7 @@ export function EditableSlider({
               setIsEditing(true);
             }}
             aria-label={`Edit ${label.toLowerCase()} value`}
-            className="rounded-sm px-1 py-0.5 font-mono text-ink hover:bg-surface-soft focus:bg-surface-soft focus:outline-none"
+            className="rounded-sm px-1.5 py-0.5 text-sm text-muted hover:bg-soft-stone focus:bg-soft-stone focus:outline-none"
           >
             {formatValue(value, unit)}
           </button>
@@ -159,7 +159,7 @@ export function EditableSlider({
         onMouseUp={onCommit}
         onTouchEnd={onCommit}
         aria-labelledby={labelId}
-        className="w-full accent-ink disabled:opacity-50"
+        className="w-full cursor-pointer appearance-none bg-transparent focus-visible:outline-none [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-hairline [&::-webkit-slider-thumb]:-mt-1.5 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-ink-primary [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-hairline [&::-moz-range-thumb]:-mt-1.5 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-ink-primary disabled:opacity-50"
       />
     </div>
   );

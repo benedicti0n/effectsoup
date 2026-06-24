@@ -2,6 +2,7 @@
 
 import type { JSX } from "react";
 import { useEditorStore } from "@/store/editorStore";
+import { cn } from "@/lib/utils";
 import { EditableSlider } from "./editableSlider";
 
 const ASPECT_RATIOS: Array<{ value: CropValue; label: string }> = [
@@ -24,8 +25,8 @@ export function CropControls(): JSX.Element {
   };
 
   return (
-    <div className="space-y-4 rounded-sm border border-hairline bg-surface-soft p-4">
-      <h4 className="font-mono text-sm font-bold text-ink">Crop</h4>
+    <div className="space-y-4 rounded-sm border border-hairline bg-soft-stone/30 p-4">
+      <h4 className="text-sm font-medium text-ink-primary">Crop</h4>
 
       <div className="grid grid-cols-5 gap-1">
         {ASPECT_RATIOS.map(({ value, label }) => (
@@ -35,11 +36,12 @@ export function CropControls(): JSX.Element {
               updateCrop({ aspectRatio: value });
               snapshotHistory();
             }}
-            className={`rounded-sm px-2 py-1.5 font-mono text-xs ${
+            className={cn(
+              "rounded-sm border px-2 py-1.5 text-xs font-medium transition-colors",
               crop.aspectRatio === value
-                ? "border border-ink bg-canvas text-ink"
-                : "border border-hairline bg-canvas text-mute hover:border-ink"
-            }`}
+                ? "border-ink-primary bg-ink-primary text-on-primary"
+                : "border-hairline bg-canvas text-muted hover:border-muted"
+            )}
           >
             {label}
           </button>

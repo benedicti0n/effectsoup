@@ -4,6 +4,8 @@ import type { JSX } from "react";
 import { useState } from "react";
 import { getPresetById } from "@imageeffects/presets";
 import { useEditorStore } from "@/store/editorStore";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { AdvancedControls } from "./advancedControls";
 import { CropControls } from "./cropControls";
 import { EditableSlider } from "./editableSlider";
@@ -20,14 +22,18 @@ export function EffectControls(): JSX.Element {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between border-b border-hairline pb-3">
-        <h3 className="font-mono text-base font-bold text-ink">{presetName}</h3>
-        <button
-          onClick={resetEffect}
-          className="font-mono text-xs text-mute underline hover:text-ink"
-        >
+      <div className="flex items-start justify-between border-b border-hairline pb-3">
+        <div>
+          <h3 className="font-display text-lg font-medium text-ink-primary">{presetName}</h3>
+          {preset && (
+            <Badge variant={preset.access === "premium" ? "premium" : "outline"} className="mt-1">
+              {preset.access === "premium" ? "Premium" : "Free"}
+            </Badge>
+          )}
+        </div>
+        <Button variant="secondary" onClick={resetEffect}>
           Reset
-        </button>
+        </Button>
       </div>
 
       <EditableSlider
@@ -42,15 +48,16 @@ export function EffectControls(): JSX.Element {
         onCommit={snapshotHistory}
       />
 
-      <button
+      <CropControls />
+
+      <Button
+        variant="outline"
         onClick={() => setShowAdvanced((s) => !s)}
-        className="flex w-full items-center justify-between rounded-sm border border-hairline bg-surface-soft px-4 py-2 font-mono text-sm text-ink hover:bg-surface-card"
+        className="w-full justify-between"
       >
         <span>Advanced Controls</span>
-        <span className="text-mute">{showAdvanced ? "[-]" : "[+]"}</span>
-      </button>
-
-      <CropControls />
+        <span className="text-muted">{showAdvanced ? "−" : "+"}</span>
+      </Button>
 
       {showAdvanced && <AdvancedControls />}
     </div>

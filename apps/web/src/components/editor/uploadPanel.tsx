@@ -5,6 +5,7 @@ import type { JSX } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Upload01Icon } from "@hugeicons/core-free-icons";
 import { useEditorStore } from "@/store/editorStore";
+import { Button } from "@/components/ui/button";
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -70,16 +71,27 @@ export function UploadPanel(): JSX.Element {
     <div
       onDrop={onDrop}
       onDragOver={(e) => e.preventDefault()}
-      className="flex flex-col items-center justify-center rounded-sm border border-dashed border-hairline-strong bg-surface-soft p-12 text-center hover:border-ink"
+      className="flex flex-1 flex-col items-center justify-center rounded-sm border border-dashed border-hairline bg-soft-stone/30 p-8 text-center transition-colors hover:border-muted md:p-12"
     >
-      <HugeiconsIcon icon={Upload01Icon} className="mb-4 h-10 w-10 text-mute" />
-      <p className="mb-2 font-mono text-base font-medium text-ink">
-        Drop an image here, or click to upload
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-soft-stone">
+        <HugeiconsIcon icon={Upload01Icon} className="h-7 w-7 text-ink-primary" />
+      </div>
+      <h2 className="mb-2 font-display text-xl font-medium text-ink-primary">
+        Drop an image here
+      </h2>
+      <p className="mb-6 max-w-xs text-sm text-body-muted">
+        or click to upload. Supports JPEG, PNG, and WebP up to 20 MB.
       </p>
-      <p className="mb-6 font-mono text-sm text-mute">JPEG, PNG, WebP. Max 20 MB.</p>
-      <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-sm bg-ink px-5 font-mono text-base font-medium text-canvas hover:bg-ink-deep">
-        Choose Image
-        <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onChange} />
+      <label className="cursor-pointer">
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={onChange}
+        />
+        <Button asChild>
+          <span>Choose Image</span>
+        </Button>
       </label>
     </div>
   );
