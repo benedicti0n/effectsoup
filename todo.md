@@ -105,15 +105,15 @@
 - [x] Wire pricing CTAs to existing Dodo checkout or show disabled/coming-soon state
 - [x] Build `/docs` page shell with navigation cards and placeholder state
 
-### Phase 6 — Playground Revamp (in progress)
+### Phase 6 — Playground Revamp (completed)
 
-- [ ] Create `/playground` route (or revamp `/editor`) with Cohere three-column workspace
-- [ ] Revamp effect library sidebar with categories, search, premium badges
-- [ ] Revamp canvas workspace with centered preview, toolbar, upload empty state
-- [ ] Revamp controls inspector with intensity, crop, color, advanced sections
-- [ ] Implement responsive mobile layout (bottom sheet / collapsible panels)
+- [x] Create `/playground` route with Cohere three-column workspace
+- [x] Revamp effect library sidebar with categories, search, premium badges
+- [x] Revamp canvas workspace with centered preview, toolbar, upload empty state
+- [x] Revamp controls inspector with intensity, crop, color, advanced sections
+- [x] Implement responsive mobile layout (collapsible library)
 
-### Phase 7 — Polish, Accessibility, Tests, Docs (pending)
+### Phase 7 — Polish, Accessibility, Tests, Docs (in progress)
 
 - [ ] Add hover/focus states, reduced-motion support, subtle transitions
 - [ ] Add toasts for export/save feedback
