@@ -66,10 +66,10 @@ const cyberAsciiPreset: EffectPreset = {
   description: "Colored terminal-like character image with a technical glyph set and neon glow.",
   category: "asciiSymbols",
   access: "premium",
-  defaultIntensity: 60,
+  defaultIntensity: 15,
   advancedControlSchema: [
     ...universalAdvancedControls,
-    { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 10 },
+    { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 6 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "tint", "monochrome"], defaultValue: "originalColors" },
     { id: "tintPreset", name: "Tint Preset", type: "select", options: ["terminalGreen", "electricCyan", "amberCrt", "violetCode"], defaultValue: "terminalGreen" },
@@ -81,7 +81,7 @@ const cyberAsciiPreset: EffectPreset = {
     return {
       intensity,
       advancedOverrides: overrides,
-      fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
+      fontSize: resolveOverride(overrides, "fontSize", 6),
       density: resolveOverride(overrides, "density", 2 + Math.round((intensity / 100) * 8)),
       colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
       tintPreset,

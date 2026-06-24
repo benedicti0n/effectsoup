@@ -1,5 +1,5 @@
 import type { PixelBuffer } from "./types.js";
-import { clampByte, createPixelBuffer, pixelIndex } from "./buffer.js";
+import { clampByte, createPixelBuffer } from "./buffer.js";
 
 export type BlendMode = "normal" | "multiply" | "screen" | "overlay" | "soft";
 
@@ -63,37 +63,62 @@ export function blendPixelBuffers(
 }
 
 /**
- * Apply a simple box blur in-place.
- * radius: blur radius in pixels
+ * Apply a separable box blur in-place using prefix sums.
+ * Complexity is O(pixels) independent of radius, which keeps glow/bloom
+ * effects responsive on large previews.
  */
 export function applyBoxBlur(buffer: PixelBuffer, radius: number): void {
   if (radius <= 0) return;
   const { data, width, height } = buffer;
-  const output = new Uint8ClampedArray(data);
+  const temp = new Uint8ClampedArray(data.length);
 
+  // Horizontal pass.
   for (let y = 0; y < height; y++) {
+    // Build prefix sums for this row (3 channels).
+    const rowOffset = y * width * 4;
+    const pr = new Uint32Array(width + 1);
+    const pg = new Uint32Array(width + 1);
+    const pb = new Uint32Array(width + 1);
     for (let x = 0; x < width; x++) {
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      let count = 0;
-      for (let ky = -radius; ky <= radius; ky++) {
-        for (let kx = -radius; kx <= radius; kx++) {
-          const sx = Math.max(0, Math.min(width - 1, x + kx));
-          const sy = Math.max(0, Math.min(height - 1, y + ky));
-          const idx = pixelIndex(buffer, sx, sy);
-          r += data[idx];
-          g += data[idx + 1];
-          b += data[idx + 2];
-          count++;
-        }
-      }
-      const idx = pixelIndex(buffer, x, y);
-      output[idx] = r / count;
-      output[idx + 1] = g / count;
-      output[idx + 2] = b / count;
+      const idx = rowOffset + x * 4;
+      pr[x + 1] = pr[x] + data[idx];
+      pg[x + 1] = pg[x] + data[idx + 1];
+      pb[x + 1] = pb[x] + data[idx + 2];
+    }
+
+    for (let x = 0; x < width; x++) {
+      const lo = Math.max(0, x - radius);
+      const hi = Math.min(width - 1, x + radius);
+      const count = hi - lo + 1;
+      const idx = rowOffset + x * 4;
+      temp[idx] = (pr[hi + 1] - pr[lo]) / count;
+      temp[idx + 1] = (pg[hi + 1] - pg[lo]) / count;
+      temp[idx + 2] = (pb[hi + 1] - pb[lo]) / count;
+      temp[idx + 3] = data[idx + 3];
     }
   }
 
-  data.set(output);
+  // Vertical pass.
+  for (let x = 0; x < width; x++) {
+    // Build prefix sums for this column (3 channels) from temp.
+    const pc = new Uint32Array(height + 1);
+    const pg = new Uint32Array(height + 1);
+    const pb = new Uint32Array(height + 1);
+    for (let y = 0; y < height; y++) {
+      const idx = (y * width + x) * 4;
+      pc[y + 1] = pc[y] + temp[idx];
+      pg[y + 1] = pg[y] + temp[idx + 1];
+      pb[y + 1] = pb[y] + temp[idx + 2];
+    }
+
+    for (let y = 0; y < height; y++) {
+      const lo = Math.max(0, y - radius);
+      const hi = Math.min(height - 1, y + radius);
+      const count = hi - lo + 1;
+      const idx = (y * width + x) * 4;
+      data[idx] = (pc[hi + 1] - pc[lo]) / count;
+      data[idx + 1] = (pg[hi + 1] - pg[lo]) / count;
+      data[idx + 2] = (pb[hi + 1] - pb[lo]) / count;
+    }
+  }
 }

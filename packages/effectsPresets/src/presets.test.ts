@@ -101,9 +101,12 @@ describe("presets", () => {
       expect(resolved.colorMode).toBe("originalColors");
     });
 
-    it("Cyber ASCII defaults to Original Colors", () => {
+    it("Cyber ASCII defaults to 15% intensity, font size 6, and Original Colors", () => {
       const preset = allPresets.find((p) => p.id === "cyberAscii");
+      expect(preset?.defaultIntensity).toBe(15);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.intensity).toBe(15);
+      expect(resolved.fontSize).toBe(6);
       expect(resolved.colorMode).toBe("originalColors");
     });
 

@@ -44,6 +44,13 @@
 - [x] Update preset counts, tests, and docs
 - [x] Run full test/typecheck/lint verification
 
+## Follow-up Fixes (completed)
+
+- [x] Cyber ASCII defaults: 15% intensity, font size 6
+- [x] Optimize `applyBoxBlur` with separable prefix-sum blur to fix Symbol Glow lag
+- [x] Update Cyber ASCII default test
+- [x] Run full test/typecheck/lint/build verification
+
 ## Phase 0 — Audit and Planning
 
 - [x] Inspect repository state
