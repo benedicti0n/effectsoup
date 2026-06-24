@@ -21,7 +21,7 @@ export function UpgradeDialog({ onClose }: { onClose: () => void }): JSX.Element
     setLoading(true);
     setError(null);
     try {
-      const { checkoutUrl } = await createCheckoutSession(session.user.email);
+      const { checkoutUrl } = await createCheckoutSession();
       if (checkoutUrl) {
         window.location.href = checkoutUrl;
       } else {

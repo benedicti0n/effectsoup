@@ -7,6 +7,7 @@ import { CanvasPreview } from "./canvasPreview";
 import { EffectControls } from "./effectControls";
 import { ExportDialog } from "./exportDialog";
 import { PresetGrid } from "./presetGrid";
+import { SaveProjectDialog } from "./saveProjectDialog";
 import { UploadPanel } from "./uploadPanel";
 
 export function EditorShell(): JSX.Element {
@@ -16,6 +17,7 @@ export function EditorShell(): JSX.Element {
   const redo = useEditorStore((state) => state.redo);
   const resetAll = useEditorStore((state) => state.resetAll);
   const [showExport, setShowExport] = useState(false);
+  const [showSave, setShowSave] = useState(false);
 
   return (
     <div className="flex h-screen flex-col bg-charcoal text-neon-cream">
@@ -39,6 +41,13 @@ export function EditorShell(): JSX.Element {
             className="rounded-md border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5"
           >
             Reset
+          </button>
+          <button
+            onClick={() => setShowSave(true)}
+            disabled={!source}
+            className="rounded-md border border-white/10 px-4 py-1.5 text-sm hover:bg-white/5 disabled:opacity-50"
+          >
+            Save
           </button>
           <button
             onClick={() => setShowExport(true)}
@@ -79,6 +88,7 @@ export function EditorShell(): JSX.Element {
       </div>
 
       {showExport && <ExportDialog onClose={() => setShowExport(false)} />}
+      {showSave && <SaveProjectDialog onClose={() => setShowSave(false)} />}
     </div>
   );
 }

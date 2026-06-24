@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { env } from "@/lib/env";
+import { createSignedUploadUrl } from "@/lib/r2";
 import { z } from "zod";
 
 const requestSchema = z.object({
@@ -10,18 +10,9 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request): Promise<Response> {
-  const session = await auth.api.getSession({ headers: new Headers() });
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (
-    !env.R2_ACCOUNT_ID ||
-    !env.R2_ACCESS_KEY_ID ||
-    !env.R2_SECRET_ACCESS_KEY ||
-    !env.R2_BUCKET_NAME
-  ) {
-    return NextResponse.json({ error: "Storage not configured" }, { status: 503 });
   }
 
   let body: unknown;
@@ -37,7 +28,11 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const key = `${session.user.id}/${crypto.randomUUID()}/${parseResult.data.fileName}`;
+  const uploadUrl = await createSignedUploadUrl(key, parseResult.data.contentType);
 
-  // Production: generate a real S3-compatible signed URL using R2 credentials.
-  return NextResponse.json({ key, uploadUrl: null });
+  if (!uploadUrl) {
+    return NextResponse.json({ error: "Storage not configured" }, { status: 503 });
+  }
+
+  return NextResponse.json({ key, uploadUrl });
 }

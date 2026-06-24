@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 const requestSchema = z.object({
-  productId: z.string().min(1),
-  userEmail: z.string().email(),
   successUrl: z.string().url(),
   cancelUrl: z.string().url()
 });
 
 export async function POST(request: Request): Promise<Response> {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (!env.DODO_API_KEY || !env.DODO_PREMIUM_PRODUCT_ID) {
     return NextResponse.json(
       { error: "Billing is not configured" },
@@ -46,7 +50,8 @@ export async function POST(request: Request): Promise<Response> {
         product_cart: [{ product_id: productId, quantity: 1 }],
         return_url: successUrl,
         cancel_url: cancelUrl,
-        customer: { email: parseResult.data.userEmail }
+        customer: { email: session.user.email },
+        metadata: { userId: session.user.id }
       })
     });
 

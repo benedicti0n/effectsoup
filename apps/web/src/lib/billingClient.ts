@@ -1,9 +1,11 @@
-export async function createCheckoutSession(userEmail: string): Promise<{ sessionId: string; checkoutUrl: string | null }> {
+export async function createCheckoutSession(): Promise<{
+  sessionId: string;
+  checkoutUrl: string | null;
+}> {
   const response = await fetch("/api/billing/createCheckout", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      userEmail,
       successUrl: `${window.location.origin}/billing/success`,
       cancelUrl: `${window.location.origin}/billing/cancel`
     })

@@ -1,5 +1,8 @@
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { projects } from "@/lib/schema";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -10,17 +13,36 @@ const createSchema = z.object({
   effectGraphJson: z.string().min(1)
 });
 
-export async function GET(): Promise<Response> {
-  const session = await auth.api.getSession({ headers: new Headers() });
+const PROJECT_LIMIT = 50;
+
+export async function GET(request: Request): Promise<Response> {
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json({ projects: [] });
+  try {
+    const userProjects = await db
+      .select({
+        id: projects.id,
+        title: projects.title,
+        thumbnailKey: projects.thumbnailKey,
+        aspectRatio: projects.aspectRatio,
+        createdAt: projects.createdAt,
+        updatedAt: projects.updatedAt
+      })
+      .from(projects)
+      .where(eq(projects.userId, session.user.id))
+      .orderBy(projects.updatedAt);
+
+    return NextResponse.json({ projects: userProjects });
+  } catch {
+    return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+  }
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const session = await auth.api.getSession({ headers: new Headers() });
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -37,6 +59,28 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  // Production: insert into projects table and enforce Premium + storage cap.
-  return NextResponse.json({ projectId: crypto.randomUUID() });
+  try {
+    const existingCount = await db
+      .select({ count: projects.id })
+      .from(projects)
+      .where(eq(projects.userId, session.user.id));
+
+    if (existingCount.length >= PROJECT_LIMIT) {
+      return NextResponse.json(
+        { error: "Project limit reached" },
+        { status: 400 }
+      );
+    }
+
+    const projectId = crypto.randomUUID();
+    await db.insert(projects).values({
+      id: projectId,
+      userId: session.user.id,
+      ...parseResult.data
+    });
+
+    return NextResponse.json({ projectId });
+  } catch {
+    return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+  }
 }
