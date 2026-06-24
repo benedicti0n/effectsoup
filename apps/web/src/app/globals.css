@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #fdfcfc;
-  --foreground: #201d1d;
+  --background: #ffffff;
+  --foreground: #17171c;
 }
 
 html,
@@ -15,23 +15,47 @@ body {
 
 body {
   font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hairline scrollbar for the cream canvas */
+/* Selection */
+::selection {
+  background-color: rgba(124, 58, 237, 0.15);
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f8f7f7;
+  background: #f2f2f2;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(15, 0, 0, 0.16);
+  background: #d9d9dd;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 0, 0, 0.24);
+  background: #93939f;
+}
+
+/* Focus visible ring */
+*:focus-visible {
+  outline: 2px solid #4c6ee6;
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

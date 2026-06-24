@@ -67,7 +67,7 @@
 
 ## EffectSoup Premium Product Revamp — Cohere Design System
 
-### Phase 1 — Audit & Planning (in progress)
+### Phase 1 — Audit & Planning (completed)
 
 - [x] Install and read Cohere `DESIGN.md`
 - [x] Make Cohere design.md active at project root
@@ -76,7 +76,7 @@
 - [x] Establish baseline test/typecheck/lint/build results
 - [x] Document implementation plan and ask permission to proceed
 
-### Phase 2 — Shared Shell, Tokens, and Primitives (pending)
+### Phase 2 — Shared Shell, Tokens, and Primitives (in progress)
 
 - [ ] Replace Tailwind tokens with Cohere palette (white canvas, ink, deep-green, dark-navy, coral, action-blue)
 - [ ] Configure Cohere typography fallbacks (Space Grotesk / Inter)

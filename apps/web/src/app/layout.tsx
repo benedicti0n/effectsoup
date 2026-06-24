@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "effectLab — Image Effects Studio",
-  description: "Browser-based, non-AI image transformation studio."
+  title: "EffectSoup — Beautiful image effects, made in the browser.",
+  description:
+    "Transform any image with pixel grids, halftones, ASCII art, glowing symbols, cinematic bloom, and graphic print effects — directly in your browser."
 };
 
 export default function RootLayout({
@@ -13,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen bg-canvas text-ink font-mono">
+      <body className="min-h-screen bg-canvas font-body text-ink-primary antialiased">
         {children}
       </body>
     </html>

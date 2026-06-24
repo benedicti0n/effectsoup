@@ -9,65 +9,56 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand
-        ink: "#201d1d",
-        "ink-deep": "#0f0000",
-        charcoal: "#302c2c",
-        body: "#424245",
-        mute: "#646262",
-        stone: "#6e6e73",
-        ash: "#9a9898",
-        canvas: "#fdfcfc",
-        "surface-soft": "#f8f7f7",
-        "surface-card": "#f1eeee",
-        "surface-dark": "#201d1d",
-        "surface-dark-elevated": "#302c2c",
-        hairline: "rgba(15,0,0,0.12)",
-        "hairline-strong": "#646262",
-        "on-dark": "#fdfcfc",
-        "on-dark-mute": "#9a9898",
-        // Semantic
-        accent: "#007aff",
-        "accent-hover": "#0056b3",
-        "accent-active": "#004085",
-        warning: "#ff9f0a",
-        "warning-hover": "#cc7f08",
-        "warning-active": "#995f06",
-        danger: "#ff3b30",
-        "danger-hover": "#d70015",
-        "danger-active": "#a50011",
-        success: "#30d158",
-        // Legacy neon aliases (kept for gradual migration)
-        neon: {
-          pink: "#ff006e",
-          blue: "#3b82f6",
-          lavender: "#c084fc",
-          lime: "#a3e635",
-          cream: "#f5f5dc"
+        // Cohere brand
+        "cohere-black": "#000000",
+        ink: "#212121",
+        "ink-primary": "#17171c",
+        "deep-green": "#003c33",
+        "dark-navy": "#071829",
+        canvas: "#ffffff",
+        "soft-stone": "#eeece7",
+        "pale-green": "#edfce9",
+        "pale-blue": "#f1f5ff",
+        hairline: "#d9d9dd",
+        "border-light": "#e5e7eb",
+        "card-border": "#f2f2f2",
+        muted: "#93939f",
+        slate: "#75758a",
+        "body-muted": "#616161",
+        "action-blue": "#1863dc",
+        "focus-blue": "#4c6ee6",
+        coral: "#ff7759",
+        "coral-soft": "#ffad9b",
+        "form-focus": "#9b60aa",
+        "on-primary": "#ffffff",
+        "on-dark": "#ffffff",
+        error: "#b30000",
+        // Product accent (EffectSoup purple/pink, used sparingly)
+        accent: {
+          DEFAULT: "#7c3aed",
+          hover: "#6d28d9",
+          muted: "#f3e8ff"
         }
       },
       fontFamily: {
-        // Berkeley Mono is the design intent; JetBrains Mono is the open-source substitute.
-        mono: [
-          "Berkeley Mono",
-          "JetBrains Mono",
-          "IBM Plex Mono",
-          "ui-monospace",
-          "SFMono-Regular",
-          "Menlo",
-          "Monaco",
-          "Consolas",
-          "Liberation Mono",
-          "Courier New",
-          "monospace"
-        ],
-        sans: ["JetBrains Mono", "IBM Plex Mono", "ui-monospace", "monospace"]
+        display: ["Space Grotesk", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        body: ["Inter", "Arial", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"]
       },
       borderRadius: {
-        sm: "4px"
+        xs: "4px",
+        sm: "8px",
+        md: "16px",
+        lg: "22px",
+        xl: "30px",
+        pill: "32px"
       },
       spacing: {
-        section: "96px"
+        section: "80px",
+        "section-lg": "120px"
+      },
+      maxWidth: {
+        "container": "1280px"
       }
     }
   },

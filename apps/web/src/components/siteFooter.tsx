@@ -5,28 +5,34 @@ import type { JSX } from "react";
 
 export function SiteFooter(): JSX.Element {
   const links = [
-    { href: "https://github.com", label: "GitHub" },
-    { href: "/editor", label: "Editor" },
-    { href: "/account", label: "Account" }
+    { href: "/playground", label: "Playground" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/docs", label: "Docs" },
+    { href: "/account", label: "Account" },
+    { href: "https://github.com", label: "GitHub" }
   ];
 
   return (
     <footer className="border-t border-hairline bg-canvas">
-      <div className="mx-auto max-w-5xl px-4 py-8">
-        <div className="grid gap-px bg-hairline sm:grid-cols-3">
-          {links.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="flex h-12 items-center justify-center bg-canvas font-mono text-sm text-mute hover:text-ink"
-            >
-              {link.label}
-            </Link>
-          ))}
+      <div className="mx-auto max-w-container px-4 py-12 lg:px-8">
+        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+          <Link href="/" className="font-display text-lg font-medium tracking-tight text-ink-primary">
+            EffectSoup
+          </Link>
+          <nav className="flex flex-wrap gap-6">
+            {links.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-sm text-body-muted hover:text-ink transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-hairline pt-6 text-sm text-mute sm:flex-row">
-          <span className="font-mono">&copy; 2026 effectLab</span>
-          <span className="font-mono">No AI. Your image stays on your device.</span>
+        <div className="mt-8 border-t border-hairline pt-8 text-sm text-muted">
+          &copy; {new Date().getFullYear()} EffectSoup. Beautiful image effects, made in the browser.
         </div>
       </div>
     </footer>
