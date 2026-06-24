@@ -16,6 +16,20 @@
 - [x] Update `Features.md` catalog and matrix
 - [x] Update preset unit tests for new counts
 
+## Effect Defaults & Controls Follow-up (completed)
+
+- [x] Tune default intensities for Pixel Grid, Dot Halftone, and Manga Grid
+- [x] Add dense ordered ramp and charset presets to Classic ASCII
+- [x] Add original/monochrome/tint color modes to Classic ASCII
+- [x] Add custom character array control and `text` schema type
+- [x] Switch Cyber ASCII default to original colors and add tint presets
+- [x] Add Symbol Glow premium preset with palettes and custom symbols
+- [x] Build EditableSlider with double-click numeric editing
+- [x] Wire EditableSlider to intensity, advanced controls, and crop controls
+- [x] Add EditableSlider component tests and Symbol Glow determinism tests
+- [x] Update `Features.md`, `todo.md`, `architecture.md`, and audit doc
+- [x] Run full test/typecheck/lint/build verification
+
 ## Phase 0 — Audit and Planning
 
 - [x] Inspect repository state
@@ -137,12 +151,12 @@
 
 ## Phase 8 — Quality and Release Readiness
 
-- [ ] Run all unit tests
-- [ ] Run type checks
-- [ ] Run lint
-- [ ] Run production build
+- [x] Run all unit tests
+- [x] Run type checks
+- [x] Run lint
+- [x] Run production build
 - [ ] Run Playwright tests
 - [ ] Run backend load test (k6 / Artillery)
 - [ ] Resolve known issues
-- [ ] Update docs and todo status
+- [x] Update docs and todo status
 - [ ] Provide release-readiness report

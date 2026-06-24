@@ -68,13 +68,41 @@ Current categories are loosely grouped. Proposed categories:
 - `blueNoirDither` — monochrome blue dither is too niche and hard to tune.
 - `cloudPrint` — dreamy blur competes with Dream Glow without adding clarity.
 
+## Follow-up Quality Pass Findings
+
+### Effect Defaults
+- Default intensity values were re-tuned so presets open at a usable starting point instead of a washed-out or over-cooked state:
+  - Pixel Grid: 5%
+  - Dot Halftone: 21% with source-colored dots, CMYK palette, dot spacing 6
+  - Manga Grid: 5% with 4 poster levels, 25 edge emphasis, 20 grid opacity
+
+### Classic ASCII
+- Default color mode changed to `originalColors` so faces and textures keep their identity.
+- Added dense ordered character ramp (`$@B%8&WM#*oahkbdpqwmZ0OQLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^\`'. `).
+- Added Character Set presets (dense, standard, technical, blocks, minimal, custom) and a Custom Character Array input.
+- Added Color Mode selector: original colors, monochrome, or tint.
+
+### Cyber ASCII
+- Default color mode changed to `originalColors`.
+- Added Color Mode selector and Tint Presets (terminal green, electric cyan, amber CRT, violet code).
+
+### Symbol Glow
+- New premium preset in ASCII & Symbols.
+- Builds a blurred base layer, renders transparent glyphs on top, then composites a soft colored glow using per-pixel alpha blending.
+- Supports multiple symbol sets and color palettes plus a custom-symbol mode.
+
+### Editable Slider
+- Every numeric slider (intensity, advanced controls, crop controls) supports double-click-to-edit.
+- Values clamp to the valid range, snap to step, and accept `%` suffix.
+
 ## Action Items
 
 1. Refactor `packages/effectsCore/src/ascii.ts` with 5x7 font and dense ramp.
 2. Refactor `packages/effectsCore/src/halftone.ts` to support colored dots.
 3. Refactor `packages/effectsCore/src/color.ts` utilities for safer brightness/contrast that preserves 0% intensity identity.
 4. Rewrite affected presets in `freePresets.ts` and `premiumPresets.ts`.
-5. Add `luminousAsciiBloom` preset.
+5. Add `luminousAsciiBloom` and `symbolGlow` presets.
 6. Remove weak presets from registry and update `Features.md`.
 7. Add Replace Image / Remove Image actions in the editor header.
-8. Update tests and run full verification.
+8. Add EditableSlider with double-click numeric editing to all sliders.
+9. Update tests and run full verification.

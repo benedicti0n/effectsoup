@@ -33,6 +33,11 @@ effectLab/
 
 This package owns UI, routing, auth, billing, storage orchestration, and project metadata. It must never contain pixel-processing algorithms.
 
+### Editor UI Components
+
+- `EditableSlider` — reusable slider with double-click numeric editing; used for intensity, advanced range controls, and crop controls. Values clamp to min/max and snap to step.
+- `AdvancedControls` — renders per-preset control schema definitions including range, select, boolean, color, and `text` (custom character arrays).
+
 ### `packages/effectsCore`
 
 Pure TypeScript library. No framework dependencies. No DOM APIs. Portable raw pixel structure:
@@ -45,7 +50,7 @@ export type PixelBuffer = {
 };
 ```
 
-Contains deterministic image-processing primitives such as resize, grayscale, dither, halftone, ASCII rendering, grid overlay, glow/bloom, noise, grain, vignette, RGB shift, scanlines, edge detection, and blending.
+Contains deterministic image-processing primitives such as resize, grayscale, dither, halftone, ASCII rendering with custom charsets and palettes, grid overlay, glow/bloom, noise, grain, vignette, RGB shift, scanlines, edge detection, and blending.
 
 ### `packages/effectsPresets`
 

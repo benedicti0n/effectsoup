@@ -56,6 +56,7 @@ Presets are grouped into three visual families:
 |----|------|----------|-----------------|
 | `cyberAscii` | Cyber ASCII | ASCII & Symbols | technical glyph set, colored glyphs, scanline grid, glow |
 | `luminousAsciiBloom` | Luminous ASCII Bloom | ASCII & Symbols | source-colored ASCII, thresholded bloom |
+| `symbolGlow` | Symbol Glow | ASCII & Symbols | blurred base + transparent glyph layer + soft glow |
 | `crtDream` | CRT Dream | Atmosphere & Glow | pixel grid, scanlines, bloom, RGB shift, vignette |
 | `vhsBloom` | VHS Bloom | Atmosphere & Glow | chromatic aberration, haze, noise, bloom |
 | `risoOffset` | Riso Offset | Print & Grid | duotone, channel offset, grain, registration shift |
@@ -87,6 +88,7 @@ Premium effects are previewable by free users; premium export and full advanced 
 - Pan and zoom inside crop frame
 - Preset grid with free/premium labels
 - Primary Intensity slider (0–100) per preset
+- Double-click any slider value to type a precise number
 - Before/after compare
 - Undo/redo of configuration changes
 - Reset effect / reset all edits
