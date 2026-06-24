@@ -3,13 +3,13 @@ import { allPresets, freePresets, premiumPresets } from "./index.js";
 import { createPixelBuffer } from "@imageeffects/core";
 
 describe("presets", () => {
-  it("has 13 presets total", () => {
-    expect(allPresets.length).toBe(13);
+  it("has 14 presets total", () => {
+    expect(allPresets.length).toBe(14);
   });
 
-  it("has 7 free and 6 premium presets", () => {
+  it("has 7 free and 7 premium presets", () => {
     expect(freePresets.length).toBe(7);
-    expect(premiumPresets.length).toBe(6);
+    expect(premiumPresets.length).toBe(7);
   });
 
   it("every preset resolves valid defaults", () => {
@@ -97,6 +97,13 @@ describe("presets", () => {
       expect(resolved.colorMode).toBe("tint");
       expect(resolved.tintPreset).toBe("terminalGreen");
       expect(resolved.tintColor).toBe("#00FF88");
+    });
+
+    it("Symbol Glow appears in the registry under ASCII & Symbols", () => {
+      const preset = allPresets.find((p) => p.id === "symbolGlow");
+      expect(preset).toBeDefined();
+      expect(preset!.category).toBe("asciiSymbols");
+      expect(preset!.defaultIntensity).toBe(40);
     });
   });
 });

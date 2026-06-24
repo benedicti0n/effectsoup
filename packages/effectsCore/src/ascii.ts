@@ -112,6 +112,8 @@ export type AsciiOptions = {
   colorMode?: AsciiColorMode;
   spacing?: number;
   backgroundBlur?: number;
+  palette?: RgbaColor[];
+  invertLuminance?: boolean;
 };
 
 function averageCellColor(
@@ -142,6 +144,22 @@ function averageCellColor(
   return [r / count, g / count, b / count, a / count];
 }
 
+function nearestPaletteColor(color: RgbaColor, palette: RgbaColor[]): RgbaColor {
+  let best = palette[0] ?? color;
+  let bestDist = Infinity;
+  for (const candidate of palette) {
+    const dr = color[0] - candidate[0];
+    const dg = color[1] - candidate[1];
+    const db = color[2] - candidate[2];
+    const dist = dr * dr + dg * dg + db * db;
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = candidate;
+    }
+  }
+  return best;
+}
+
 /**
  * Render ASCII art from a source buffer.
  * Returns a new PixelBuffer at the source dimensions.
@@ -162,7 +180,9 @@ export function renderAscii(
     backgroundColor,
     charset = DEFAULT_CHARSET,
     spacing = 0,
-    colorMode = "monochrome"
+    colorMode = "monochrome",
+    palette,
+    invertLuminance = false
   } = options;
 
   if (fontSize <= 0) {
@@ -190,11 +210,14 @@ export function renderAscii(
   for (let gy = 0; gy < rows; gy++) {
     for (let gx = 0; gx < cols; gx++) {
       const idx = (gy * smallWidth + gx) * 4;
-      const luminance =
+      let luminance =
         (0.299 * small.data[idx] +
           0.587 * small.data[idx + 1] +
           0.114 * small.data[idx + 2]) /
         255;
+      if (invertLuminance) {
+        luminance = 1 - luminance;
+      }
       const charIndex = Math.max(
         0,
         Math.min(charset.length - 1, Math.floor(luminance * (charset.length - 1)))
@@ -213,7 +236,10 @@ export function renderAscii(
 
       let glyphColor = inkColor;
       if (colorMode === "source" || colorMode === "color") {
-        const avg = averageCellColor(source, cellX, cellY, cellWidth, cellHeight);
+        let avg = averageCellColor(source, cellX, cellY, cellWidth, cellHeight);
+        if (palette && palette.length > 0) {
+          avg = nearestPaletteColor(avg, palette);
+        }
         if (colorMode === "source") {
           glyphColor = avg;
         } else {

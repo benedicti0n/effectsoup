@@ -13,7 +13,10 @@ import {
   applyRgbShift,
   applyScanlines,
   applyVignette,
+  clampByte,
   clonePixelBuffer,
+  createPixelBuffer,
+  normalizeCustomCharset,
   reducePalette,
   renderAscii,
   resizeNearestNeighbor,
@@ -56,6 +59,45 @@ const CYBER_TINT_PRESETS: Record<string, string> = {
   electricCyan: "#00f0ff",
   amberCrt: "#FFB000",
   violetCode: "#B388FF"
+};
+
+const SYMBOL_SETS: Record<string, string> = {
+  bloomSymbols: "2*+=/.e",
+  softMath: "+-*/=∞∑√",
+  technical: "01/\\|<>[]{}",
+  minimal: "·•"
+};
+
+const SYMBOL_GLOW_PALETTES: Record<string, RgbaColor[]> = {
+  skyPeach: [
+    [135, 206, 235, 255],
+    [255, 218, 185, 255],
+    [255, 160, 122, 255],
+    [255, 105, 180, 255],
+    [255, 255, 224, 255]
+  ],
+  moonlight: [
+    [192, 192, 192, 255],
+    [70, 130, 180, 255],
+    [138, 43, 226, 255],
+    [25, 25, 112, 255]
+  ],
+  roseAura: [
+    [255, 192, 203, 255],
+    [255, 20, 147, 255],
+    [255, 250, 240, 255]
+  ],
+  goldenBloom: [
+    [255, 215, 0, 255],
+    [255, 140, 0, 255],
+    [255, 248, 220, 255]
+  ],
+  indigoMist: [
+    [75, 0, 130, 255],
+    [65, 105, 225, 255],
+    [230, 230, 250, 255]
+  ],
+  originalColorGlow: []
 };
 
 const cyberAsciiPreset: EffectPreset = {
@@ -133,6 +175,130 @@ const cyberAsciiPreset: EffectPreset = {
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);
       }
+      return result;
+    };
+  }
+};
+
+const symbolGlowPreset: EffectPreset = {
+  id: "symbolGlow",
+  name: "Symbol Glow",
+  description: "Glowing symbols over a dreamy blurred image.",
+  category: "asciiSymbols",
+  access: "premium",
+  defaultIntensity: 40,
+  advancedControlSchema: [
+    ...universalAdvancedControls,
+    { id: "glyphDensity", name: "Glyph Density", type: "range", min: 4, max: 64, step: 1, defaultValue: 24 },
+    { id: "glyphScale", name: "Glyph Scale", type: "range", min: 6, max: 48, step: 1, defaultValue: 18 },
+    { id: "blurAmount", name: "Blur Amount", type: "range", min: 0, max: 24, step: 1, defaultValue: 8 },
+    { id: "glowStrength", name: "Glow Strength", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 },
+    { id: "baseOpacity", name: "Base Image Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 70 },
+    { id: "symbolSet", name: "Symbol Set", type: "select", options: ["bloomSymbols", "softMath", "technical", "minimal", "custom"], defaultValue: "bloomSymbols" },
+    { id: "customSymbols", name: "Custom Symbols", type: "text", defaultValue: "" },
+    { id: "colorMode", name: "Color Mode", type: "select", options: ["softSourceGlow", "monochrome", "palette"], defaultValue: "softSourceGlow" },
+    { id: "palette", name: "Palette", type: "select", options: ["skyPeach", "moonlight", "roseAura", "goldenBloom", "indigoMist", "originalColorGlow"], defaultValue: "skyPeach" },
+    { id: "glyphColor", name: "Glyph Color", type: "color", defaultValue: "#FFF8E7" },
+    { id: "backgroundTint", name: "Background Tint", type: "color", defaultValue: "#0A1628" },
+    { id: "invertLuminance", name: "Invert Luminance", type: "boolean", defaultValue: false }
+  ],
+  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
+    intensity,
+    advancedOverrides: overrides,
+    glyphDensity: resolveOverride(overrides, "glyphDensity", 4 + Math.round((intensity / 100) * 60)),
+    glyphScale: resolveOverride(overrides, "glyphScale", 6 + Math.round((intensity / 100) * 42)),
+    blurAmount: resolveOverride(overrides, "blurAmount", Math.round((intensity / 100) * 20)),
+    glowStrength: resolveOverride(overrides, "glowStrength", Math.round((intensity / 100) * 100)),
+    baseOpacity: resolveOverride(overrides, "baseOpacity", 70),
+    symbolSet: resolveOverride(overrides, "symbolSet", "bloomSymbols"),
+    customSymbols: resolveOverride(overrides, "customSymbols", ""),
+    colorMode: resolveOverride(overrides, "colorMode", "softSourceGlow"),
+    palette: resolveOverride(overrides, "palette", "skyPeach"),
+    glyphColor: resolveOverride(overrides, "glyphColor", "#FFF8E7"),
+    backgroundTint: resolveOverride(overrides, "backgroundTint", "#0A1628"),
+    invertLuminance: resolveOverride(overrides, "invertLuminance", false)
+  }),
+  createPipeline: (params): EffectPipeline => {
+    return (source: PixelBuffer) => {
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
+      const glyphDensity = (params.glyphDensity as number) ?? 24;
+      const glyphScale = (params.glyphScale as number) ?? 18;
+      const blurAmount = (params.blurAmount as number) ?? 8;
+      const glowStrength = ((params.glowStrength as number) ?? 0) / 100;
+      const baseOpacity = ((params.baseOpacity as number) ?? 70) / 100;
+      const symbolSet = (params.symbolSet as string) ?? "bloomSymbols";
+      const customSymbols = (params.customSymbols as string) ?? "";
+      const colorMode = (params.colorMode as string) ?? "softSourceGlow";
+      const paletteName = (params.palette as string) ?? "skyPeach";
+      const glyphColor = hexToRgba((params.glyphColor as string) ?? "#FFF8E7");
+      const backgroundTint = hexToRgba((params.backgroundTint as string) ?? "#0A1628");
+      const invertLuminance = (params.invertLuminance as boolean) ?? false;
+      const symbolOpacity = (params.intensity as number) / 100;
+
+      let charset = SYMBOL_SETS[symbolSet] ?? SYMBOL_SETS.bloomSymbols;
+      if (symbolSet === "custom") {
+        charset = normalizeCustomCharset(customSymbols, SYMBOL_SETS.bloomSymbols);
+      }
+
+      const palette = SYMBOL_GLOW_PALETTES[paletteName] ?? SYMBOL_GLOW_PALETTES.skyPeach;
+      const renderColorMode: "monochrome" | "color" | "source" =
+        colorMode === "monochrome" ? "monochrome" : "color";
+      const renderInkColor = glyphColor;
+
+      // Glyph density sets the grid; glyph scale scales the rendered symbol size.
+      const baseFontSize = source.width / Math.max(4, glyphDensity);
+      const fontSize = Math.max(6, Math.min(48, baseFontSize * (glyphScale / 18)));
+
+      // Dreamy blurred base.
+      const blurredBase = clonePixelBuffer(source);
+      applyBoxBlur(blurredBase, blurAmount);
+
+      // Start with background tint, then blend the blurred photo on top.
+      const result = createPixelBuffer(source.width, source.height, backgroundTint);
+      for (let i = 0; i < result.data.length; i += 4) {
+        for (let c = 0; c < 3; c++) {
+          result.data[i + c] = clampByte(
+            result.data[i + c] * (1 - baseOpacity) + blurredBase.data[i + c] * baseOpacity
+          );
+        }
+        result.data[i + 3] = 255;
+      }
+
+      // Render symbols on a transparent background.
+      const symbolLayer = renderAscii(source, {
+        fontSize,
+        inkColor: renderInkColor,
+        backgroundColor: [0, 0, 0, 0],
+        charset,
+        colorMode: renderColorMode,
+        palette: palette.length > 0 ? palette : undefined,
+        invertLuminance
+      });
+
+      // Apply soft glow around the symbol layer.
+      if (glowStrength > 0) {
+        applyGlow(symbolLayer, {
+          radius: Math.max(1, Math.round(glowStrength * 12)),
+          amount: glowStrength * 0.6,
+          mode: "screen",
+          color: glyphColor
+        });
+      }
+
+      // Composite glowing symbols over the dreamy base.
+      for (let i = 0; i < result.data.length; i += 4) {
+        const alpha = symbolLayer.data[i + 3] / 255;
+        if (alpha > 0) {
+          const blend = alpha * symbolOpacity;
+          for (let c = 0; c < 3; c++) {
+            result.data[i + c] = clampByte(
+              result.data[i + c] * (1 - blend) + symbolLayer.data[i + c] * blend
+            );
+          }
+        }
+      }
+
       return result;
     };
   }
@@ -412,6 +578,7 @@ const mangaGridPreset: EffectPreset = {
 export const premiumPresets: EffectPreset[] = [
   cyberAsciiPreset,
   luminousAsciiBloomPreset,
+  symbolGlowPreset,
   crtDreamPreset,
   vhsBloomPreset,
   risoOffsetPreset,

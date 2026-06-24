@@ -18,9 +18,12 @@ export function AdvancedControls(): JSX.Element {
   }
 
   const isVisible = (control: AdvancedControlDefinition): boolean => {
-    // Hide custom charset input unless Character Set is "custom".
+    // Hide custom charset/symbols inputs unless the corresponding set is "custom".
     if (control.id === "customCharset") {
       return resolvedValues.characterSet === "custom";
+    }
+    if (control.id === "customSymbols") {
+      return resolvedValues.symbolSet === "custom";
     }
     // Hide tint controls unless Color Mode is "tint".
     if (control.id === "tintColor" || control.id === "tintPreset") {
@@ -29,6 +32,14 @@ export function AdvancedControls(): JSX.Element {
     // Hide ink color unless Color Mode is "monochrome".
     if (control.id === "inkColor") {
       return resolvedValues.colorMode === "monochrome";
+    }
+    // Symbol Glow: palette picker only matters in palette mode.
+    if (control.id === "palette") {
+      return resolvedValues.colorMode === "palette";
+    }
+    // Symbol Glow: glyph color is the symbol tint in non-palette modes.
+    if (control.id === "glyphColor") {
+      return resolvedValues.colorMode !== "palette";
     }
     // Hide accent color unless Cyber ASCII tint mode is active.
     if (control.id === "accentColor") {
