@@ -99,13 +99,13 @@
 - [x] Build creators/developers split section with npm package block (coming soon)
 - [x] Build three-step "How It Works" section
 
-### Phase 5 — Pricing + Docs Shell (in progress)
+### Phase 5 — Pricing + Docs Shell (completed)
 
-- [ ] Build `/pricing` with Free/Pro tiers and FAQ
-- [ ] Wire pricing CTAs to existing Dodo checkout or show disabled/coming-soon state
-- [ ] Build `/docs` page shell with navigation cards and placeholder state
+- [x] Build `/pricing` with Free/Pro tiers and FAQ
+- [x] Wire pricing CTAs to existing Dodo checkout or show disabled/coming-soon state
+- [x] Build `/docs` page shell with navigation cards and placeholder state
 
-### Phase 6 — Playground Revamp (pending)
+### Phase 6 — Playground Revamp (in progress)
 
 - [ ] Create `/playground` route (or revamp `/editor`) with Cohere three-column workspace
 - [ ] Revamp effect library sidebar with categories, search, premium badges
