@@ -85,14 +85,14 @@
 - [x] Add `public/assets/showcase/` and generate 12 demo images (`img1.png`–`img12.png`)
 - [x] Update `layout.tsx` and global styles
 
-### Phase 3 — Homepage + Mini Playground (in progress)
+### Phase 3 — Homepage + Mini Playground (completed)
 
-- [ ] Build `/` hero with eyebrow, headline, CTAs, trust row
-- [ ] Add interactive mini-playground with demo image selector, curated effect chips, intensity slider, upload
-- [ ] Link mini-playground state to full `/playground`
-- [ ] Implement lazy loading of effect renderer on homepage
+- [x] Build `/` hero with eyebrow, headline, CTAs, trust row
+- [x] Add interactive mini-playground with demo image selector, curated effect chips, intensity slider, upload
+- [x] Link mini-playground state to full `/playground`
+- [x] Implement lazy loading of effect renderer on homepage
 
-### Phase 4 — Showcase, Categories, npm Section (pending)
+### Phase 4 — Showcase, Categories, npm Section (in progress)
 
 - [ ] Build effect showcase section with 8–12 curated effect cards
 - [ ] Build three category cards (Print & Grid, ASCII & Symbols, Atmosphere & Glow)
