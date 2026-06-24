@@ -65,6 +65,63 @@
 - [x] Note effectLab adaptation in `DESIGN.md`
 - [x] Run full test/typecheck/lint/build verification
 
+## EffectSoup Premium Product Revamp — Cohere Design System
+
+### Phase 1 — Audit & Planning (in progress)
+
+- [x] Install and read Cohere `DESIGN.md`
+- [x] Make Cohere design.md active at project root
+- [x] Audit existing routes, components, design tokens, and effect registry
+- [x] Read `Features.md`, `README.md`, `architecture.md`, `todo.md`
+- [x] Establish baseline test/typecheck/lint/build results
+- [x] Document implementation plan and ask permission to proceed
+
+### Phase 2 — Shared Shell, Tokens, and Primitives (pending)
+
+- [ ] Replace Tailwind tokens with Cohere palette (white canvas, ink, deep-green, dark-navy, coral, action-blue)
+- [ ] Configure Cohere typography fallbacks (Space Grotesk / Inter)
+- [ ] Create reusable primitives: Button, Card, Badge, Pill, Input, Slider, Dialog, Toast
+- [ ] Build new `SiteHeader` and `SiteFooter` with Cohere nav structure
+- [ ] Add `public/assets/showcase/` and generate 12 demo images (`img1.png`–`img12.png`)
+- [ ] Update `layout.tsx` and global styles
+
+### Phase 3 — Homepage + Mini Playground (pending)
+
+- [ ] Build `/` hero with eyebrow, headline, CTAs, trust row
+- [ ] Add interactive mini-playground with demo image selector, curated effect chips, intensity slider, upload
+- [ ] Link mini-playground state to full `/playground`
+- [ ] Implement lazy loading of effect renderer on homepage
+
+### Phase 4 — Showcase, Categories, npm Section (pending)
+
+- [ ] Build effect showcase section with 8–12 curated effect cards
+- [ ] Build three category cards (Print & Grid, ASCII & Symbols, Atmosphere & Glow)
+- [ ] Build creators/developers split section with npm package block (coming soon)
+- [ ] Build three-step "How It Works" section
+
+### Phase 5 — Pricing + Docs Shell (pending)
+
+- [ ] Build `/pricing` with Free/Pro tiers and FAQ
+- [ ] Wire pricing CTAs to existing Dodo checkout or show disabled/coming-soon state
+- [ ] Build `/docs` page shell with navigation cards and placeholder state
+
+### Phase 6 — Playground Revamp (pending)
+
+- [ ] Create `/playground` route (or revamp `/editor`) with Cohere three-column workspace
+- [ ] Revamp effect library sidebar with categories, search, premium badges
+- [ ] Revamp canvas workspace with centered preview, toolbar, upload empty state
+- [ ] Revamp controls inspector with intensity, crop, color, advanced sections
+- [ ] Implement responsive mobile layout (bottom sheet / collapsible panels)
+
+### Phase 7 — Polish, Accessibility, Tests, Docs (pending)
+
+- [ ] Add hover/focus states, reduced-motion support, subtle transitions
+- [ ] Add toasts for export/save feedback
+- [ ] Responsive QA across breakpoints
+- [ ] Update tests for changed UI behavior
+- [ ] Update `Features.md`, `README.md`, `architecture.md`, `DESIGN.md`
+- [ ] Run full test/typecheck/lint/build verification
+
 ## Phase 0 — Audit and Planning
 
 - [x] Inspect repository state
