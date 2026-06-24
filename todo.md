@@ -113,14 +113,14 @@
 - [x] Revamp controls inspector with intensity, crop, color, advanced sections
 - [x] Implement responsive mobile layout (collapsible library)
 
-### Phase 7 — Polish, Accessibility, Tests, Docs (in progress)
+### Phase 7 — Polish, Accessibility, Tests, Docs (completed)
 
-- [ ] Add hover/focus states, reduced-motion support, subtle transitions
-- [ ] Add toasts for export/save feedback
-- [ ] Responsive QA across breakpoints
-- [ ] Update tests for changed UI behavior
-- [ ] Update `Features.md`, `README.md`, `architecture.md`, `DESIGN.md`
-- [ ] Run full test/typecheck/lint/build verification
+- [x] Add hover/focus states, reduced-motion support, subtle transitions
+- [x] Add toasts for export/save feedback
+- [x] Responsive QA across breakpoints
+- [x] Update tests for changed UI behavior
+- [x] Update `Features.md`, `README.md`, `architecture.md`, `DESIGN.md`
+- [x] Run full test/typecheck/lint/build verification
 
 ## Phase 0 — Audit and Planning
 
