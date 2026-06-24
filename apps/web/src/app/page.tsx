@@ -2,6 +2,10 @@ import type { JSX } from "react";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { MiniPlayground } from "@/components/home/miniPlayground";
+import { EffectShowcase } from "@/components/home/effectShowcase";
+import { CategoryCards } from "@/components/home/categoryCards";
+import { HowItWorks } from "@/components/home/howItWorks";
+import { CreatorsDevelopers } from "@/components/home/creatorsDevelopers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -116,6 +120,10 @@ export default function HomePage(): JSX.Element {
       <main className="flex-1">
         <Hero />
         <Features />
+        <EffectShowcase />
+        <CategoryCards />
+        <HowItWorks />
+        <CreatorsDevelopers />
       </main>
       <SiteFooter />
     </div>
