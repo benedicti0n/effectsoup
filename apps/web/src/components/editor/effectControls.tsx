@@ -1,14 +1,18 @@
 "use client";
 
 import type { JSX } from "react";
+import { useState } from "react";
 import { getPresetById } from "@imageeffects/presets";
 import { useEditorStore } from "@/store/editorStore";
+import { AdvancedControls } from "./advancedControls";
+import { CropControls } from "./cropControls";
 
 export function EffectControls(): JSX.Element {
   const effect = useEditorStore((state) => state.effect);
   const setIntensity = useEditorStore((state) => state.setIntensity);
   const snapshotHistory = useEditorStore((state) => state.snapshotHistory);
   const resetEffect = useEditorStore((state) => state.resetEffect);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const preset = getPresetById(effect.presetId);
   const presetName = preset?.name ?? effect.presetId;
@@ -40,11 +44,17 @@ export function EffectControls(): JSX.Element {
         <div className="mt-1 text-right font-mono text-xs text-white/50">{effect.intensity}%</div>
       </div>
 
-      <div className="rounded-lg border border-white/10 bg-ink p-4">
-        <p className="text-xs text-white/50">
-          Advanced controls and export options will appear here as the editor evolves.
-        </p>
-      </div>
+      <button
+        onClick={() => setShowAdvanced((s) => !s)}
+        className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-surface px-4 py-2 text-sm hover:bg-white/5"
+      >
+        <span>Advanced Controls</span>
+        <span className="text-white/50">{showAdvanced ? "−" : "+"}</span>
+      </button>
+
+      <CropControls />
+
+      {showAdvanced && <AdvancedControls />}
     </div>
   );
 }

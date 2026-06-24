@@ -1,9 +1,11 @@
 "use client";
 
 import type { JSX } from "react";
+import { useState } from "react";
 import { useEditorStore } from "@/store/editorStore";
 import { CanvasPreview } from "./canvasPreview";
 import { EffectControls } from "./effectControls";
+import { ExportDialog } from "./exportDialog";
 import { PresetGrid } from "./presetGrid";
 import { UploadPanel } from "./uploadPanel";
 
@@ -13,6 +15,7 @@ export function EditorShell(): JSX.Element {
   const undo = useEditorStore((state) => state.undo);
   const redo = useEditorStore((state) => state.redo);
   const resetAll = useEditorStore((state) => state.resetAll);
+  const [showExport, setShowExport] = useState(false);
 
   return (
     <div className="flex h-screen flex-col bg-charcoal text-neon-cream">
@@ -36,6 +39,13 @@ export function EditorShell(): JSX.Element {
             className="rounded-md border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5"
           >
             Reset
+          </button>
+          <button
+            onClick={() => setShowExport(true)}
+            disabled={!source}
+            className="rounded-md bg-neon-pink px-4 py-1.5 text-sm font-semibold text-white hover:bg-neon-pink/90 disabled:opacity-50"
+          >
+            Export
           </button>
         </div>
       </header>
@@ -67,6 +77,8 @@ export function EditorShell(): JSX.Element {
       <div className="border-t border-white/10 p-4 md:hidden">
         <PresetGrid />
       </div>
+
+      {showExport && <ExportDialog onClose={() => setShowExport(false)} />}
     </div>
   );
 }
