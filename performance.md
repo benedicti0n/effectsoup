@@ -53,15 +53,14 @@ Use transferable objects to move large buffers between main thread and worker wi
 
 ## Automatic Quality Adaptation
 
-A lightweight `QualityManager` observes render duration:
+Implemented in `apps/web/src/hooks/useAdaptiveQuality.ts`:
 
-- Maintains a rolling average of recent render times.
-- If average exceeds 2× budget for 3 consecutive frames:
-  - Reduce preview longest side by one step (e.g., 1400 → 1050).
-  - Reduce expensive quality knobs (e.g., dither iterations, ASCII density).
-- If average stays below 0.5× budget for 5 frames:
-  - Optionally restore one quality step.
+- Observes each preview render duration against a 300 ms budget.
+- If 3 consecutive frames exceed the budget, reduces preview scale one step:
+  - `1.0 → 0.75 → 0.5 → 0.35`
+- If 5 consecutive frames stay below budget, restores one scale step.
 - Display no intrusive warning; keep UI responsive.
+- Final export always uses original or requested resolution.
 
 ## Browser Profiling Checklist
 
@@ -87,8 +86,16 @@ pnpm build
 # Playwright e2e
 pnpm test:e2e
 
-# Load test backend
-pnpm loadtest
+# Load test backend (requires k6)
+k6 run performance/loadtest.js
+```
+
+## Load Test
+
+`performance/loadtest.js` simulates up to 1,000 virtual users hitting `/api/me/entitlements`. The backend intentionally does no image processing; this validates entitlement-read scalability. Run after `pnpm dev`:
+
+```bash
+k6 run performance/loadtest.js
 ```
 
 ## Rollout Metrics to Monitor

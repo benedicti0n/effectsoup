@@ -82,7 +82,8 @@ pnpm build        # Production build
 pnpm typecheck    # Type check all packages
 pnpm lint         # Lint all packages
 pnpm test         # Run unit tests
-pnpm test:e2e     # Run Playwright tests
+pnpm test:e2e     # Run Playwright tests (requires dev server)
+pnpm loadtest     # Run k6 backend load test (requires k6 and dev server)
 pnpm format       # Format with Prettier
 ```
 

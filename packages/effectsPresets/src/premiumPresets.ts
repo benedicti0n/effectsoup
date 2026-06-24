@@ -249,7 +249,7 @@ const cloudPrintPreset: EffectPreset = {
         shape: "circle"
       });
 
-      let result = blendPixelBuffers(blurred, halftone, "multiply", 0.4);
+      const result = blendPixelBuffers(blurred, halftone, "multiply", 0.4);
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);
       }

@@ -1,23 +1,26 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import type { JSX } from "react";
+import { useEffect, useRef } from "react";
 import type { PixelBuffer } from "@imageeffects/core";
 import { getPresetById } from "@imageeffects/presets";
 import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
+import { useEffectsWorker } from "@/hooks/useEffectsWorker";
+import { useAdaptiveQuality } from "@/hooks/useAdaptiveQuality";
 
 function getPreviewSize(
   sourceWidth: number,
   sourceHeight: number,
-  isMobile: boolean
+  isMobile: boolean,
+  qualityScale: number
 ): { width: number; height: number } {
-  const maxLongest = isMobile ? 960 : 1400;
+  const maxLongest = (isMobile ? 960 : 1400) * qualityScale;
   const longest = Math.max(sourceWidth, sourceHeight);
   const scale = longest > maxLongest ? maxLongest / longest : 1;
   return {
-    width: Math.round(sourceWidth * scale),
-    height: Math.round(sourceHeight * scale)
+    width: Math.max(1, Math.round(sourceWidth * scale)),
+    height: Math.max(1, Math.round(sourceHeight * scale))
   };
 }
 
@@ -28,6 +31,8 @@ export function CanvasPreview(): JSX.Element {
   const effect = useEditorStore((state) => state.effect);
   const compareBefore = useEditorStore((state) => state.compareBefore);
   const setIsRendering = useEditorStore((state) => state.setIsRendering);
+  const { render: renderInWorker } = useEffectsWorker();
+  const { scale: qualityScale, reportDuration } = useAdaptiveQuality();
 
   useEffect(() => {
     if (!source || !canvasRef.current) return;
@@ -37,13 +42,16 @@ export function CanvasPreview(): JSX.Element {
     if (!ctx) return;
 
     let cancelled = false;
+    const abortController = new AbortController();
 
     const render = async () => {
       setIsRendering(true);
       const image = new Image();
       image.src = source.objectUrl;
-      await new Promise<void>((resolve) => {
+      await new Promise<void>((resolve, reject) => {
         image.onload = () => resolve();
+        image.onerror = () => reject(new Error("Failed to load image"));
+        abortController.signal.addEventListener("abort", () => reject(new Error("Aborted")));
       });
       if (cancelled) return;
 
@@ -64,10 +72,31 @@ export function CanvasPreview(): JSX.Element {
       if (!preset) return;
       const resolved = preset.intensityMapper(effect.intensity, effect.advancedOverrides);
 
-      const { width, height } = getPreviewSize(image.width, image.height, window.innerWidth < 768);
+      const { width, height } = getPreviewSize(
+        image.width,
+        image.height,
+        window.innerWidth < 768,
+        qualityScale
+      );
+
+      const startTime = performance.now();
 
       try {
-        const output = renderEffectSync(sourceBuffer, crop, effect.presetId, resolved, width, height);
+        let output: PixelBuffer;
+        try {
+          output = await renderInWorker({
+            source: sourceBuffer,
+            crop,
+            presetId: effect.presetId,
+            resolvedParameters: resolved,
+            targetWidth: width,
+            targetHeight: height
+          });
+        } catch {
+          // Fallback to synchronous main-thread rendering.
+          output = renderEffectSync(sourceBuffer, crop, effect.presetId, resolved, width, height);
+        }
+
         if (cancelled) return;
 
         canvas.width = width;
@@ -78,6 +107,8 @@ export function CanvasPreview(): JSX.Element {
           output.height
         );
         ctx.putImageData(outputData, 0, 0);
+
+        reportDuration(performance.now() - startTime);
       } catch (error) {
         console.error("Render failed:", error);
       } finally {
@@ -89,8 +120,9 @@ export function CanvasPreview(): JSX.Element {
 
     return () => {
       cancelled = true;
+      abortController.abort();
     };
-  }, [source, crop, effect, compareBefore, setIsRendering]);
+  }, [source, crop, effect, compareBefore, setIsRendering, renderInWorker, qualityScale, reportDuration]);
 
   if (!source) {
     return (
