@@ -105,5 +105,28 @@ describe("presets", () => {
       expect(preset!.category).toBe("asciiSymbols");
       expect(preset!.defaultIntensity).toBe(40);
     });
+
+    it("Symbol Glow produces deterministic output for the same input and settings", () => {
+      const preset = allPresets.find((p) => p.id === "symbolGlow")!;
+      const source = createPixelBuffer(80, 80, [128, 128, 128, 255]);
+      const resolved = preset.intensityMapper(preset.defaultIntensity, {});
+      const pipeline = preset.createPipeline(resolved);
+      const outputA = pipeline(source, resolved);
+      const outputB = pipeline(source, resolved);
+      expect(outputA.data).toEqual(outputB.data);
+    });
+
+    it("Symbol Glow does not crash with custom symbol sets", () => {
+      const preset = allPresets.find((p) => p.id === "symbolGlow")!;
+      const source = createPixelBuffer(80, 80, [128, 128, 128, 255]);
+      const resolved = preset.intensityMapper(preset.defaultIntensity, {
+        symbolSet: "custom",
+        customSymbols: "XO"
+      });
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+      expect(output.width).toBe(source.width);
+      expect(output.height).toBe(source.height);
+    });
   });
 });
