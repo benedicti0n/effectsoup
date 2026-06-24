@@ -77,5 +77,12 @@ describe("presets", () => {
       expect(resolved.edgeStrength).toBe(25);
       expect(resolved.gridOpacity).toBe(20);
     });
+
+    it("Classic ASCII defaults to Dense character set and Original Colors", () => {
+      const preset = allPresets.find((p) => p.id === "classicAscii");
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.characterSet).toBe("dense");
+      expect(resolved.colorMode).toBe("originalColors");
+    });
   });
 });

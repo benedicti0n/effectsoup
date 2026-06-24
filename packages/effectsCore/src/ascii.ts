@@ -64,14 +64,43 @@ const BITMAP_FONT: Record<string, number[]> = {
   W: [0b10001, 0b10001, 0b10001, 0b10101, 0b10101, 0b11011, 0b10001],
   X: [0b10001, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b10001],
   Y: [0b10001, 0b10001, 0b10001, 0b01010, 0b00100, 0b00100, 0b00100],
-  Z: [0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b11111]
+  Z: [0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b11111],
+  "█": [0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111],
+  "▓": [0b10101, 0b01010, 0b10101, 0b01010, 0b10101, 0b01010, 0b10101],
+  "▒": [0b10101, 0b00000, 0b01010, 0b00000, 0b10101, 0b00000, 0b01010],
+  "░": [0b10001, 0b00000, 0b00100, 0b00000, 0b10001, 0b00000, 0b00100]
 };
+
+export const ASCII_CHARSET_PRESETS: Record<string, string> = {
+  dense: `$@B%8&WM#*oahkbdpqwmZ0OQLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^\` . `,
+  standard: "@%#*+=-:. ",
+  technical: "01/\\|<>[]{}?=-_+~",
+  blocks: "█▓▒░ ",
+  minimal: " #."
+};
+
+/**
+ * Validate and normalize a user-provided custom character set.
+ * Requires at least two non-whitespace characters. Preserves order.
+ * Falls back to the dense preset on invalid input.
+ */
+export function normalizeCustomCharset(input: string, fallback = ASCII_CHARSET_PRESETS.dense): string {
+  const trimmed = input.replace(/\s/g, "");
+  if (trimmed.length < 2) return fallback;
+  // Preserve the user's exact visible characters in order, but allow spaces
+  // in the ramp by keeping any space characters that are surrounded by visible
+  // glyphs if the user explicitly included them. For safety we collapse
+  // leading/trailing whitespace but keep internal spaces.
+  const cleaned = input.replace(/^\s+|\s+$/g, "");
+  if (cleaned.length < 2) return fallback;
+  return cleaned;
+}
 
 /**
  * Dense 10-level luminance ramp. Dark characters have more ink,
  * light characters have less, giving recognizability at small cell sizes.
  */
-const DEFAULT_CHARSET = " .:-=+*#%@";
+const DEFAULT_CHARSET = ASCII_CHARSET_PRESETS.dense;
 
 export type AsciiColorMode = "monochrome" | "color" | "source";
 
@@ -171,7 +200,11 @@ export function renderAscii(
         Math.min(charset.length - 1, Math.floor(luminance * (charset.length - 1)))
       );
       const char = charset[charIndex];
-      const bitmap = BITMAP_FONT[char] ?? BITMAP_FONT[" "];
+      const bitmap =
+        BITMAP_FONT[char] ??
+        BITMAP_FONT[char.toUpperCase()] ??
+        BITMAP_FONT[char.toLowerCase()] ??
+        BITMAP_FONT[" "];
 
       const cellX = Math.floor(gx * cellWidth);
       const cellY = Math.floor(gy * cellHeight);

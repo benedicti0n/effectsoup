@@ -9,8 +9,10 @@ import {
   applyGridOverlay,
   applyOrderedDither,
   applyVignette,
+  ASCII_CHARSET_PRESETS,
   blendPixelBuffers,
   clonePixelBuffer,
+  normalizeCustomCharset,
   renderAscii,
   renderHalftoneData,
   resizeNearestNeighbor,
@@ -195,8 +197,10 @@ const classicAsciiPreset: EffectPreset = {
   advancedControlSchema: [
     ...universalAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
-    { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
-    { id: "colorMode", name: "Color Mode", type: "select", options: ["monochrome", "color", "source"], defaultValue: "monochrome" },
+    { id: "characterSet", name: "Character Set", type: "select", options: ["dense", "standard", "technical", "blocks", "minimal", "custom"], defaultValue: "dense" },
+    { id: "customCharset", name: "Custom Character Array", type: "text", defaultValue: "" },
+    { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "monochrome", "tint"], defaultValue: "originalColors" },
+    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ffffff" },
     { id: "backgroundColor", name: "Background", type: "color", defaultValue: "#000000" },
     { id: "inkColor", name: "Ink", type: "color", defaultValue: "#ffffff" }
   ],
@@ -204,8 +208,10 @@ const classicAsciiPreset: EffectPreset = {
     intensity,
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
-    density: resolveOverride(overrides, "density", 2 + Math.round((intensity / 100) * 8)),
-    colorMode: resolveOverride(overrides, "colorMode", "monochrome"),
+    characterSet: resolveOverride(overrides, "characterSet", "dense"),
+    customCharset: resolveOverride(overrides, "customCharset", ""),
+    colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
+    tintColor: resolveOverride(overrides, "tintColor", "#ffffff"),
     backgroundColor: resolveOverride(overrides, "backgroundColor", "#000000"),
     inkColor: resolveOverride(overrides, "inkColor", "#ffffff")
   }),
@@ -214,18 +220,28 @@ const classicAsciiPreset: EffectPreset = {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
       const fontSize = (params.fontSize as number) ?? 12;
-      const colorMode = (params.colorMode as string) ?? "monochrome";
+      const characterSet = (params.characterSet as string) ?? "dense";
+      const customCharset = (params.customCharset as string) ?? "";
+      const colorMode = (params.colorMode as string) ?? "originalColors";
+      const tintColor = hexToRgba((params.tintColor as string) ?? "#ffffff");
       const backgroundColor = hexToRgba((params.backgroundColor as string) ?? "#000000");
       const inkColor = hexToRgba((params.inkColor as string) ?? "#ffffff");
-      const density = Math.max(2, Math.min(10, (params.density as number) ?? 10));
-      const charset = " .:-=+*#%@".slice(0, density);
+
+      let charset = ASCII_CHARSET_PRESETS[characterSet] ?? ASCII_CHARSET_PRESETS.dense;
+      if (characterSet === "custom") {
+        charset = normalizeCustomCharset(customCharset, ASCII_CHARSET_PRESETS.dense);
+      }
+
+      const renderColorMode: "monochrome" | "color" | "source" =
+        colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
+      const renderInkColor = colorMode === "tint" ? tintColor : inkColor;
 
       return renderAscii(source, {
         fontSize,
-        inkColor,
+        inkColor: renderInkColor,
         backgroundColor,
         charset,
-        colorMode: colorMode as "monochrome" | "color" | "source"
+        colorMode: renderColorMode
       });
     };
   }

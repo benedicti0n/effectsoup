@@ -11,7 +11,8 @@ export type AdvancedControlType =
   | "range"
   | "select"
   | "color"
-  | "boolean";
+  | "boolean"
+  | "text";
 
 export type AdvancedControlDefinition = {
   id: string;

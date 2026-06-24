@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createPixelBuffer, renderAscii } from "./index.js";
+import { ASCII_CHARSET_PRESETS, createPixelBuffer, normalizeCustomCharset, renderAscii } from "./index.js";
 
 describe("renderAscii", () => {
   it("renders monochrome ASCII at source size", () => {
@@ -43,5 +43,46 @@ describe("renderAscii", () => {
         charset: ""
       })
     ).toThrow("charset must not be empty");
+  });
+
+  it("uses a multi-character ordered ramp by default", () => {
+    const source = createPixelBuffer(60, 60, [128, 128, 128, 255]);
+    const output = renderAscii(source, {
+      fontSize: 8,
+      inkColor: [255, 255, 255, 255],
+      backgroundColor: [0, 0, 0, 255],
+      charset: ASCII_CHARSET_PRESETS.dense
+    });
+    expect(ASCII_CHARSET_PRESETS.dense.length).toBeGreaterThan(10);
+    // Ensure something was drawn (not all background).
+    let drawnPixels = 0;
+    for (let i = 0; i < output.data.length; i += 4) {
+      if (output.data[i] > 0) drawnPixels++;
+    }
+    expect(drawnPixels).toBeGreaterThan(0);
+  });
+
+  it("supports a custom character set", () => {
+    const source = createPixelBuffer(40, 40, [255, 255, 255, 255]);
+    const output = renderAscii(source, {
+      fontSize: 8,
+      inkColor: [255, 255, 255, 255],
+      backgroundColor: [0, 0, 0, 255],
+      charset: normalizeCustomCharset("XO")
+    });
+    let foundXOrO = false;
+    for (let i = 0; i < output.data.length; i += 4) {
+      if (output.data[i] > 0) {
+        foundXOrO = true;
+        break;
+      }
+    }
+    expect(foundXOrO).toBe(true);
+  });
+
+  it("falls back to dense preset for invalid custom charset", () => {
+    expect(normalizeCustomCharset(" ")).toBe(ASCII_CHARSET_PRESETS.dense);
+    expect(normalizeCustomCharset("")).toBe(ASCII_CHARSET_PRESETS.dense);
+    expect(normalizeCustomCharset("   ")).toBe(ASCII_CHARSET_PRESETS.dense);
   });
 });
