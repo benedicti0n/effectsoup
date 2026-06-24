@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { CropConfig } from "@imageeffects/core";
+import { getPresetById } from "@imageeffects/presets";
 
 export type EditorDocument = {
   source: {
@@ -34,6 +35,8 @@ type EditorState = EditorDocument & {
   history: HistoryEntry[];
   historyIndex: number;
   setSource: (source: EditorDocument["source"]) => void;
+  replaceSource: (source: EditorDocument["source"]) => void;
+  removeSource: () => void;
   setCrop: (crop: CropConfig) => void;
   setPresetId: (presetId: string) => void;
   setIntensity: (intensity: number) => void;
@@ -58,7 +61,7 @@ const defaultCrop: CropConfig = {
 
 const defaultEffect: EditorDocument["effect"] = {
   presetId: "pixelGrid",
-  intensity: 60,
+  intensity: 5,
   advancedOverrides: {}
 };
 
@@ -66,6 +69,12 @@ const defaultOutput: EditorDocument["output"] = {
   format: "png",
   width: 1080
 };
+
+function revokeSourceUrl(source: EditorDocument["source"]): void {
+  if (source?.objectUrl) {
+    URL.revokeObjectURL(source.objectUrl);
+  }
+}
 
 function createSnapshot(state: EditorState): HistoryEntry {
   return {
@@ -85,7 +94,28 @@ export const useEditorStore = create<EditorState>((set) => ({
   history: [],
   historyIndex: -1,
 
-  setSource: (source) => set({ source, crop: { ...defaultCrop }, effect: { ...defaultEffect } }),
+  setSource: (source) =>
+    set((state) => {
+      revokeSourceUrl(state.source);
+      return { source, crop: { ...defaultCrop }, effect: { ...defaultEffect } };
+    }),
+
+  replaceSource: (source) =>
+    set((state) => {
+      revokeSourceUrl(state.source);
+      return { source, crop: { ...defaultCrop } };
+    }),
+
+  removeSource: () =>
+    set((state) => {
+      revokeSourceUrl(state.source);
+      return {
+        source: null,
+        crop: { ...defaultCrop },
+        effect: { ...defaultEffect },
+        output: { ...defaultOutput }
+      };
+    }),
 
   setCrop: (crop) => set({ crop }),
 
@@ -153,9 +183,13 @@ export const useEditorStore = create<EditorState>((set) => ({
     }),
 
   resetEffect: () =>
-    set((state) => ({
-      effect: { presetId: state.effect.presetId, intensity: 50, advancedOverrides: {} }
-    })),
+    set((state) => {
+      const preset = getPresetById(state.effect.presetId);
+      const defaultIntensity = preset?.defaultIntensity ?? 50;
+      return {
+        effect: { presetId: state.effect.presetId, intensity: defaultIntensity, advancedOverrides: {} }
+      };
+    }),
 
   resetAll: () =>
     set(() => ({

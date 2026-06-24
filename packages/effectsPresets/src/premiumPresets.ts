@@ -1,25 +1,22 @@
 import {
   adjustBrightnessContrast,
   adjustSaturation,
+  applyBloom,
   applyBoxBlur,
   applyDuotone,
   applyEdgeDetect,
-  applyFloydSteinbergDither,
+  applyGlow,
   applyGrain,
+  applyGridOverlay,
   applyNoise,
-  applyOrderedDither,
   applyPosterize,
   applyRgbShift,
   applyScanlines,
   applyVignette,
-  blendPixelBuffers,
   clonePixelBuffer,
-  createPixelBuffer,
   reducePalette,
   renderAscii,
-  renderHalftoneData,
   resizeNearestNeighbor,
-  toGrayscale,
   type PixelBuffer,
   type RgbaColor
 } from "@imageeffects/core";
@@ -54,153 +51,64 @@ function hexToRgba(hex: string): RgbaColor {
   return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255, 255];
 }
 
-const pinkDotMatrixPreset: EffectPreset = {
-  id: "pinkDotMatrix",
-  name: "Pink Dot Matrix",
-  description: "Hot-pink / pale-pink / dark background dither aesthetic.",
-  category: "dither",
-  access: "premium",
-  defaultIntensity: 60,
-  advancedControlSchema: [
-    ...universalAdvancedControls,
-    { id: "ditherScale", name: "Dither Scale", type: "range", min: 1, max: 8, step: 1, defaultValue: 2 },
-    { id: "paletteSize", name: "Palette Size", type: "range", min: 2, max: 8, step: 1, defaultValue: 3 }
-  ],
-  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
-    intensity,
-    advancedOverrides: overrides,
-    ditherScale: resolveOverride(overrides, "ditherScale", 1 + Math.round((intensity / 100) * 7)),
-    paletteSize: resolveOverride(overrides, "paletteSize", 2 + Math.round((intensity / 100) * 6)),
-    contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 40)),
-    glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 30)),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 25))
-  }),
-  createPipeline: (params): EffectPipeline => {
-    return (source: PixelBuffer) => {
-      const ditherScale = (params.ditherScale as number) ?? 2;
-      const paletteSize = (params.paletteSize as number) ?? 3;
-      const contrast = ((params.contrast as number) ?? 0) / 100;
-      const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
-      const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
-
-      const result = clonePixelBuffer(source);
-      adjustBrightnessContrast(result, 0, contrast);
-      reducePalette(result, paletteSize);
-      const small = resizeNearestNeighbor(result, Math.max(1, Math.floor(result.width / ditherScale)), Math.max(1, Math.floor(result.height / ditherScale)));
-      applyOrderedDither(small, 140);
-      let final = resizeNearestNeighbor(small, source.width, source.height);
-
-      // Pink tint.
-      const pink = hexToRgba("#ff006e");
-      const dark = hexToRgba("#1a0510");
-      applyDuotone(final, dark, pink);
-
-      if (glowAmount > 0) {
-        const glow = clonePixelBuffer(final);
-        applyBoxBlur(glow, Math.max(1, Math.round(glowAmount * 6)));
-        final = blendPixelBuffers(final, glow, "screen", glowAmount * 0.4);
-      }
-      if (grainAmount > 0) {
-        applyGrain(final, grainAmount);
-      }
-      return final;
-    };
-  }
-};
-
-const blueNoirDitherPreset: EffectPreset = {
-  id: "blueNoirDither",
-  name: "Blue Noir Dither",
-  description: "Dark navy / cobalt neon dither art.",
-  category: "dither",
-  access: "premium",
-  defaultIntensity: 65,
-  advancedControlSchema: [
-    ...universalAdvancedControls,
-    { id: "threshold", name: "Threshold", type: "range", min: 0, max: 255, step: 1, defaultValue: 120 },
-    { id: "bloom", name: "Bloom", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
-  ],
-  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
-    intensity,
-    advancedOverrides: overrides,
-    threshold: resolveOverride(overrides, "threshold", 80 + Math.round((intensity / 100) * 120)),
-    bloom: resolveOverride(overrides, "bloom", Math.round((intensity / 100) * 60)),
-    contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 50)),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 30))
-  }),
-  createPipeline: (params): EffectPipeline => {
-    return (source: PixelBuffer) => {
-      const threshold = (params.threshold as number) ?? 120;
-      const bloom = ((params.bloom as number) ?? 0) / 100;
-      const contrast = ((params.contrast as number) ?? 0) / 100;
-      const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
-
-      const result = clonePixelBuffer(source);
-      toGrayscale(result);
-      adjustBrightnessContrast(result, 0, contrast);
-      applyFloydSteinbergDither(result, threshold);
-
-      const navy = hexToRgba("#0a0f29");
-      const cobalt = hexToRgba("#3b82f6");
-      applyDuotone(result, navy, cobalt);
-
-      if (bloom > 0) {
-        const glow = clonePixelBuffer(result);
-        applyBoxBlur(glow, Math.max(1, Math.round(bloom * 8)));
-        result.data.set(blendPixelBuffers(result, glow, "screen", bloom * 0.5).data);
-      }
-      if (grainAmount > 0) {
-        applyGrain(result, grainAmount);
-      }
-      return result;
-    };
-  }
-};
-
 const cyberAsciiPreset: EffectPreset = {
   id: "cyberAscii",
   name: "Cyber ASCII",
-  description: "Colored terminal-like character image with blue/purple glow.",
-  category: "ascii",
+  description: "Colored terminal-like character image with a technical glyph set and neon glow.",
+  category: "asciiSymbols",
   access: "premium",
   defaultIntensity: 60,
   advancedControlSchema: [
     ...universalAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 10 },
-    { id: "density", name: "Density", type: "range", min: 2, max: 16, step: 1, defaultValue: 10 }
+    { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
+    { id: "accentColor", name: "Accent", type: "color", defaultValue: "#00f0ff" }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
-    density: resolveOverride(overrides, "density", 2 + Math.round((intensity / 100) * 14)),
+    density: resolveOverride(overrides, "density", 2 + Math.round((intensity / 100) * 8)),
+    accentColor: resolveOverride(overrides, "accentColor", "#00f0ff"),
     glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 50)),
     grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20))
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
       const fontSize = (params.fontSize as number) ?? 10;
-      const density = (params.density as number) ?? 10;
+      const density = Math.max(2, Math.min(10, (params.density as number) ?? 10));
+      const accentColor = hexToRgba((params.accentColor as string) ?? "#00f0ff");
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
-      const charset = " .:-=+*#%@".slice(0, Math.max(2, density));
+      // Technical glyph set with more symbols for detail.
+      const charset = " .:-=+*#%@01/\\|<>[]{}";
+      const trimmedCharset = charset.slice(0, Math.max(2, density + 12));
 
-      let result = renderAscii(source, {
+      const result = renderAscii(source, {
         fontSize,
-        inkColor: [100, 200, 255, 255],
+        inkColor: accentColor,
         backgroundColor: [5, 5, 15, 255],
-        charset,
-        colorMode: "monochrome"
+        charset: trimmedCharset,
+        colorMode: "color"
       });
 
-      // Purple/cyan tint overlay.
-      const tint = createPixelBuffer(source.width, source.height, [80, 20, 120, 255]);
-      result = blendPixelBuffers(result, tint, "overlay", 0.25);
+      // Subtle scanline grid.
+      applyGridOverlay(result, {
+        cellSize: Math.max(2, Math.round(fontSize * 1.4)),
+        opacity: 0.08,
+        style: "darken",
+        lineWidth: 1
+      });
 
       if (glowAmount > 0) {
-        const glow = clonePixelBuffer(result);
-        applyBoxBlur(glow, Math.max(1, Math.round(glowAmount * 8)));
-        result = blendPixelBuffers(result, glow, "screen", glowAmount * 0.5);
+        applyGlow(result, {
+          radius: Math.max(1, Math.round(glowAmount * 8)),
+          amount: glowAmount * 0.5,
+          mode: "screen",
+          color: accentColor
+        });
       }
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);
@@ -210,46 +118,56 @@ const cyberAsciiPreset: EffectPreset = {
   }
 };
 
-const cloudPrintPreset: EffectPreset = {
-  id: "cloudPrint",
-  name: "Cloud Print",
-  description: "Dreamy muted print/halftone look.",
-  category: "print",
+const luminousAsciiBloomPreset: EffectPreset = {
+  id: "luminousAsciiBloom",
+  name: "Luminous ASCII Bloom",
+  description: "ASCII characters that glow from bright areas with source-colored light.",
+  category: "asciiSymbols",
   access: "premium",
   defaultIntensity: 55,
   advancedControlSchema: [
     ...universalAdvancedControls,
-    { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 12, step: 1, defaultValue: 3 },
-    { id: "paletteSize", name: "Palette Size", type: "range", min: 2, max: 12, step: 1, defaultValue: 5 }
+    { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
+    { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
+    { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 10 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    blurAmount: resolveOverride(overrides, "blurAmount", Math.round((intensity / 100) * 8)),
-    paletteSize: resolveOverride(overrides, "paletteSize", 2 + Math.round((intensity / 100) * 10)),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 30))
+    fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
+    density: resolveOverride(overrides, "density", 2 + Math.round((intensity / 100) * 8)),
+    bloomRadius: resolveOverride(overrides, "bloomRadius", 2 + Math.round((intensity / 100) * 22)),
+    glowAmount: resolveOverride(overrides, "glowAmount", intensity),
+    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 15))
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
-      const blurAmount = (params.blurAmount as number) ?? 3;
-      const paletteSize = (params.paletteSize as number) ?? 5;
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
+      const fontSize = (params.fontSize as number) ?? 12;
+      const density = Math.max(2, Math.min(10, (params.density as number) ?? 10));
+      const bloomRadius = (params.bloomRadius as number) ?? 10;
+      const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
+      const charset = " .:-=+*#%@";
+      const trimmedCharset = charset.slice(0, Math.max(2, density));
 
-      const blurred = clonePixelBuffer(source);
-      applyBoxBlur(blurred, blurAmount);
-      reducePalette(blurred, paletteSize);
-
-      const gray = clonePixelBuffer(blurred);
-      toGrayscale(gray);
-      const halftone = renderHalftoneData(gray, {
-        dotSpacing: 12,
-        maxDotSize: 8,
-        inkColor: [120, 130, 150, 255],
-        backgroundColor: [245, 245, 250, 255],
-        shape: "circle"
+      const ascii = renderAscii(source, {
+        fontSize,
+        inkColor: [255, 255, 255, 255],
+        backgroundColor: [0, 0, 0, 255],
+        charset: trimmedCharset,
+        colorMode: "source"
       });
 
-      const result = blendPixelBuffers(blurred, halftone, "multiply", 0.4);
+      const result = ascii;
+      if (glowAmount > 0) {
+        applyBloom(result, {
+          radius: bloomRadius,
+          threshold: 0.55,
+          amount: glowAmount * 0.6
+        });
+      }
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);
       }
@@ -262,7 +180,7 @@ const crtDreamPreset: EffectPreset = {
   id: "crtDream",
   name: "CRT Dream",
   description: "Soft retro display effect.",
-  category: "retro",
+  category: "atmosphereGlow",
   access: "premium",
   defaultIntensity: 55,
   advancedControlSchema: [
@@ -282,6 +200,8 @@ const crtDreamPreset: EffectPreset = {
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
       const pixelCellSize = (params.pixelCellSize as number) ?? 4;
       const scanlineStrength = ((params.scanlineStrength as number) ?? 0) / 100;
       const rgbShift = (params.rgbShift as number) ?? 0;
@@ -300,9 +220,11 @@ const crtDreamPreset: EffectPreset = {
         applyScanlines(result, scanlineStrength);
       }
       if (glowAmount > 0) {
-        const glow = clonePixelBuffer(result);
-        applyBoxBlur(glow, Math.max(1, Math.round(glowAmount * 6)));
-        result = blendPixelBuffers(result, glow, "screen", glowAmount * 0.4);
+        applyGlow(result, {
+          radius: Math.max(1, Math.round(glowAmount * 6)),
+          amount: glowAmount * 0.4,
+          mode: "screen"
+        });
       }
       if (vignette > 0) {
         applyVignette(result, vignette);
@@ -316,7 +238,7 @@ const vhsBloomPreset: EffectPreset = {
   id: "vhsBloom",
   name: "VHS Bloom",
   description: "Blurry compressed nostalgic digital effect.",
-  category: "retro",
+  category: "atmosphereGlow",
   access: "premium",
   defaultIntensity: 60,
   advancedControlSchema: [
@@ -336,13 +258,15 @@ const vhsBloomPreset: EffectPreset = {
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
       const blurAmount = (params.blurAmount as number) ?? 5;
       const chromatic = (params.chromatic as number) ?? 0;
       const noise = ((params.noise as number) ?? 0) / 100;
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const saturation = ((params.saturation as number) ?? 0) / 100;
 
-      let result = clonePixelBuffer(source);
+      const result = clonePixelBuffer(source);
       if (saturation !== 0) {
         adjustSaturation(result, saturation);
       }
@@ -354,9 +278,11 @@ const vhsBloomPreset: EffectPreset = {
         applyNoise(result, noise);
       }
       if (glowAmount > 0) {
-        const glow = clonePixelBuffer(result);
-        applyBoxBlur(glow, Math.max(1, Math.round(glowAmount * 8)));
-        result = blendPixelBuffers(result, glow, "screen", glowAmount * 0.5);
+        applyGlow(result, {
+          radius: Math.max(1, Math.round(glowAmount * 8)),
+          amount: glowAmount * 0.5,
+          mode: "screen"
+        });
       }
       return result;
     };
@@ -367,7 +293,7 @@ const risoOffsetPreset: EffectPreset = {
   id: "risoOffset",
   name: "Riso Offset",
   description: "Imperfect risograph-inspired print effect.",
-  category: "print",
+  category: "printGrid",
   access: "premium",
   defaultIntensity: 55,
   advancedControlSchema: [
@@ -386,6 +312,8 @@ const risoOffsetPreset: EffectPreset = {
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
       const channelShift = (params.channelShift as number) ?? 0;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
       const inkColor = hexToRgba((params.inkColor as string) ?? "#ff5c5c");
@@ -409,26 +337,29 @@ const mangaGridPreset: EffectPreset = {
   id: "mangaGrid",
   name: "Manga Grid",
   description: "Graphic portrait/panel effect inspired by manga printing.",
-  category: "pixel",
+  category: "printGrid",
   access: "premium",
-  defaultIntensity: 60,
+  defaultIntensity: 5,
   advancedControlSchema: [
     ...universalAdvancedControls,
-    { id: "posterLevels", name: "Poster Levels", type: "range", min: 2, max: 8, step: 1, defaultValue: 3 },
-    { id: "edgeStrength", name: "Edge Emphasis", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 },
-    { id: "gridOpacity", name: "Grid Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 25 }
+    { id: "posterLevels", name: "Poster Levels", type: "range", min: 2, max: 8, step: 1, defaultValue: 4 },
+    { id: "edgeStrength", name: "Edge Emphasis", type: "range", min: 0, max: 100, step: 1, defaultValue: 25 },
+    { id: "gridOpacity", name: "Grid Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    posterLevels: resolveOverride(overrides, "posterLevels", 2 + Math.round((intensity / 100) * 6)),
-    edgeStrength: resolveOverride(overrides, "edgeStrength", Math.round((intensity / 100) * 60)),
-    gridOpacity: resolveOverride(overrides, "gridOpacity", Math.round((intensity / 100) * 40)),
-    contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 40))
+    // At the default intensity of 5, posterLevels=4, edgeStrength=25, gridOpacity=20.
+    posterLevels: resolveOverride(overrides, "posterLevels", Math.max(2, Math.round(4 - ((intensity - 5) / 95) * 2))),
+    edgeStrength: resolveOverride(overrides, "edgeStrength", Math.min(100, Math.max(0, Math.round(25 + ((intensity - 5) / 95) * 55)))),
+    gridOpacity: resolveOverride(overrides, "gridOpacity", Math.min(100, Math.max(0, Math.round(20 + ((intensity - 5) / 95) * 40)))),
+    contrast: resolveOverride(overrides, "contrast", Math.min(100, Math.max(0, Math.round(((intensity - 5) / 95) * 30))))
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
-      const posterLevels = (params.posterLevels as number) ?? 3;
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
+      const posterLevels = (params.posterLevels as number) ?? 4;
       const edgeStrength = ((params.edgeStrength as number) ?? 0) / 100;
       const gridOpacity = ((params.gridOpacity as number) ?? 0) / 100;
       const contrast = ((params.contrast as number) ?? 0) / 100;
@@ -438,30 +369,20 @@ const mangaGridPreset: EffectPreset = {
         adjustBrightnessContrast(result, 0, contrast);
       }
       applyPosterize(result, posterLevels);
-      reducePalette(result, 4);
+      // Keep some source color rather than crushing to a tiny palette.
+      reducePalette(result, Math.min(16, posterLevels * 4));
+
       if (edgeStrength > 0) {
-        applyEdgeDetect(result, edgeStrength);
+        applyEdgeDetect(result, edgeStrength * 0.5);
       }
 
-      // Manga-style grid overlay.
       if (gridOpacity > 0) {
-        const cell = 24;
-        for (let y = 0; y < result.height; y += cell) {
-          for (let x = 0; x < result.width; x++) {
-            const idx = (y * result.width + x) * 4;
-            result.data[idx] = 0;
-            result.data[idx + 1] = 0;
-            result.data[idx + 2] = 0;
-          }
-        }
-        for (let x = 0; x < result.width; x += cell) {
-          for (let y = 0; y < result.height; y++) {
-            const idx = (y * result.width + x) * 4;
-            result.data[idx] = 0;
-            result.data[idx + 1] = 0;
-            result.data[idx + 2] = 0;
-          }
-        }
+        applyGridOverlay(result, {
+          cellSize: 24,
+          opacity: gridOpacity,
+          style: "darken",
+          lineWidth: 1
+        });
       }
       return result;
     };
@@ -469,10 +390,8 @@ const mangaGridPreset: EffectPreset = {
 };
 
 export const premiumPresets: EffectPreset[] = [
-  pinkDotMatrixPreset,
-  blueNoirDitherPreset,
   cyberAsciiPreset,
-  cloudPrintPreset,
+  luminousAsciiBloomPreset,
   crtDreamPreset,
   vhsBloomPreset,
   risoOffsetPreset,

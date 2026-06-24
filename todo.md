@@ -1,5 +1,21 @@
 # effectLab — Implementation Todo
 
+## Visual Quality Pass (completed)
+
+- [x] Write technical audit document (`docs/visual-quality-audit.md`)
+- [x] Fix Pixel Grid to preserve source colors with subtle grid overlay
+- [x] Fix Classic ASCII with 5x7 font, dense luminance ramp, and correct aspect ratio
+- [x] Upgrade Dot Halftone to colored dots with palette presets
+- [x] Improve Dream Glow with Golden Dusk default and palette presets
+- [x] Fix Cyber ASCII with denser technical glyph set and colored glyphs
+- [x] Fix Manga Grid with controlled posterization and non-destructive grid
+- [x] Add Luminous ASCII Bloom premium effect
+- [x] Remove weak effects: posterPop, pinkDotMatrix, blueNoirDither, cloudPrint
+- [x] Reorganize categories into Print & Grid, ASCII & Symbols, Atmosphere & Glow
+- [x] Add Replace Image and Remove Image actions
+- [x] Update `Features.md` catalog and matrix
+- [x] Update preset unit tests for new counts
+
 ## Phase 0 — Audit and Planning
 
 - [x] Inspect repository state

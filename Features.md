@@ -30,31 +30,36 @@ No watermark on free exports.
 
 Effects are built from reusable, deterministic image-processing primitives. Each preset exposes a single Intensity slider that drives a bundle of parameters.
 
+### Categories
+
+Presets are grouped into three visual families:
+
+- **Print & Grid** — pixel, halftone, dither, and grid-driven looks
+- **ASCII & Symbols** — text-based rendering with luminance-to-glyph mapping
+- **Atmosphere & Glow** — color grading, bloom, grain, and nostalgic tones
+
 ### Free Presets
 
 | ID | Name | Category | Core Primitives |
 |----|------|----------|-----------------|
-| `pixelGrid` | Pixel Grid | pixel | pixelation, palette reduction, grid overlay |
-| `monoDither` | Mono Dither | dither | grayscale, contrast, Bayer dither, inversion |
-| `classicAscii` | Classic ASCII | ascii | downsample, luminance-to-glyph mapping |
-| `dotHalftone` | Dot Halftone | print | luminance sampling, dot radius by brightness |
-| `duotone` | Duotone | dreamy | luminance mapping, two-color interpolation |
-| `dreamGlow` | Dream Glow | dreamy | blur, bloom, warm tint, grain |
-| `noirGrain` | Noir Grain | retro | monochrome, contrast, grain, vignette |
-| `posterPop` | Poster Pop | pixel | posterization, palette reduction, edge emphasis |
+| `pixelGrid` | Pixel Grid | Print & Grid | cell averaging, subtle grid overlay |
+| `monoDither` | Mono Dither | Print & Grid | grayscale, contrast, Bayer dither, inversion |
+| `classicAscii` | Classic ASCII | ASCII & Symbols | 5x7 bitmap font, dense luminance ramp |
+| `dotHalftone` | Dot Halftone | Print & Grid | colored dots, palette presets, saturation boost |
+| `duotone` | Duotone | Atmosphere & Glow | luminance mapping, two-color interpolation |
+| `dreamGlow` | Dream Glow | Atmosphere & Glow | blur, soft glow, palette presets, grain |
+| `noirGrain` | Noir Grain | Atmosphere & Glow | monochrome, contrast, grain, vignette |
 
 ### Premium Presets
 
 | ID | Name | Category | Core Primitives |
 |----|------|----------|-----------------|
-| `pinkDotMatrix` | Pink Dot Matrix | dither | custom palette, ordered dither, glow, grain |
-| `blueNoirDither` | Blue Noir Dither | dither | blue palette, contrast, dither, bloom |
-| `cyberAscii` | Cyber ASCII | ascii | colored glyph rendering, bloom, grain |
-| `cloudPrint` | Cloud Print | print | soft blur, palette reduction, halftone, grain |
-| `crtDream` | CRT Dream | retro | pixel grid, scanlines, bloom, RGB shift, vignette |
-| `vhsBloom` | VHS Bloom | retro | chromatic aberration, haze, noise, bloom |
-| `risoOffset` | Riso Offset | print | duotone, channel offset, grain, registration shift |
-| `mangaGrid` | Manga Grid | pixel | posterization, edge emphasis, limited palette, grid |
+| `cyberAscii` | Cyber ASCII | ASCII & Symbols | technical glyph set, colored glyphs, scanline grid, glow |
+| `luminousAsciiBloom` | Luminous ASCII Bloom | ASCII & Symbols | source-colored ASCII, thresholded bloom |
+| `crtDream` | CRT Dream | Atmosphere & Glow | pixel grid, scanlines, bloom, RGB shift, vignette |
+| `vhsBloom` | VHS Bloom | Atmosphere & Glow | chromatic aberration, haze, noise, bloom |
+| `risoOffset` | Riso Offset | Print & Grid | duotone, channel offset, grain, registration shift |
+| `mangaGrid` | Manga Grid | Print & Grid | controlled posterization, light edge emphasis, grid |
 
 Premium effects are previewable by free users; premium export and full advanced controls are gated.
 
@@ -63,7 +68,7 @@ Premium effects are previewable by free users; premium export and full advanced 
 | Capability | Guest / Free | Premium |
 |------------|--------------|---------|
 | Upload & crop | Yes | Yes |
-| Free presets | 8 | 8 |
+| Free presets | 7 | 7 |
 | Premium preview | Yes | Yes |
 | Premium export | No | Yes |
 | Export up to 1080px | Yes | Yes |
@@ -77,6 +82,7 @@ Premium effects are previewable by free users; premium export and full advanced 
 ## Editor Capabilities
 
 - Drag-and-drop or click-to-upload image input
+- Replace Image and Remove Image actions in the editor header
 - Non-destructive crop with aspect ratios: Original, 1:1, 4:5, 9:16, 16:9
 - Pan and zoom inside crop frame
 - Preset grid with free/premium labels

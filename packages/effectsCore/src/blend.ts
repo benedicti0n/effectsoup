@@ -1,7 +1,7 @@
 import type { PixelBuffer } from "./types.js";
 import { clampByte, createPixelBuffer, pixelIndex } from "./buffer.js";
 
-export type BlendMode = "normal" | "multiply" | "screen" | "overlay";
+export type BlendMode = "normal" | "multiply" | "screen" | "overlay" | "soft";
 
 /**
  * Blend two PixelBuffers of the same size into a new buffer.
@@ -42,6 +42,16 @@ export function blendPixelBuffers(
           av < 128
             ? (2 * av * bv) / 255
             : 255 - (2 * (255 - av) * (255 - bv)) / 255;
+      } else if (mode === "soft") {
+        const bvNorm = bv / 255;
+        const avNorm = av / 255;
+        const soft =
+          bv < 128
+            ? avNorm - (1 - 2 * bvNorm) * avNorm * (1 - avNorm)
+            : avNorm +
+              (2 * bvNorm - 1) *
+                (Math.sqrt(avNorm) - avNorm);
+        blended = soft * 255;
       }
 
       out[i + c] = clampByte(blended);

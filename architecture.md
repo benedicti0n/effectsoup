@@ -45,7 +45,7 @@ export type PixelBuffer = {
 };
 ```
 
-Contains deterministic image-processing primitives such as resize, grayscale, dither, halftone, noise, grain, vignette, RGB shift, scanlines, edge detection, and blending.
+Contains deterministic image-processing primitives such as resize, grayscale, dither, halftone, ASCII rendering, grid overlay, glow/bloom, noise, grain, vignette, RGB shift, scanlines, edge detection, and blending.
 
 ### `packages/effectsPresets`
 
@@ -56,7 +56,7 @@ type EffectPreset = {
   id: string;
   name: string;
   description: string;
-  category: "pixel" | "dither" | "ascii" | "print" | "dreamy" | "retro";
+  category: "printGrid" | "asciiSymbols" | "atmosphereGlow";
   access: "free" | "premium";
   defaultIntensity: number;
   intensityMapper: IntensityMapper;

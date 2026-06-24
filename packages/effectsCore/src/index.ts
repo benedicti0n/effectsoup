@@ -10,3 +10,5 @@ export * from "./scanlines.js";
 export * from "./edge.js";
 export * from "./blend.js";
 export * from "./ascii.js";
+export * from "./grid.js";
+export * from "./glow.js";

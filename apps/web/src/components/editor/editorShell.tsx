@@ -1,7 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useEditorStore } from "@/store/editorStore";
 import { CanvasPreview } from "./canvasPreview";
 import { EffectControls } from "./effectControls";
@@ -10,14 +10,68 @@ import { PresetGrid } from "./presetGrid";
 import { SaveProjectDialog } from "./saveProjectDialog";
 import { UploadPanel } from "./uploadPanel";
 
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 export function EditorShell(): JSX.Element {
   const source = useEditorStore((state) => state.source);
   const isRendering = useEditorStore((state) => state.isRendering);
   const undo = useEditorStore((state) => state.undo);
   const redo = useEditorStore((state) => state.redo);
   const resetAll = useEditorStore((state) => state.resetAll);
+  const replaceSource = useEditorStore((state) => state.replaceSource);
+  const removeSource = useEditorStore((state) => state.removeSource);
   const [showExport, setShowExport] = useState(false);
   const [showSave, setShowSave] = useState(false);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+
+  const handleReplaceFile = useCallback(
+    async (file: File) => {
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        alert("Only JPEG, PNG, and WebP images are supported.");
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        alert("File size must be under 20 MB.");
+        return;
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      const image = new Image();
+      image.src = objectUrl;
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error("Failed to load image"));
+      });
+
+      const megapixels = (image.width * image.height) / 1_000_000;
+      if (megapixels > 25) {
+        alert("Image is too large. Maximum decoded size is 25 megapixels.");
+        URL.revokeObjectURL(objectUrl);
+        return;
+      }
+
+      replaceSource({
+        localId: crypto.randomUUID(),
+        fileName: file.name,
+        width: image.width,
+        height: image.height,
+        objectUrl
+      });
+    },
+    [replaceSource]
+  );
+
+  const onReplaceChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) void handleReplaceFile(file);
+      if (replaceInputRef.current) {
+        replaceInputRef.current.value = "";
+      }
+    },
+    [handleReplaceFile]
+  );
 
   return (
     <div className="flex h-screen flex-col bg-charcoal text-neon-cream">
@@ -42,6 +96,26 @@ export function EditorShell(): JSX.Element {
           >
             Reset
           </button>
+          {source && (
+            <>
+              <label className="cursor-pointer rounded-md border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5">
+                Replace
+                <input
+                  ref={replaceInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={onReplaceChange}
+                />
+              </label>
+              <button
+                onClick={removeSource}
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5"
+              >
+                Remove
+              </button>
+            </>
+          )}
           <button
             onClick={() => setShowSave(true)}
             disabled={!source}

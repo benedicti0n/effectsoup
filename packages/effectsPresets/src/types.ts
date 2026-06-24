@@ -1,12 +1,9 @@
 import type { PixelBuffer } from "@imageeffects/core";
 
 export type PresetCategory =
-  | "pixel"
-  | "dither"
-  | "ascii"
-  | "print"
-  | "dreamy"
-  | "retro";
+  | "printGrid"
+  | "asciiSymbols"
+  | "atmosphereGlow";
 
 export type PresetAccess = "free" | "premium";
 

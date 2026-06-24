@@ -1,7 +1,9 @@
 import type { PixelBuffer, RgbaColor } from "./types.js";
-import { createPixelBuffer, pixelIndex } from "./buffer.js";
+import { clampByte, createPixelBuffer, pixelIndex } from "./buffer.js";
 
 export type HalftoneShape = "circle" | "square" | "diamond";
+
+export type HalftoneColorMode = "monochrome" | "source" | "palette";
 
 export type HalftoneOptions = {
   dotSpacing: number;
@@ -10,11 +12,75 @@ export type HalftoneOptions = {
   backgroundColor: RgbaColor;
   angle?: number;
   shape?: HalftoneShape;
+  colorMode?: HalftoneColorMode;
+  palette?: RgbaColor[];
+  saturationBoost?: number;
 };
+
+function averageCellColor(
+  source: PixelBuffer,
+  cellX: number,
+  cellY: number,
+  cellW: number,
+  cellH: number
+): RgbaColor {
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let a = 0;
+  let count = 0;
+  const maxX = Math.min(source.width, cellX + cellW);
+  const maxY = Math.min(source.height, cellY + cellH);
+  for (let y = cellY; y < maxY; y++) {
+    for (let x = cellX; x < maxX; x++) {
+      const idx = pixelIndex(source, x, y);
+      r += source.data[idx];
+      g += source.data[idx + 1];
+      b += source.data[idx + 2];
+      a += source.data[idx + 3];
+      count++;
+    }
+  }
+  if (count === 0) return [0, 0, 0, 255];
+  return [r / count, g / count, b / count, a / count];
+}
+
+function nearestPaletteColor(color: RgbaColor, palette: RgbaColor[]): RgbaColor {
+  let best = palette[0] ?? color;
+  let bestDist = Infinity;
+  for (const candidate of palette) {
+    const dr = color[0] - candidate[0];
+    const dg = color[1] - candidate[1];
+    const db = color[2] - candidate[2];
+    const dist = dr * dr + dg * dg + db * db;
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = candidate;
+    }
+  }
+  return best;
+}
+
+function boostSaturation(color: RgbaColor, amount: number): RgbaColor {
+  if (amount <= 0) return color;
+  const lum =
+    0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2];
+  return [
+    clampByte(lum + (color[0] - lum) * (1 + amount)),
+    clampByte(lum + (color[1] - lum) * (1 + amount)),
+    clampByte(lum + (color[2] - lum) * (1 + amount)),
+    color[3]
+  ];
+}
 
 /**
  * Render a dot halftone pattern into a new buffer.
  * Bright areas produce larger dots.
+ *
+ * New capabilities:
+ * - `colorMode: "source"` renders dots in the local cell color.
+ * - `colorMode: "palette"` snaps each dot to the nearest palette color.
+ * - `saturationBoost` makes dot colors more vivid.
  */
 export function renderHalftoneData(
   source: PixelBuffer,
@@ -26,7 +92,10 @@ export function renderHalftoneData(
     inkColor,
     backgroundColor,
     angle = 0,
-    shape = "circle"
+    shape = "circle",
+    colorMode = "monochrome",
+    palette = [],
+    saturationBoost = 0
   } = options;
 
   if (dotSpacing <= 0 || maxDotSize <= 0) {
@@ -50,6 +119,24 @@ export function renderHalftoneData(
       const sampleX = Math.max(0, Math.min(width - 1, Math.round(rx)));
       const sampleY = Math.max(0, Math.min(height - 1, Math.round(ry)));
       const idx = pixelIndex(source, sampleX, sampleY);
+
+      let dotColor: RgbaColor;
+      if (colorMode === "source" || colorMode === "palette") {
+        const cellColor = averageCellColor(
+          source,
+          Math.max(0, sampleX - dotSpacing / 2),
+          Math.max(0, sampleY - dotSpacing / 2),
+          dotSpacing,
+          dotSpacing
+        );
+        dotColor =
+          colorMode === "palette" && palette.length > 0
+            ? nearestPaletteColor(cellColor, palette)
+            : boostSaturation(cellColor, saturationBoost);
+      } else {
+        dotColor = inkColor;
+      }
+
       const luminance =
         (0.299 * source.data[idx] +
           0.587 * source.data[idx + 1] +
@@ -59,7 +146,7 @@ export function renderHalftoneData(
 
       if (radius <= 0) continue;
 
-      drawDot(output, x, y, radius, inkColor, shape);
+      drawDot(output, x, y, radius, dotColor, shape);
     }
   }
 
