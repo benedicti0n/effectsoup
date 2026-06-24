@@ -3,6 +3,7 @@
 import type { JSX } from "react";
 import { getPresetById, type AdvancedControlDefinition } from "@imageeffects/presets";
 import { useEditorStore } from "@/store/editorStore";
+import { EditableSlider } from "./editableSlider";
 
 export function AdvancedControls(): JSX.Element {
   const effect = useEditorStore((state) => state.effect);
@@ -56,25 +57,28 @@ export function AdvancedControls(): JSX.Element {
       const min = control.min ?? 0;
       const max = control.max ?? 100;
       const step = control.step ?? 1;
+      const unit =
+        control.name.toLowerCase().includes("opacity") ||
+        control.name.toLowerCase().includes("strength") ||
+        control.name.toLowerCase().includes("saturation") ||
+        control.name.toLowerCase().includes("amount") ||
+        control.id === "glowStrength" ||
+        control.id === "baseOpacity"
+          ? "%"
+          : "";
       return (
-        <div key={control.id} className="space-y-1">
-          <div className="flex items-center justify-between text-xs text-white/70">
-            <label htmlFor={control.id}>{control.name}</label>
-            <span className="font-mono">{String(currentValue)}</span>
-          </div>
-          <input
-            id={control.id}
-            type="range"
-            min={min}
-            max={max}
-            step={step}
-            value={currentValue as number}
-            onChange={(e) => setAdvancedOverride(control.id, Number(e.target.value))}
-            onMouseUp={snapshotHistory}
-            onTouchEnd={snapshotHistory}
-            className="w-full accent-neon-blue"
-          />
-        </div>
+        <EditableSlider
+          key={control.id}
+          id={control.id}
+          label={control.name}
+          value={currentValue as number}
+          min={min}
+          max={max}
+          step={step}
+          unit={unit}
+          onChange={(value) => setAdvancedOverride(control.id, value)}
+          onCommit={snapshotHistory}
+        />
       );
     }
 

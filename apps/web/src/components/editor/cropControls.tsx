@@ -2,6 +2,7 @@
 
 import type { JSX } from "react";
 import { useEditorStore } from "@/store/editorStore";
+import { EditableSlider } from "./editableSlider";
 
 const ASPECT_RATIOS: Array<{ value: CropValue; label: string }> = [
   { value: "original", label: "Original" },
@@ -45,50 +46,39 @@ export function CropControls(): JSX.Element {
         ))}
       </div>
 
-      <div>
-        <label className="mb-1 block text-xs text-white/70">Zoom</label>
-        <input
-          type="range"
-          min={1}
-          max={3}
-          step={0.05}
-          value={crop.zoom}
-          onChange={(e) => updateCrop({ zoom: Number(e.target.value) })}
-          onMouseUp={snapshotHistory}
-          onTouchEnd={snapshotHistory}
-          className="w-full accent-neon-blue"
-        />
-      </div>
+      <EditableSlider
+        id="zoom"
+        label="Zoom"
+        value={crop.zoom}
+        min={1}
+        max={3}
+        step={0.05}
+        unit="x"
+        onChange={(value) => updateCrop({ zoom: value })}
+        onCommit={snapshotHistory}
+      />
 
       <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="mb-1 block text-xs text-white/70">Offset X</label>
-          <input
-            type="range"
-            min={-1}
-            max={1}
-            step={0.05}
-            value={crop.offsetX}
-            onChange={(e) => updateCrop({ offsetX: Number(e.target.value) })}
-            onMouseUp={snapshotHistory}
-            onTouchEnd={snapshotHistory}
-            className="w-full accent-neon-blue"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs text-white/70">Offset Y</label>
-          <input
-            type="range"
-            min={-1}
-            max={1}
-            step={0.05}
-            value={crop.offsetY}
-            onChange={(e) => updateCrop({ offsetY: Number(e.target.value) })}
-            onMouseUp={snapshotHistory}
-            onTouchEnd={snapshotHistory}
-            className="w-full accent-neon-blue"
-          />
-        </div>
+        <EditableSlider
+          id="offsetX"
+          label="Offset X"
+          value={crop.offsetX}
+          min={-1}
+          max={1}
+          step={0.05}
+          onChange={(value) => updateCrop({ offsetX: value })}
+          onCommit={snapshotHistory}
+        />
+        <EditableSlider
+          id="offsetY"
+          label="Offset Y"
+          value={crop.offsetY}
+          min={-1}
+          max={1}
+          step={0.05}
+          onChange={(value) => updateCrop({ offsetY: value })}
+          onCommit={snapshotHistory}
+        />
       </div>
     </div>
   );

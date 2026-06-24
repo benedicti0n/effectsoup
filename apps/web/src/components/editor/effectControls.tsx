@@ -6,6 +6,7 @@ import { getPresetById } from "@imageeffects/presets";
 import { useEditorStore } from "@/store/editorStore";
 import { AdvancedControls } from "./advancedControls";
 import { CropControls } from "./cropControls";
+import { EditableSlider } from "./editableSlider";
 
 export function EffectControls(): JSX.Element {
   const effect = useEditorStore((state) => state.effect);
@@ -29,20 +30,17 @@ export function EffectControls(): JSX.Element {
         </button>
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium">Intensity</label>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={effect.intensity}
-          onChange={(e) => setIntensity(Number(e.target.value))}
-          onMouseUp={snapshotHistory}
-          onTouchEnd={snapshotHistory}
-          className="w-full accent-neon-pink"
-        />
-        <div className="mt-1 text-right font-mono text-xs text-white/50">{effect.intensity}%</div>
-      </div>
+      <EditableSlider
+        id="intensity"
+        label="Intensity"
+        value={effect.intensity}
+        min={0}
+        max={100}
+        step={1}
+        unit="%"
+        onChange={setIntensity}
+        onCommit={snapshotHistory}
+      />
 
       <button
         onClick={() => setShowAdvanced((s) => !s)}
