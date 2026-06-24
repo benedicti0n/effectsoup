@@ -1,0 +1,1 @@
+import "@imageeffects/worker/worker";

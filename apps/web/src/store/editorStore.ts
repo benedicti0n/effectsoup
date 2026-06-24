@@ -1,0 +1,166 @@
+import { create } from "zustand";
+import type { CropConfig } from "@imageeffects/core";
+
+export type EditorDocument = {
+  source: {
+    localId: string;
+    fileName: string;
+    width: number;
+    height: number;
+    objectUrl: string;
+  } | null;
+  crop: CropConfig;
+  effect: {
+    presetId: string;
+    intensity: number;
+    advancedOverrides: Record<string, number | string | boolean>;
+  };
+  output: {
+    format: "png" | "jpeg" | "webp";
+    width: number;
+    backgroundColor?: string;
+  };
+};
+
+type HistoryEntry = {
+  crop: CropConfig;
+  effect: EditorDocument["effect"];
+  output: EditorDocument["output"];
+};
+
+type EditorState = EditorDocument & {
+  isRendering: boolean;
+  compareBefore: boolean;
+  history: HistoryEntry[];
+  historyIndex: number;
+  setSource: (source: EditorDocument["source"]) => void;
+  setCrop: (crop: CropConfig) => void;
+  setPresetId: (presetId: string) => void;
+  setIntensity: (intensity: number) => void;
+  setAdvancedOverride: (key: string, value: number | string | boolean) => void;
+  resetAdvancedOverrides: () => void;
+  setOutput: (output: Partial<EditorDocument["output"]>) => void;
+  setIsRendering: (isRendering: boolean) => void;
+  setCompareBefore: (compare: boolean) => void;
+  undo: () => void;
+  redo: () => void;
+  resetEffect: () => void;
+  resetAll: () => void;
+  snapshotHistory: () => void;
+};
+
+const defaultCrop: CropConfig = {
+  aspectRatio: "original",
+  zoom: 1,
+  offsetX: 0,
+  offsetY: 0
+};
+
+const defaultEffect: EditorDocument["effect"] = {
+  presetId: "pixelGrid",
+  intensity: 60,
+  advancedOverrides: {}
+};
+
+const defaultOutput: EditorDocument["output"] = {
+  format: "png",
+  width: 1080
+};
+
+function createSnapshot(state: EditorState): HistoryEntry {
+  return {
+    crop: state.crop,
+    effect: state.effect,
+    output: state.output
+  };
+}
+
+export const useEditorStore = create<EditorState>((set) => ({
+  source: null,
+  crop: { ...defaultCrop },
+  effect: { ...defaultEffect, advancedOverrides: {} },
+  output: { ...defaultOutput },
+  isRendering: false,
+  compareBefore: false,
+  history: [],
+  historyIndex: -1,
+
+  setSource: (source) => set({ source, crop: { ...defaultCrop }, effect: { ...defaultEffect } }),
+
+  setCrop: (crop) => set({ crop }),
+
+  setPresetId: (presetId) =>
+    set((state) => ({
+      effect: { ...state.effect, presetId, intensity: state.effect.intensity }
+    })),
+
+  setIntensity: (intensity) =>
+    set((state) => ({
+      effect: { ...state.effect, intensity }
+    })),
+
+  setAdvancedOverride: (key, value) =>
+    set((state) => ({
+      effect: {
+        ...state.effect,
+        advancedOverrides: { ...state.effect.advancedOverrides, [key]: value }
+      }
+    })),
+
+  resetAdvancedOverrides: () =>
+    set((state) => ({
+      effect: { ...state.effect, advancedOverrides: {} }
+    })),
+
+  setOutput: (output) =>
+    set((state) => ({
+      output: { ...state.output, ...output }
+    })),
+
+  setIsRendering: (isRendering) => set({ isRendering }),
+  setCompareBefore: (compareBefore) => set({ compareBefore }),
+
+  undo: () =>
+    set((state) => {
+      if (state.historyIndex <= 0) return state;
+      const entry = state.history[state.historyIndex - 1];
+      return {
+        historyIndex: state.historyIndex - 1,
+        crop: entry.crop,
+        effect: entry.effect,
+        output: entry.output
+      };
+    }),
+
+  redo: () =>
+    set((state) => {
+      if (state.historyIndex >= state.history.length - 1) return state;
+      const entry = state.history[state.historyIndex + 1];
+      return {
+        historyIndex: state.historyIndex + 1,
+        crop: entry.crop,
+        effect: entry.effect,
+        output: entry.output
+      };
+    }),
+
+  snapshotHistory: () =>
+    set((state) => {
+      const entry = createSnapshot(state);
+      const history = state.history.slice(0, state.historyIndex + 1);
+      history.push(entry);
+      return { history, historyIndex: history.length - 1 };
+    }),
+
+  resetEffect: () =>
+    set((state) => ({
+      effect: { presetId: state.effect.presetId, intensity: 50, advancedOverrides: {} }
+    })),
+
+  resetAll: () =>
+    set(() => ({
+      crop: { ...defaultCrop },
+      effect: { ...defaultEffect },
+      output: { ...defaultOutput }
+    }))
+}));
