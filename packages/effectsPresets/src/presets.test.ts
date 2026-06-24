@@ -84,5 +84,19 @@ describe("presets", () => {
       expect(resolved.characterSet).toBe("dense");
       expect(resolved.colorMode).toBe("originalColors");
     });
+
+    it("Cyber ASCII defaults to Original Colors", () => {
+      const preset = allPresets.find((p) => p.id === "cyberAscii");
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.colorMode).toBe("originalColors");
+    });
+
+    it("Cyber ASCII Tint mode defaults to terminal green", () => {
+      const preset = allPresets.find((p) => p.id === "cyberAscii");
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, { colorMode: "tint" });
+      expect(resolved.colorMode).toBe("tint");
+      expect(resolved.tintPreset).toBe("terminalGreen");
+      expect(resolved.tintColor).toBe("#00FF88");
+    });
   });
 });

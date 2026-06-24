@@ -22,8 +22,8 @@ export function AdvancedControls(): JSX.Element {
     if (control.id === "customCharset") {
       return resolvedValues.characterSet === "custom";
     }
-    // Hide tint color unless Color Mode is "tint".
-    if (control.id === "tintColor") {
+    // Hide tint controls unless Color Mode is "tint".
+    if (control.id === "tintColor" || control.id === "tintPreset") {
       return resolvedValues.colorMode === "tint";
     }
     // Hide ink color unless Color Mode is "monochrome".
@@ -77,7 +77,20 @@ export function AdvancedControls(): JSX.Element {
             id={control.id}
             value={currentValue as string}
             onChange={(e) => {
-              setAdvancedOverride(control.id, e.target.value);
+              const value = e.target.value;
+              setAdvancedOverride(control.id, value);
+              // Cyber ASCII tint preset changes should update the tint color too.
+              if (control.id === "tintPreset") {
+                const colors: Record<string, string> = {
+                  terminalGreen: "#00FF88",
+                  electricCyan: "#00f0ff",
+                  amberCrt: "#FFB000",
+                  violetCode: "#B388FF"
+                };
+                if (colors[value]) {
+                  setAdvancedOverride("tintColor", colors[value]);
+                }
+              }
               snapshotHistory();
             }}
             className="w-full rounded-md border border-white/10 bg-ink px-3 py-2 text-sm text-white outline-none focus:border-neon-blue"

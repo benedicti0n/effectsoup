@@ -51,6 +51,13 @@ function hexToRgba(hex: string): RgbaColor {
   return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255, 255];
 }
 
+const CYBER_TINT_PRESETS: Record<string, string> = {
+  terminalGreen: "#00FF88",
+  electricCyan: "#00f0ff",
+  amberCrt: "#FFB000",
+  violetCode: "#B388FF"
+};
+
 const cyberAsciiPreset: EffectPreset = {
   id: "cyberAscii",
   name: "Cyber ASCII",
@@ -62,36 +69,49 @@ const cyberAsciiPreset: EffectPreset = {
     ...universalAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 10 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
-    { id: "accentColor", name: "Accent", type: "color", defaultValue: "#00f0ff" }
+    { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "tint", "monochrome"], defaultValue: "originalColors" },
+    { id: "tintPreset", name: "Tint Preset", type: "select", options: ["terminalGreen", "electricCyan", "amberCrt", "violetCode"], defaultValue: "terminalGreen" },
+    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#00FF88" }
   ],
-  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
-    intensity,
-    advancedOverrides: overrides,
-    fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
-    density: resolveOverride(overrides, "density", 2 + Math.round((intensity / 100) * 8)),
-    accentColor: resolveOverride(overrides, "accentColor", "#00f0ff"),
-    glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 50)),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20))
-  }),
+  intensityMapper: (intensity, overrides): ResolvedPresetParameters => {
+    const tintPreset = resolveOverride(overrides, "tintPreset", "terminalGreen");
+    const defaultTintColor = CYBER_TINT_PRESETS[tintPreset] ?? CYBER_TINT_PRESETS.terminalGreen;
+    return {
+      intensity,
+      advancedOverrides: overrides,
+      fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
+      density: resolveOverride(overrides, "density", 2 + Math.round((intensity / 100) * 8)),
+      colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
+      tintPreset,
+      tintColor: resolveOverride(overrides, "tintColor", defaultTintColor),
+      glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 50)),
+      grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20))
+    };
+  },
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
       const fontSize = (params.fontSize as number) ?? 10;
       const density = Math.max(2, Math.min(10, (params.density as number) ?? 10));
-      const accentColor = hexToRgba((params.accentColor as string) ?? "#00f0ff");
+      const colorMode = (params.colorMode as string) ?? "originalColors";
+      const tintColor = hexToRgba((params.tintColor as string) ?? "#00FF88");
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
       // Technical glyph set with more symbols for detail.
       const charset = " .:-=+*#%@01/\\|<>[]{}";
       const trimmedCharset = charset.slice(0, Math.max(2, density + 12));
 
+      const renderColorMode: "monochrome" | "color" | "source" =
+        colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
+      const inkColor = colorMode === "tint" ? tintColor : [100, 200, 255, 255] as RgbaColor;
+
       const result = renderAscii(source, {
         fontSize,
-        inkColor: accentColor,
+        inkColor,
         backgroundColor: [5, 5, 15, 255],
         charset: trimmedCharset,
-        colorMode: "color"
+        colorMode: renderColorMode
       });
 
       // Subtle scanline grid.
@@ -105,9 +125,9 @@ const cyberAsciiPreset: EffectPreset = {
       if (glowAmount > 0) {
         applyGlow(result, {
           radius: Math.max(1, Math.round(glowAmount * 8)),
-          amount: glowAmount * 0.5,
+          amount: glowAmount * 0.25,
           mode: "screen",
-          color: accentColor
+          color: colorMode === "originalColors" ? [255, 255, 255, 255] : tintColor
         });
       }
       if (grainAmount > 0) {
