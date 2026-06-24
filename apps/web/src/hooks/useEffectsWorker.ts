@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import type { CropConfig, PixelBuffer } from "@imageeffects/core";
+import { clonePixelBuffer, type CropConfig, type PixelBuffer } from "@imageeffects/core";
 import type { ResolvedPresetParameters } from "@imageeffects/presets";
 import type {
   RenderErrorMessage,
@@ -78,11 +78,15 @@ export function useEffectsWorker() {
     return new Promise((resolve, reject) => {
       pendingRef.current.set(version, { resolve, reject });
 
+      // Clone the source so the original buffer stays intact for sync fallback
+      // and future renders. Transfer the clone to the worker.
+      const sourceForWorker = clonePixelBuffer(options.source);
+
       const message: WorkerRequestMessage = {
         type: "render",
         job: {
           renderVersion: version,
-          source: options.source,
+          source: sourceForWorker,
           crop: options.crop,
           presetId: options.presetId,
           resolvedParameters: options.resolvedParameters,
@@ -91,7 +95,13 @@ export function useEffectsWorker() {
         }
       };
 
-      worker.postMessage(message, [options.source.data.buffer]);
+      try {
+        worker.postMessage(message, [sourceForWorker.data.buffer]);
+      } catch (error) {
+        pendingRef.current.delete(version);
+        const messageText = error instanceof Error ? error.message : String(error);
+        reject(new Error(`Failed to post render job: ${messageText}`));
+      }
     });
   }, []);
 

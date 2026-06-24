@@ -121,6 +121,19 @@ export function AdvancedControls(): JSX.Element {
     }
 
     if (control.type === "color") {
+      const shuffleColor = () => {
+        const randomHex =
+          "#" +
+          Array.from({ length: 3 }, () =>
+            Math.floor(Math.random() * 256)
+              .toString(16)
+              .padStart(2, "0")
+          ).join("");
+        setAdvancedOverride(control.id, randomHex);
+        snapshotHistory();
+      };
+      const showShuffle = control.id === "shadowColor" || control.id === "highlightColor";
+
       return (
         <div key={control.id} className="flex items-center justify-between">
           <label htmlFor={control.id} className="text-xs text-white/70">
@@ -128,6 +141,16 @@ export function AdvancedControls(): JSX.Element {
           </label>
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-white/50">{String(currentValue)}</span>
+            {showShuffle && (
+              <button
+                type="button"
+                onClick={shuffleColor}
+                title={`Shuffle ${control.name}`}
+                className="rounded border border-white/10 bg-ink px-2 py-1 text-xs text-white/70 hover:bg-white/10 hover:text-white"
+              >
+                Shuffle
+              </button>
+            )}
             <input
               id={control.id}
               type="color"

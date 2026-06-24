@@ -44,7 +44,9 @@ Presets are grouped into three visual families:
 |----|------|----------|-----------------|
 | `pixelGrid` | Pixel Grid | Print & Grid | cell averaging, subtle grid overlay |
 | `monoDither` | Mono Dither | Print & Grid | grayscale, contrast, Bayer dither, inversion |
-| `classicAscii` | Classic ASCII | ASCII & Symbols | 5x7 bitmap font, dense luminance ramp |
+| `classicAscii` | Classic ASCII | ASCII & Symbols | 5x7 bitmap font, standard luminance ramp |
+| `blocksAscii` | Blocks ASCII | ASCII & Symbols | 5x7 bitmap font, block-shade glyphs |
+| `minimalAscii` | Minimal ASCII | ASCII & Symbols | 5x7 bitmap font, sparse high-contrast glyphs |
 | `dotHalftone` | Dot Halftone | Print & Grid | colored dots, palette presets, saturation boost |
 | `duotone` | Duotone | Atmosphere & Glow | luminance mapping, two-color interpolation |
 | `dreamGlow` | Dream Glow | Atmosphere & Glow | blur, soft glow, palette presets, grain |
@@ -56,7 +58,7 @@ Presets are grouped into three visual families:
 |----|------|----------|-----------------|
 | `cyberAscii` | Cyber ASCII | ASCII & Symbols | technical glyph set, colored glyphs, scanline grid, glow |
 | `luminousAsciiBloom` | Luminous ASCII Bloom | ASCII & Symbols | source-colored ASCII, thresholded bloom |
-| `symbolGlow` | Symbol Glow | ASCII & Symbols | blurred base + transparent glyph layer + soft glow |
+| `symbolGlow` | Symbol Glow | ASCII & Symbols | glowing symbols over a blurred source image |
 | `crtDream` | CRT Dream | Atmosphere & Glow | pixel grid, scanlines, bloom, RGB shift, vignette |
 | `vhsBloom` | VHS Bloom | Atmosphere & Glow | chromatic aberration, haze, noise, bloom |
 | `risoOffset` | Riso Offset | Print & Grid | duotone, channel offset, grain, registration shift |
@@ -69,7 +71,7 @@ Premium effects are previewable by free users; premium export and full advanced 
 | Capability | Guest / Free | Premium |
 |------------|--------------|---------|
 | Upload & crop | Yes | Yes |
-| Free presets | 7 | 7 |
+| Free presets | 9 | 9 |
 | Premium preview | Yes | Yes |
 | Premium export | No | Yes |
 | Export up to 1080px | Yes | Yes |

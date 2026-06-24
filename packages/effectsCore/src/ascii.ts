@@ -1,6 +1,8 @@
 import type { PixelBuffer, RgbaColor } from "./types.js";
 import { clampByte, createPixelBuffer, pixelIndex } from "./buffer.js";
 import { resizeBilinear } from "./resize.js";
+import { applyBoxBlur } from "./blend.js";
+import { applyGlow } from "./glow.js";
 
 /**
  * 5x7 bitmap font for ASCII rendering without DOM APIs.
@@ -284,6 +286,73 @@ export function renderAscii(
         }
       }
     }
+  }
+
+  return output;
+}
+
+export type SymbolGlowOptions = {
+  fontSize: number;
+  symbolSet: string;
+  glowRadius: number;
+  colorMode: "monochrome" | "colored";
+};
+
+/**
+ * Symbol Glow effect from the original MVP (commit c69b15f), ported to the
+ * PixelBuffer pipeline:
+ * 1. Blur the source image.
+ * 2. Render a grid of symbols chosen by inverted cell brightness.
+ * 3. Add a soft glow around the symbol layer.
+ * 4. Composite the glowing symbols over the blurred base.
+ */
+export function renderSymbolGlow(
+  source: PixelBuffer,
+  options: SymbolGlowOptions
+): PixelBuffer {
+  const { fontSize, symbolSet, glowRadius, colorMode } = options;
+
+  const symbols = symbolSet.length > 0 ? symbolSet : "2*+/=e";
+  const { width, height } = source;
+
+  // Dreamy blurred base.
+  const blurredBase: PixelBuffer = {
+    width,
+    height,
+    data: new Uint8ClampedArray(source.data)
+  };
+  applyBoxBlur(blurredBase, Math.max(0, glowRadius));
+
+  // Transparent symbol layer. In "colored" mode the glyph color samples the
+  // average cell color from the source (mirroring the original canvas code).
+  const symbolLayer = renderAscii(source, {
+    fontSize,
+    inkColor: [255, 255, 255, 255],
+    backgroundColor: [0, 0, 0, 0],
+    charset: symbols,
+    colorMode: colorMode === "colored" ? "source" : "monochrome"
+  });
+
+  // Soft glow around the symbols.
+  if (glowRadius > 0) {
+    applyGlow(symbolLayer, {
+      radius: Math.max(1, Math.round(glowRadius)),
+      amount: 0.6,
+      mode: "screen",
+      color: [255, 255, 255, 255]
+    });
+  }
+
+  // Composite glowing symbols over the blurred base.
+  const output = createPixelBuffer(width, height);
+  for (let i = 0; i < output.data.length; i += 4) {
+    const alpha = symbolLayer.data[i + 3] / 255;
+    for (let c = 0; c < 3; c++) {
+      output.data[i + c] = clampByte(
+        blurredBase.data[i + c] * (1 - alpha) + symbolLayer.data[i + c] * alpha
+      );
+    }
+    output.data[i + 3] = 255;
   }
 
   return output;

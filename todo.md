@@ -30,6 +30,20 @@
 - [x] Update `Features.md`, `todo.md`, `architecture.md`, and audit doc
 - [x] Run full test/typecheck/lint/build verification
 
+## Effect Tuning & Reliability Pass (completed)
+
+- [x] Riso Offset defaults: intensity 70%, paper #000000
+- [x] Classic ASCII defaults: 15% intensity, standard charset, original colors
+- [x] Split Classic ASCII into Classic ASCII, Blocks ASCII, and Minimal ASCII
+- [x] Luminous ASCII Bloom defaults: 5% intensity, density 10
+- [x] Restore original MVP Symbol Glow algorithm from commit c69b15f
+- [x] Duotone defaults: shadow #000000; shuffle buttons for shadow/highlight
+- [x] Noir Grain default: 70% grain
+- [x] Fix worker render reliability by cloning source before transfer
+- [x] Reset advanced overrides and apply default intensity when switching presets
+- [x] Update preset counts, tests, and docs
+- [x] Run full test/typecheck/lint verification
+
 ## Phase 0 — Audit and Planning
 
 - [x] Inspect repository state

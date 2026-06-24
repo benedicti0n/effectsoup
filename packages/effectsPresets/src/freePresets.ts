@@ -193,11 +193,11 @@ const classicAsciiPreset: EffectPreset = {
   description: "ASCII image from a dense luminance-to-glyph mapping.",
   category: "asciiSymbols",
   access: "free",
-  defaultIntensity: 50,
+  defaultIntensity: 15,
   advancedControlSchema: [
     ...universalAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
-    { id: "characterSet", name: "Character Set", type: "select", options: ["dense", "standard", "technical", "blocks", "minimal", "custom"], defaultValue: "dense" },
+    { id: "characterSet", name: "Character Set", type: "select", options: ["dense", "standard", "technical", "blocks", "minimal", "custom"], defaultValue: "standard" },
     { id: "customCharset", name: "Custom Character Array", type: "text", defaultValue: "" },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "monochrome", "tint"], defaultValue: "originalColors" },
     { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ffffff" },
@@ -208,7 +208,7 @@ const classicAsciiPreset: EffectPreset = {
     intensity,
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
-    characterSet: resolveOverride(overrides, "characterSet", "dense"),
+    characterSet: resolveOverride(overrides, "characterSet", "standard"),
     customCharset: resolveOverride(overrides, "customCharset", ""),
     colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
     tintColor: resolveOverride(overrides, "tintColor", "#ffffff"),
@@ -220,16 +220,16 @@ const classicAsciiPreset: EffectPreset = {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
       const fontSize = (params.fontSize as number) ?? 12;
-      const characterSet = (params.characterSet as string) ?? "dense";
+      const characterSet = (params.characterSet as string) ?? "standard";
       const customCharset = (params.customCharset as string) ?? "";
       const colorMode = (params.colorMode as string) ?? "originalColors";
       const tintColor = hexToRgba((params.tintColor as string) ?? "#ffffff");
       const backgroundColor = hexToRgba((params.backgroundColor as string) ?? "#000000");
       const inkColor = hexToRgba((params.inkColor as string) ?? "#ffffff");
 
-      let charset = ASCII_CHARSET_PRESETS[characterSet] ?? ASCII_CHARSET_PRESETS.dense;
+      let charset = ASCII_CHARSET_PRESETS[characterSet] ?? ASCII_CHARSET_PRESETS.standard;
       if (characterSet === "custom") {
-        charset = normalizeCustomCharset(customCharset, ASCII_CHARSET_PRESETS.dense);
+        charset = normalizeCustomCharset(customCharset, ASCII_CHARSET_PRESETS.standard);
       }
 
       const renderColorMode: "monochrome" | "color" | "source" =
@@ -245,6 +245,38 @@ const classicAsciiPreset: EffectPreset = {
       });
     };
   }
+};
+
+const blocksAsciiPreset: EffectPreset = {
+  id: "blocksAscii",
+  name: "Blocks ASCII",
+  description: "ASCII image built from block-shade glyphs.",
+  category: "asciiSymbols",
+  access: "free",
+  defaultIntensity: 15,
+  advancedControlSchema: classicAsciiPreset.advancedControlSchema,
+  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
+    ...classicAsciiPreset.intensityMapper(intensity, overrides),
+    advancedOverrides: overrides,
+    characterSet: resolveOverride(overrides, "characterSet", "blocks")
+  }),
+  createPipeline: classicAsciiPreset.createPipeline
+};
+
+const minimalAsciiPreset: EffectPreset = {
+  id: "minimalAscii",
+  name: "Minimal ASCII",
+  description: "Sparse ASCII image using just a few high-contrast glyphs.",
+  category: "asciiSymbols",
+  access: "free",
+  defaultIntensity: 15,
+  advancedControlSchema: classicAsciiPreset.advancedControlSchema,
+  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
+    ...classicAsciiPreset.intensityMapper(intensity, overrides),
+    advancedOverrides: overrides,
+    characterSet: resolveOverride(overrides, "characterSet", "minimal")
+  }),
+  createPipeline: classicAsciiPreset.createPipeline
 };
 
 const dotHalftonePreset: EffectPreset = {
@@ -339,14 +371,14 @@ const duotonePreset: EffectPreset = {
   defaultIntensity: 60,
   advancedControlSchema: [
     ...universalAdvancedControls,
-    { id: "shadowColor", name: "Shadow", type: "color", defaultValue: "#1a0b2e" },
+    { id: "shadowColor", name: "Shadow", type: "color", defaultValue: "#000000" },
     { id: "highlightColor", name: "Highlight", type: "color", defaultValue: "#ff006e" },
     { id: "contrast", name: "Contrast", type: "range", min: 0, max: 100, step: 1, defaultValue: 30 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    shadowColor: resolveOverride(overrides, "shadowColor", "#1a0b2e"),
+    shadowColor: resolveOverride(overrides, "shadowColor", "#000000"),
     highlightColor: resolveOverride(overrides, "highlightColor", "#ff006e"),
     contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 50))
   }),
@@ -461,7 +493,7 @@ const noirGrainPreset: EffectPreset = {
     contrast: resolveOverride(overrides, "contrast", 30 + Math.round((intensity / 100) * 50)),
     brightness: resolveOverride(overrides, "brightness", Math.round((intensity / 100) * -15)),
     vignette: resolveOverride(overrides, "vignette", Math.round((intensity / 100) * 70)),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 40))
+    grainAmount: resolveOverride(overrides, "grainAmount", 70)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -490,6 +522,8 @@ export const freePresets: EffectPreset[] = [
   pixelGridPreset,
   monoDitherPreset,
   classicAsciiPreset,
+  blocksAsciiPreset,
+  minimalAsciiPreset,
   dotHalftonePreset,
   duotonePreset,
   dreamGlowPreset,

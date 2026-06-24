@@ -120,9 +120,17 @@ export const useEditorStore = create<EditorState>((set) => ({
   setCrop: (crop) => set({ crop }),
 
   setPresetId: (presetId) =>
-    set((state) => ({
-      effect: { ...state.effect, presetId, intensity: state.effect.intensity }
-    })),
+    set(() => {
+      const preset = getPresetById(presetId);
+      const defaultIntensity = preset?.defaultIntensity ?? 50;
+      return {
+        effect: {
+          presetId,
+          intensity: defaultIntensity,
+          advancedOverrides: {}
+        }
+      };
+    }),
 
   setIntensity: (intensity) =>
     set((state) => ({

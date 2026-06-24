@@ -3,12 +3,12 @@ import { allPresets, freePresets, premiumPresets } from "./index.js";
 import { createPixelBuffer } from "@imageeffects/core";
 
 describe("presets", () => {
-  it("has 14 presets total", () => {
-    expect(allPresets.length).toBe(14);
+  it("has 16 presets total", () => {
+    expect(allPresets.length).toBe(16);
   });
 
-  it("has 7 free and 7 premium presets", () => {
-    expect(freePresets.length).toBe(7);
+  it("has 9 free and 7 premium presets", () => {
+    expect(freePresets.length).toBe(9);
     expect(premiumPresets.length).toBe(7);
   });
 
@@ -78,10 +78,26 @@ describe("presets", () => {
       expect(resolved.gridOpacity).toBe(20);
     });
 
-    it("Classic ASCII defaults to Dense character set and Original Colors", () => {
+    it("Classic ASCII defaults to 15% intensity, Standard character set and Original Colors", () => {
       const preset = allPresets.find((p) => p.id === "classicAscii");
+      expect(preset?.defaultIntensity).toBe(15);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.characterSet).toBe("dense");
+      expect(resolved.intensity).toBe(15);
+      expect(resolved.characterSet).toBe("standard");
+      expect(resolved.colorMode).toBe("originalColors");
+    });
+
+    it("Blocks ASCII defaults to blocks character set", () => {
+      const preset = allPresets.find((p) => p.id === "blocksAscii");
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.characterSet).toBe("blocks");
+      expect(resolved.colorMode).toBe("originalColors");
+    });
+
+    it("Minimal ASCII defaults to minimal character set", () => {
+      const preset = allPresets.find((p) => p.id === "minimalAscii");
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.characterSet).toBe("minimal");
       expect(resolved.colorMode).toBe("originalColors");
     });
 
@@ -104,6 +120,34 @@ describe("presets", () => {
       expect(preset).toBeDefined();
       expect(preset!.category).toBe("asciiSymbols");
       expect(preset!.defaultIntensity).toBe(40);
+    });
+
+    it("Riso Offset defaults to 70% intensity and black paper", () => {
+      const preset = allPresets.find((p) => p.id === "risoOffset");
+      expect(preset?.defaultIntensity).toBe(70);
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.intensity).toBe(70);
+      expect(resolved.paperColor).toBe("#000000");
+    });
+
+    it("Luminous ASCII Bloom defaults to 5% intensity and density 10", () => {
+      const preset = allPresets.find((p) => p.id === "luminousAsciiBloom");
+      expect(preset?.defaultIntensity).toBe(5);
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.intensity).toBe(5);
+      expect(resolved.density).toBe(10);
+    });
+
+    it("Duotone defaults to black shadow", () => {
+      const preset = allPresets.find((p) => p.id === "duotone");
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.shadowColor).toBe("#000000");
+    });
+
+    it("Noir Grain defaults to 70% grain", () => {
+      const preset = allPresets.find((p) => p.id === "noirGrain");
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.grainAmount).toBe(70);
     });
 
     it("Symbol Glow produces deterministic output for the same input and settings", () => {
