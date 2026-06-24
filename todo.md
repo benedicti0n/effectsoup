@@ -76,16 +76,16 @@
 - [x] Establish baseline test/typecheck/lint/build results
 - [x] Document implementation plan and ask permission to proceed
 
-### Phase 2 — Shared Shell, Tokens, and Primitives (in progress)
+### Phase 2 — Shared Shell, Tokens, and Primitives (completed)
 
-- [ ] Replace Tailwind tokens with Cohere palette (white canvas, ink, deep-green, dark-navy, coral, action-blue)
-- [ ] Configure Cohere typography fallbacks (Space Grotesk / Inter)
-- [ ] Create reusable primitives: Button, Card, Badge, Pill, Input, Slider, Dialog, Toast
-- [ ] Build new `SiteHeader` and `SiteFooter` with Cohere nav structure
-- [ ] Add `public/assets/showcase/` and generate 12 demo images (`img1.png`–`img12.png`)
-- [ ] Update `layout.tsx` and global styles
+- [x] Replace Tailwind tokens with Cohere palette (white canvas, ink, deep-green, dark-navy, coral, action-blue)
+- [x] Configure Cohere typography fallbacks (Space Grotesk / Inter)
+- [x] Create reusable primitives: Button, Card, Badge, Input, Slider, Toast
+- [x] Build new `SiteHeader` and `SiteFooter` with Cohere nav structure
+- [x] Add `public/assets/showcase/` and generate 12 demo images (`img1.png`–`img12.png`)
+- [x] Update `layout.tsx` and global styles
 
-### Phase 3 — Homepage + Mini Playground (pending)
+### Phase 3 — Homepage + Mini Playground (in progress)
 
 - [ ] Build `/` hero with eyebrow, headline, CTAs, trust row
 - [ ] Add interactive mini-playground with demo image selector, curated effect chips, intensity slider, upload
