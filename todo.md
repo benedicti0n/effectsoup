@@ -92,14 +92,14 @@
 - [x] Link mini-playground state to full `/playground`
 - [x] Implement lazy loading of effect renderer on homepage
 
-### Phase 4 — Showcase, Categories, npm Section (in progress)
+### Phase 4 — Showcase, Categories, npm Section (completed)
 
-- [ ] Build effect showcase section with 8–12 curated effect cards
-- [ ] Build three category cards (Print & Grid, ASCII & Symbols, Atmosphere & Glow)
-- [ ] Build creators/developers split section with npm package block (coming soon)
-- [ ] Build three-step "How It Works" section
+- [x] Build effect showcase section with 12 curated effect cards
+- [x] Build three category cards (Print & Grid, ASCII & Symbols, Atmosphere & Glow)
+- [x] Build creators/developers split section with npm package block (coming soon)
+- [x] Build three-step "How It Works" section
 
-### Phase 5 — Pricing + Docs Shell (pending)
+### Phase 5 — Pricing + Docs Shell (in progress)
 
 - [ ] Build `/pricing` with Free/Pro tiers and FAQ
 - [ ] Wire pricing CTAs to existing Dodo checkout or show disabled/coming-soon state
