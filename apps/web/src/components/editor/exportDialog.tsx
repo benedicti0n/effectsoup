@@ -10,6 +10,7 @@ import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
 import { authClient } from "@/lib/authClient";
 import { UpgradeDialog } from "@/components/billing/upgradeDialog";
+import { useToast } from "@/components/ui/toast";
 
 const PREMIUM_EXPORT_LONGEST = 4096;
 const FREE_EXPORT_LONGEST = 1080;
@@ -90,6 +91,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }): JSX.Element 
   const [error, setError] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const { data: session } = authClient.useSession();
+  const { showToast } = useToast();
 
   const isPremium = false;
   const selectedPreset = getPresetById(effect.presetId);
@@ -127,13 +129,14 @@ export function ExportDialog({ onClose }: { onClose: () => void }): JSX.Element 
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      showToast("Image exported successfully", "success");
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Export failed");
     } finally {
       setIsExporting(false);
     }
-  }, [source, crop, effect, format, quality, resolution, isPremium, onClose]);
+  }, [source, crop, effect, format, quality, resolution, isPremium, onClose, showToast]);
 
   if (showUpgrade) {
     return <UpgradeDialog onClose={() => setShowUpgrade(false)} />;

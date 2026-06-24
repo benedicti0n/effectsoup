@@ -1,3 +1,5 @@
+> **EffectSoup adaptation note:** This Cohere design analysis is the active visual source of truth for the EffectSoup product revamp. Tailwind tokens, color names, typography, and component patterns below are implemented in `apps/web/tailwind.config.ts`, `apps/web/src/app/globals.css`, and the reusable UI primitives under `apps/web/src/components/ui/`.
+
 ---
 version: alpha
 name: Cohere-design-analysis

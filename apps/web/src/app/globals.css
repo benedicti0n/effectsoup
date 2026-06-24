@@ -49,6 +49,29 @@ body {
   outline-offset: 2px;
 }
 
+/* Smooth interactive transitions */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"] {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    transition-duration: 0.01ms;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

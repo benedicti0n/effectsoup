@@ -1,6 +1,6 @@
-# effectLab
+# EffectSoup
 
-Browser-based, non-AI image transformation studio. Upload a photo, choose a retro-digital aesthetic, adjust one Intensity slider, and export.
+Browser-based, non-AI image transformation studio. Upload a photo, choose a retro-digital aesthetic, adjust one Intensity slider, and export. Built with the Cohere design system.
 
 ## Tech Stack
 
@@ -100,6 +100,14 @@ pnpm --filter web db:migrate
 2. Create a subscription product for Premium.
 3. Set `DODO_API_KEY`, `DODO_WEBHOOK_SECRET`, and `DODO_PREMIUM_PRODUCT_ID`.
 4. Use the Dodo CLI or dashboard to send test webhooks to `/api/webhooks/dodo`.
+
+## Key Routes
+
+- `/` — Marketing homepage with interactive mini-playground
+- `/playground` — Full image editor workspace
+- `/pricing` — Free and Premium plans
+- `/docs` — Documentation shell
+- `/account` — User account and subscription status
 
 ## Architecture Summary
 

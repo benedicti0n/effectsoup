@@ -1,4 +1,4 @@
-# effectLab — Architecture
+# EffectSoup — Architecture
 
 ## Repository Structure
 
@@ -23,7 +23,8 @@ effectLab/
 ### `apps/web`
 
 - Next.js App Router, React, TypeScript, Tailwind CSS
-- shadcn/ui components where useful
+- Cohere design system with Space Grotesk / Inter typography
+- Custom reusable UI primitives (Button, Card, Badge, Input, Slider, Toast)
 - Zustand for local editor UI state
 - TanStack Query for server state
 - Better Auth, Drizzle ORM, Neon PostgreSQL
@@ -31,7 +32,7 @@ effectLab/
 - Cloudflare R2 signed uploads for cloud projects
 - Sentry, PostHog
 
-This package owns UI, routing, auth, billing, storage orchestration, and project metadata. It must never contain pixel-processing algorithms.
+This package owns UI, routing, auth, billing, storage orchestration, and project metadata. It must never contain pixel-processing algorithms. Public routes include `/` (homepage + mini-playground), `/playground` (full editor), `/pricing`, `/docs`, `/account`, `/billing/success`, and `/billing/cancel`.
 
 ### Editor UI Components
 

@@ -1,8 +1,8 @@
-# effectLab — Product Features
+# EffectSoup — Product Features
 
 ## Product Promise
 
-effectLab is a browser-based, non-AI image transformation studio. Upload a photo, choose a retro-digital aesthetic, adjust one smart Intensity slider, and export a shareable result in under a minute. Your image stays on your device while editing.
+EffectSoup is a browser-based, non-AI image transformation studio. Upload a photo, choose a retro-digital aesthetic, adjust one smart Intensity slider, and export a shareable result in under a minute. Your image stays on your device while editing. The product is styled with the Cohere design system and centered around a `/playground` workspace plus a marketing homepage with an interactive mini-playground.
 
 ## Guest-first Behavior
 

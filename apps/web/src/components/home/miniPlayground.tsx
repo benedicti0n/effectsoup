@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useEffectsWorker } from "@/hooks/useEffectsWorker";
 import { renderEffectSync } from "@/lib/renderEffect";
+import { useToast } from "@/components/ui/toast";
 import NextImage from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -95,6 +96,7 @@ export function MiniPlayground(): JSX.Element {
   const [isRendering, setIsRendering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { render: renderInWorker } = useEffectsWorker();
+  const { showToast } = useToast();
 
   const preset = getPresetById(presetId);
   const presets = allPresets.filter((p) => p.access === "free").slice(0, 6);
@@ -228,10 +230,12 @@ export function MiniPlayground(): JSX.Element {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      showToast("Preview downloaded", "success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Download failed");
+      showToast(err instanceof Error ? err.message : "Download failed", "error");
     }
-  }, [source, preset, intensity, presetId, sourceName]);
+  }, [source, preset, intensity, presetId, sourceName, showToast]);
 
   return (
     <div className="rounded-sm border border-card-border bg-canvas p-4 shadow-sm md:p-6">

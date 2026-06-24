@@ -9,6 +9,7 @@ import { createProject, createSignedUploadUrl, uploadToSignedUrl } from "@/lib/p
 import { useEditorStore } from "@/store/editorStore";
 import { SignInDialog } from "@/components/auth/signInDialog";
 import { UpgradeDialog } from "@/components/billing/upgradeDialog";
+import { useToast } from "@/components/ui/toast";
 
 function dataUrlToBlob(dataUrl: string): Blob {
   const byteString = atob(dataUrl.split(",")[1] ?? "");
@@ -58,6 +59,7 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
   const [error, setError] = useState<string | null>(null);
   const [showSignIn, setShowSignIn] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const { showToast } = useToast();
 
   const isPremium = false;
 
@@ -111,6 +113,7 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
         effectGraphJson
       });
 
+      showToast("Project saved successfully", "success");
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
