@@ -19,30 +19,24 @@ export function AdvancedControls(): JSX.Element {
   }
 
   const isVisible = (control: AdvancedControlDefinition): boolean => {
-    // Hide custom charset/symbols inputs unless the corresponding set is "custom".
     if (control.id === "customCharset") {
       return resolvedValues.characterSet === "custom";
     }
     if (control.id === "customSymbols") {
       return resolvedValues.symbolSet === "custom";
     }
-    // Hide tint controls unless Color Mode is "tint".
     if (control.id === "tintColor" || control.id === "tintPreset") {
       return resolvedValues.colorMode === "tint";
     }
-    // Hide ink color unless Color Mode is "monochrome".
     if (control.id === "inkColor") {
       return resolvedValues.colorMode === "monochrome";
     }
-    // Symbol Glow: palette picker only matters in palette mode.
     if (control.id === "palette") {
       return resolvedValues.colorMode === "palette";
     }
-    // Symbol Glow: glyph color is the symbol tint in non-palette modes.
     if (control.id === "glyphColor") {
       return resolvedValues.colorMode !== "palette";
     }
-    // Hide accent color unless Cyber ASCII tint mode is active.
     if (control.id === "accentColor") {
       return resolvedValues.colorMode === "tint";
     }
@@ -85,7 +79,7 @@ export function AdvancedControls(): JSX.Element {
     if (control.type === "select") {
       return (
         <div key={control.id} className="space-y-1">
-          <label htmlFor={control.id} className="text-xs text-white/70">
+          <label htmlFor={control.id} className="font-mono text-xs text-mute">
             {control.name}
           </label>
           <select
@@ -94,7 +88,6 @@ export function AdvancedControls(): JSX.Element {
             onChange={(e) => {
               const value = e.target.value;
               setAdvancedOverride(control.id, value);
-              // Cyber ASCII tint preset changes should update the tint color too.
               if (control.id === "tintPreset") {
                 const colors: Record<string, string> = {
                   terminalGreen: "#00FF88",
@@ -108,7 +101,7 @@ export function AdvancedControls(): JSX.Element {
               }
               snapshotHistory();
             }}
-            className="w-full rounded-md border border-white/10 bg-ink px-3 py-2 text-sm text-white outline-none focus:border-neon-blue"
+            className="h-10 w-full rounded-sm border border-hairline bg-surface-soft px-3 font-mono text-sm text-ink outline-none focus:border-ink"
           >
             {control.options?.map((option) => (
               <option key={option} value={option}>
@@ -136,17 +129,17 @@ export function AdvancedControls(): JSX.Element {
 
       return (
         <div key={control.id} className="flex items-center justify-between">
-          <label htmlFor={control.id} className="text-xs text-white/70">
+          <label htmlFor={control.id} className="font-mono text-xs text-mute">
             {control.name}
           </label>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-white/50">{String(currentValue)}</span>
+            <span className="font-mono text-xs text-mute">{String(currentValue)}</span>
             {showShuffle && (
               <button
                 type="button"
                 onClick={shuffleColor}
                 title={`Shuffle ${control.name}`}
-                className="rounded border border-white/10 bg-ink px-2 py-1 text-xs text-white/70 hover:bg-white/10 hover:text-white"
+                className="rounded-sm border border-hairline bg-surface-soft px-2 py-1 font-mono text-xs text-mute hover:border-ink hover:text-ink"
               >
                 Shuffle
               </button>
@@ -157,7 +150,7 @@ export function AdvancedControls(): JSX.Element {
               value={currentValue as string}
               onChange={(e) => setAdvancedOverride(control.id, e.target.value)}
               onBlur={snapshotHistory}
-              className="h-8 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+              className="h-8 w-8 cursor-pointer rounded-sm border border-hairline bg-transparent"
             />
           </div>
         </div>
@@ -167,7 +160,7 @@ export function AdvancedControls(): JSX.Element {
     if (control.type === "boolean") {
       return (
         <div key={control.id} className="flex items-center justify-between">
-          <label htmlFor={control.id} className="text-xs text-white/70">
+          <label htmlFor={control.id} className="font-mono text-xs text-mute">
             {control.name}
           </label>
           <input
@@ -178,7 +171,7 @@ export function AdvancedControls(): JSX.Element {
               setAdvancedOverride(control.id, e.target.checked);
               snapshotHistory();
             }}
-            className="h-4 w-4 accent-neon-pink"
+            className="h-4 w-4 accent-ink"
           />
         </div>
       );
@@ -187,7 +180,7 @@ export function AdvancedControls(): JSX.Element {
     if (control.type === "text") {
       return (
         <div key={control.id} className="space-y-1">
-          <label htmlFor={control.id} className="text-xs text-white/70">
+          <label htmlFor={control.id} className="font-mono text-xs text-mute">
             {control.name}
           </label>
           <input
@@ -196,7 +189,7 @@ export function AdvancedControls(): JSX.Element {
             value={String(currentValue)}
             onChange={(e) => setAdvancedOverride(control.id, e.target.value)}
             onBlur={snapshotHistory}
-            className="w-full rounded-md border border-white/10 bg-ink px-3 py-2 text-sm text-white outline-none focus:border-neon-blue"
+            className="h-10 w-full rounded-sm border border-hairline bg-surface-soft px-3 font-mono text-sm text-ink outline-none focus:border-ink"
           />
         </div>
       );
@@ -206,12 +199,12 @@ export function AdvancedControls(): JSX.Element {
   };
 
   return (
-    <div className="space-y-4 rounded-lg border border-white/10 bg-ink p-4">
-      <div className="flex items-center justify-between">
-        <h4 className="font-mono text-sm text-neon-lavender">Advanced</h4>
+    <div className="space-y-4 rounded-sm border border-hairline bg-surface-soft p-4">
+      <div className="flex items-center justify-between border-b border-hairline pb-2">
+        <h4 className="font-mono text-sm font-bold text-ink">Advanced</h4>
         <button
           onClick={resetAdvancedOverrides}
-          className="text-xs text-white/50 hover:text-white underline"
+          className="font-mono text-xs text-mute underline hover:text-ink"
         >
           Reset overrides
         </button>

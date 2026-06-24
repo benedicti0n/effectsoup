@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0c;
-  --foreground: #f5f5dc;
+  --background: #fdfcfc;
+  --foreground: #201d1d;
 }
 
 html,
@@ -17,21 +17,21 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Custom scrollbar for dark theme */
+/* Hairline scrollbar for the cream canvas */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #111114;
+  background: #f8f7f7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #33333a;
+  background: rgba(15, 0, 0, 0.16);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #44444c;
+  background: rgba(15, 0, 0, 0.24);
 }

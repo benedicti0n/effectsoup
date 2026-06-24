@@ -20,11 +20,11 @@ export function EffectControls(): JSX.Element {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-mono text-neon-lavender">{presetName}</h3>
+      <div className="flex items-center justify-between border-b border-hairline pb-3">
+        <h3 className="font-mono text-base font-bold text-ink">{presetName}</h3>
         <button
           onClick={resetEffect}
-          className="text-xs text-white/50 hover:text-white underline"
+          className="font-mono text-xs text-mute underline hover:text-ink"
         >
           Reset
         </button>
@@ -44,10 +44,10 @@ export function EffectControls(): JSX.Element {
 
       <button
         onClick={() => setShowAdvanced((s) => !s)}
-        className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-surface px-4 py-2 text-sm hover:bg-white/5"
+        className="flex w-full items-center justify-between rounded-sm border border-hairline bg-surface-soft px-4 py-2 font-mono text-sm text-ink hover:bg-surface-card"
       >
         <span>Advanced Controls</span>
-        <span className="text-white/50">{showAdvanced ? "−" : "+"}</span>
+        <span className="text-mute">{showAdvanced ? "[-]" : "[+]"}</span>
       </button>
 
       <CropControls />

@@ -2,6 +2,8 @@
 
 import type { JSX } from "react";
 import { useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { authClient } from "@/lib/authClient";
 import { createCheckoutSession } from "@/lib/billingClient";
 import { SignInDialog } from "@/components/auth/signInDialog";
@@ -35,33 +37,39 @@ export function UpgradeDialog({ onClose }: { onClose: () => void }): JSX.Element
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-surface p-6 shadow-xl">
-        <h2 className="mb-2 text-xl font-bold text-neon-lavender">Unlock Premium</h2>
-        <p className="mb-4 text-sm text-white/70">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
+      <div className="w-full max-w-md rounded-sm border border-hairline bg-canvas p-6 shadow-sm">
+        <div className="mb-4 flex items-center justify-between border-b border-hairline pb-3">
+          <h2 className="font-mono text-xl font-bold text-ink">Unlock Premium</h2>
+          <button onClick={onClose} className="text-mute hover:text-ink" aria-label="Close">
+            <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
+          </button>
+        </div>
+
+        <p className="mb-4 font-mono text-sm text-body">
           Get all 16 presets, original/4K export, full advanced controls, and cloud projects for
           $3/month.
         </p>
 
-        <ul className="mb-6 space-y-2 text-sm text-white/70">
-          <li className="flex items-center gap-2">✓ All premium presets</li>
-          <li className="flex items-center gap-2">✓ Original & 4K exports</li>
-          <li className="flex items-center gap-2">✓ Cloud projects</li>
+        <ul className="mb-6 space-y-2 font-mono text-sm text-body">
+          <li>[+] All premium presets</li>
+          <li>[+] Original & 4K exports</li>
+          <li>[+] Cloud projects</li>
         </ul>
 
-        {error && <p className="mb-3 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-3 font-mono text-sm text-danger">{error}</p>}
 
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/5"
+            className="h-9 rounded-sm border border-hairline bg-canvas px-4 font-mono text-sm text-ink hover:bg-surface-soft"
           >
             Not now
           </button>
           <button
             onClick={upgrade}
             disabled={loading}
-            className="rounded-lg bg-neon-pink px-6 py-2 text-sm font-semibold text-white hover:bg-neon-pink/90 disabled:opacity-50"
+            className="h-9 rounded-sm bg-ink px-6 font-mono text-sm font-medium text-canvas hover:bg-ink-deep disabled:bg-surface-card disabled:text-ash"
           >
             {loading ? "Loading…" : session ? "Subscribe" : "Sign in to Subscribe"}
           </button>

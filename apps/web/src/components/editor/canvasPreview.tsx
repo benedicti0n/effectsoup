@@ -93,7 +93,6 @@ export function CanvasPreview(): JSX.Element {
             targetHeight: height
           });
         } catch {
-          // Fallback to synchronous main-thread rendering.
           output = renderEffectSync(sourceBuffer, crop, effect.presetId, resolved, width, height);
         }
 
@@ -126,14 +125,14 @@ export function CanvasPreview(): JSX.Element {
 
   if (!source) {
     return (
-      <div className="flex h-full items-center justify-center rounded-2xl border border-white/10 bg-surface p-8 text-white/50">
+      <div className="flex h-full items-center justify-center rounded-sm border border-hairline bg-surface-soft p-8 font-mono text-mute">
         Upload an image to start editing.
       </div>
     );
   }
 
   return (
-    <div className="relative flex h-full items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-ink">
+    <div className="relative flex h-full items-center justify-center overflow-hidden rounded-sm border border-hairline bg-surface-soft">
       <canvas ref={canvasRef} className="max-h-full max-w-full object-contain" />
     </div>
   );

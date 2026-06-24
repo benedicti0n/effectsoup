@@ -51,6 +51,20 @@
 - [x] Update Cyber ASCII default test
 - [x] Run full test/typecheck/lint/build verification
 
+## UI Revamp — DESIGN.md System (completed)
+
+- [x] Read and adopt `DESIGN.md` as the UI reference
+- [x] Install `@hugeicons/react` and `@hugeicons/core-free-icons`
+- [x] Update Tailwind config with DESIGN.md color/tokens/spacing scale
+- [x] Update `globals.css` and `layout.tsx` for cream-canvas / ink theme
+- [x] Build `SiteHeader` and `SiteFooter` components
+- [x] Revamp homepage with terminal-native hero TUI mockup, ASCII bracket lists, free/premium grid
+- [x] Revamp editor chrome (header, preset grid, controls, dialogs) to match design system
+- [x] Add Hugeicons to editor buttons where needed (download, undo, upload, etc.)
+- [x] Revamp account, billing success/cancel, sign-in, upgrade, and save-project pages/dialogs
+- [x] Note effectLab adaptation in `DESIGN.md`
+- [x] Run full test/typecheck/lint/build verification
+
 ## Phase 0 — Audit and Planning
 
 - [x] Inspect repository state

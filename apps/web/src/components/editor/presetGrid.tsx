@@ -1,6 +1,8 @@
 "use client";
 
 import type { JSX } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CrownIcon } from "@hugeicons/core-free-icons";
 import { allPresets, type EffectPreset, type PresetCategory } from "@imageeffects/presets";
 import { useEditorStore } from "@/store/editorStore";
 import { cn } from "@/lib/utils";
@@ -31,30 +33,28 @@ export function PresetGrid(): JSX.Element {
     <div className="space-y-6">
       {(Object.keys(grouped) as PresetCategory[]).map((category) => (
         <div key={category}>
-          <h3 className="mb-2 text-xs font-mono uppercase tracking-wider text-white/40">
+          <h3 className="mb-2 font-mono text-xs font-bold uppercase tracking-wider text-mute">
             {categoryLabels[category]}
           </h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {grouped[category].map((preset) => (
               <button
                 key={preset.id}
                 onClick={() => selectPreset(preset.id)}
                 className={cn(
-                  "rounded-xl border p-4 text-left transition hover:border-neon-blue/50",
+                  "rounded-sm border p-3 text-left transition hover:border-ink",
                   presetId === preset.id
-                    ? "border-neon-pink bg-neon-pink/10"
-                    : "border-white/10 bg-surface"
+                    ? "border-ink bg-surface-soft"
+                    : "border-hairline bg-canvas"
                 )}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm">{preset.name}</span>
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="font-mono text-sm font-medium text-ink">{preset.name}</span>
                   {preset.access === "premium" && (
-                    <span className="rounded bg-neon-lavender/20 px-1.5 py-0.5 text-[10px] font-mono text-neon-lavender">
-                      PRO
-                    </span>
+                    <HugeiconsIcon icon={CrownIcon} className="h-3.5 w-3.5 text-mute" />
                   )}
                 </div>
-                <p className="text-xs text-white/50">{preset.description}</p>
+                <p className="font-mono text-xs text-mute">{preset.description}</p>
               </button>
             ))}
           </div>

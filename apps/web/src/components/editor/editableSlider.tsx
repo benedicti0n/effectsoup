@@ -116,8 +116,8 @@ export function EditableSlider({
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs text-white/70">
-        <label id={labelId} htmlFor={id}>
+      <div className="flex items-center justify-between text-xs text-mute">
+        <label id={labelId} htmlFor={id} className="font-mono">
           {label}
         </label>
         {isEditing ? (
@@ -130,7 +130,7 @@ export function EditableSlider({
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             aria-label={`Edit ${label.toLowerCase()} value`}
-            className="w-16 rounded border border-neon-blue bg-ink px-1 py-0.5 text-right text-xs text-white outline-none focus:ring-1 focus:ring-neon-blue"
+            className="w-16 rounded-sm border border-ink bg-canvas px-1 py-0.5 text-right font-mono text-xs text-ink outline-none"
           />
         ) : (
           <button
@@ -141,7 +141,7 @@ export function EditableSlider({
               setIsEditing(true);
             }}
             aria-label={`Edit ${label.toLowerCase()} value`}
-            className="rounded px-1 py-0.5 font-mono text-white hover:bg-white/10 focus:bg-white/10 focus:outline-none"
+            className="rounded-sm px-1 py-0.5 font-mono text-ink hover:bg-surface-soft focus:bg-surface-soft focus:outline-none"
           >
             {formatValue(value, unit)}
           </button>
@@ -159,7 +159,7 @@ export function EditableSlider({
         onMouseUp={onCommit}
         onTouchEnd={onCommit}
         aria-labelledby={labelId}
-        className="w-full accent-neon-blue disabled:opacity-50"
+        className="w-full accent-ink disabled:opacity-50"
       />
     </div>
   );

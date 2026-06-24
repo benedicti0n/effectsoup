@@ -24,8 +24,8 @@ export function CropControls(): JSX.Element {
   };
 
   return (
-    <div className="space-y-4 rounded-lg border border-white/10 bg-ink p-4">
-      <h4 className="font-mono text-sm text-neon-lavender">Crop</h4>
+    <div className="space-y-4 rounded-sm border border-hairline bg-surface-soft p-4">
+      <h4 className="font-mono text-sm font-bold text-ink">Crop</h4>
 
       <div className="grid grid-cols-5 gap-1">
         {ASPECT_RATIOS.map(({ value, label }) => (
@@ -35,10 +35,10 @@ export function CropControls(): JSX.Element {
               updateCrop({ aspectRatio: value });
               snapshotHistory();
             }}
-            className={`rounded-md px-2 py-1.5 text-xs ${
+            className={`rounded-sm px-2 py-1.5 font-mono text-xs ${
               crop.aspectRatio === value
-                ? "bg-neon-pink/20 text-neon-pink"
-                : "bg-white/5 text-white/70 hover:bg-white/10"
+                ? "border border-ink bg-canvas text-ink"
+                : "border border-hairline bg-canvas text-mute hover:border-ink"
             }`}
           >
             {label}

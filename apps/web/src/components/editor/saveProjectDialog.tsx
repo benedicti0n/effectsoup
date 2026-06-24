@@ -2,6 +2,8 @@
 
 import type { JSX } from "react";
 import { useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { authClient } from "@/lib/authClient";
 import { createProject, createSignedUploadUrl, uploadToSignedUrl } from "@/lib/projectClient";
 import { useEditorStore } from "@/store/editorStore";
@@ -57,7 +59,6 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
   const [showSignIn, setShowSignIn] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
-  // Production: derive from /api/me/entitlements.
   const isPremium = false;
 
   const save = async () => {
@@ -75,14 +76,11 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
     setError(null);
 
     try {
-      // Fetch original source file as Blob.
       const sourceResponse = await fetch(source.objectUrl);
       const sourceBlob = await sourceResponse.blob();
 
-      // Generate thumbnail.
       const thumbnailBlob = await generateThumbnail(source.objectUrl);
 
-      // Get signed URLs and upload.
       const sourceUpload = await createSignedUploadUrl({
         fileName: source.fileName,
         contentType: sourceBlob.type as "image/jpeg" | "image/png" | "image/webp",
@@ -97,7 +95,6 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
       });
       await uploadToSignedUrl(thumbnailUpload.uploadUrl, thumbnailBlob);
 
-      // Save project metadata.
       const effectGraphJson = JSON.stringify({
         presetId: effect.presetId,
         intensity: effect.intensity,
@@ -139,37 +136,49 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-surface p-6 shadow-xl">
-        <h2 className="mb-4 text-xl font-bold">Save Project</h2>
-        <p className="mb-4 text-sm text-white/70">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
+      <div className="w-full max-w-md rounded-sm border border-hairline bg-canvas p-6 shadow-sm">
+        <div className="mb-4 flex items-center justify-between border-b border-hairline pb-3">
+          <h2 className="font-mono text-xl font-bold text-ink">Save Project</h2>
+          <button onClick={onClose} className="text-mute hover:text-ink" aria-label="Close">
+            <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
+          </button>
+        </div>
+
+        <p className="mb-4 font-mono text-sm text-body">
           Cloud projects are a Premium feature. Your source image, crop, preset, and settings are
           saved so you can edit later.
         </p>
 
-        <label className="mb-1 block text-xs text-white/70">Project title</label>
+        <label className="mb-1 block font-mono text-xs text-mute">Project title</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mb-4 w-full rounded-md border border-white/10 bg-ink px-3 py-2 text-sm text-white outline-none focus:border-neon-blue"
+          className="mb-4 h-10 w-full rounded-sm border border-hairline bg-surface-soft px-3 font-mono text-sm text-ink outline-none focus:border-ink"
         />
 
-        {error && <p className="mb-3 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-3 font-mono text-sm text-danger">{error}</p>}
 
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/5"
+            className="h-9 rounded-sm border border-hairline bg-canvas px-4 font-mono text-sm text-ink hover:bg-surface-soft"
           >
             Cancel
           </button>
           <button
             onClick={save}
             disabled={loading}
-            className="rounded-lg bg-neon-pink px-6 py-2 text-sm font-semibold text-white hover:bg-neon-pink/90 disabled:opacity-50"
+            className="h-9 rounded-sm bg-ink px-6 font-mono text-sm font-medium text-canvas hover:bg-ink-deep disabled:bg-surface-card disabled:text-ash"
           >
-            {loading ? "Saving…" : session ? (isPremium ? "Save" : "Upgrade to Save") : "Sign in to Save"}
+            {loading
+              ? "Saving…"
+              : session
+                ? isPremium
+                  ? "Save"
+                  : "Upgrade to Save"
+                : "Sign in to Save"}
           </button>
         </div>
       </div>

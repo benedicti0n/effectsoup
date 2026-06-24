@@ -18,6 +18,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
     "@aws-sdk/s3-request-presigner": "^3.750.0",
+    "@hugeicons/core-free-icons": "^4.2.1",
+    "@hugeicons/react": "^1.1.7",
     "@imageeffects/core": "workspace:*",
     "@imageeffects/presets": "workspace:*",
     "@imageeffects/worker": "workspace:*",

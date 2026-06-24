@@ -2,6 +2,8 @@
 
 import { useCallback } from "react";
 import type { JSX } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Upload01Icon } from "@hugeicons/core-free-icons";
 import { useEditorStore } from "@/store/editorStore";
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -68,11 +70,14 @@ export function UploadPanel(): JSX.Element {
     <div
       onDrop={onDrop}
       onDragOver={(e) => e.preventDefault()}
-      className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-surface p-12 text-center hover:border-neon-pink/50 transition"
+      className="flex flex-col items-center justify-center rounded-sm border border-dashed border-hairline-strong bg-surface-soft p-12 text-center hover:border-ink"
     >
-      <p className="mb-4 text-lg font-medium">Drop an image here, or click to upload</p>
-      <p className="mb-6 text-sm text-white/50">JPEG, PNG, WebP. Max 20 MB.</p>
-      <label className="cursor-pointer rounded-lg bg-neon-pink px-6 py-2 text-sm font-semibold text-white hover:bg-neon-pink/90 transition">
+      <HugeiconsIcon icon={Upload01Icon} className="mb-4 h-10 w-10 text-mute" />
+      <p className="mb-2 font-mono text-base font-medium text-ink">
+        Drop an image here, or click to upload
+      </p>
+      <p className="mb-6 font-mono text-sm text-mute">JPEG, PNG, WebP. Max 20 MB.</p>
+      <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-sm bg-ink px-5 font-mono text-base font-medium text-canvas hover:bg-ink-deep">
         Choose Image
         <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onChange} />
       </label>
