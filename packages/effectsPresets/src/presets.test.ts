@@ -137,12 +137,14 @@ describe("presets", () => {
       expect(resolved.paperColor).toBe("#000000");
     });
 
-    it("Luminous ASCII Bloom defaults to 5% intensity and density 10", () => {
+    it("Luminous ASCII Bloom defaults to 30% intensity, density 10, bloom radius 12, and base opacity 20", () => {
       const preset = allPresets.find((p) => p.id === "luminousAsciiBloom");
-      expect(preset?.defaultIntensity).toBe(5);
+      expect(preset?.defaultIntensity).toBe(30);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.intensity).toBe(5);
+      expect(resolved.intensity).toBe(30);
       expect(resolved.density).toBe(10);
+      expect(resolved.bloomRadius).toBe(12);
+      expect(resolved.baseOpacity).toBe(20);
     });
 
     it("Duotone defaults to black shadow", () => {
@@ -199,6 +201,88 @@ describe("presets", () => {
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.tileSize).toBeGreaterThanOrEqual(4);
       expect(resolved.frost).toBeGreaterThanOrEqual(40);
+    });
+
+    it("Cyber ASCII keeps dark backgrounds dark on a low-key input", () => {
+      const preset = allPresets.find((p) => p.id === "cyberAscii")!;
+      const source = createPixelBuffer(60, 60, [25, 25, 25, 255]);
+      const resolved = preset.intensityMapper(preset.defaultIntensity, {});
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+
+      // True background pixels should remain near the dark background color.
+      let hasDarkBackground = false;
+      let hasBrightGlyph = false;
+      for (let i = 0; i < output.data.length; i += 4) {
+        const r = output.data[i];
+        const g = output.data[i + 1];
+        const b = output.data[i + 2];
+        if (r <= 30 && g <= 30 && b <= 35) hasDarkBackground = true;
+        if (r > 50 || g > 50 || b > 50) hasBrightGlyph = true;
+      }
+      expect(hasDarkBackground).toBe(true);
+      expect(hasBrightGlyph).toBe(true);
+    });
+
+    it("Minimal ASCII places glyphs in dark-detail and edge regions", () => {
+      const preset = allPresets.find((p) => p.id === "minimalAscii")!;
+      // Mid-gray background with a darker disk; the disk should draw glyphs,
+      // while the background should stay mostly empty.
+      const source = createPixelBuffer(60, 60, [100, 100, 100, 255]);
+      const cx = 30;
+      const cy = 30;
+      for (let y = 0; y < 60; y++) {
+        for (let x = 0; x < 60; x++) {
+          if ((x - cx) ** 2 + (y - cy) ** 2 <= 18 ** 2) {
+            const idx = (y * 60 + x) * 4;
+            source.data[idx] = 50;
+            source.data[idx + 1] = 50;
+            source.data[idx + 2] = 50;
+          }
+        }
+      }
+
+      const resolved = preset.intensityMapper(preset.defaultIntensity, {});
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+
+      let diskDrawn = 0;
+      let backgroundDrawn = 0;
+      for (let y = 0; y < 60; y++) {
+        for (let x = 0; x < 60; x++) {
+          const idx = (y * 60 + x) * 4;
+          const inside = (x - cx) ** 2 + (y - cy) ** 2 <= 18 ** 2;
+          if (output.data[idx] > 15 || output.data[idx + 1] > 15 || output.data[idx + 2] > 15) {
+            if (inside) diskDrawn++;
+            else backgroundDrawn++;
+          }
+        }
+      }
+      expect(diskDrawn).toBeGreaterThan(backgroundDrawn * 2);
+    });
+
+    it("Minimal ASCII stays sparser than Classic ASCII for the same input", () => {
+      const minimal = allPresets.find((p) => p.id === "minimalAscii")!;
+      const classic = allPresets.find((p) => p.id === "classicAscii")!;
+      const source = createPixelBuffer(60, 60, [120, 120, 120, 255]);
+
+      const minimalResolved = minimal.intensityMapper(minimal.defaultIntensity, {});
+      const classicResolved = classic.intensityMapper(classic.defaultIntensity, {});
+
+      const minimalOutput = minimal.createPipeline(minimalResolved)(source, minimalResolved);
+      const classicOutput = classic.createPipeline(classicResolved)(source, classicResolved);
+
+      let minimalDrawn = 0;
+      let classicDrawn = 0;
+      for (let i = 0; i < source.data.length; i += 4) {
+        if (minimalOutput.data[i] > 20 || minimalOutput.data[i + 1] > 20 || minimalOutput.data[i + 2] > 20) {
+          minimalDrawn++;
+        }
+        if (classicOutput.data[i] > 20 || classicOutput.data[i + 1] > 20 || classicOutput.data[i + 2] > 20) {
+          classicDrawn++;
+        }
+      }
+      expect(minimalDrawn).toBeLessThan(classicDrawn);
     });
   });
 });

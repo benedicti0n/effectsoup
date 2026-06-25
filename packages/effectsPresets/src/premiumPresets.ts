@@ -1,5 +1,4 @@
 import {
-  applyBloom,
   applyBoxBlur,
   applyCubicGlass,
   applyDuotone,
@@ -12,9 +11,11 @@ import {
   applyScanlines,
   applyTint,
   applyVignette,
+  clampByte,
   clonePixelBuffer,
   normalizeCustomCharset,
   renderAscii,
+  renderLuminousAsciiBloom,
   renderSymbolGlow,
   resizeNearestNeighbor,
   type PixelBuffer,
@@ -89,7 +90,7 @@ const cyberAsciiPreset: EffectPreset = {
       colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
       tintPreset,
       tintColor: resolveOverride(overrides, "tintColor", defaultTintColor),
-      glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 50)),
+      glowAmount: resolveOverride(overrides, "glowAmount", 40 + Math.round((intensity / 100) * 30)),
       grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20))
     };
   },
@@ -114,9 +115,10 @@ const cyberAsciiPreset: EffectPreset = {
       const result = renderAscii(source, {
         fontSize,
         inkColor,
-        backgroundColor: [5, 5, 15, 255],
+        backgroundColor: [2, 2, 8, 255],
         charset: trimmedCharset,
-        colorMode: renderColorMode
+        colorMode: renderColorMode,
+        minGlyphLuminance: 0.25
       });
 
       // Subtle scanline grid.
@@ -128,13 +130,49 @@ const cyberAsciiPreset: EffectPreset = {
       });
 
       if (glowAmount > 0) {
-        applyGlow(result, {
-          radius: Math.max(1, Math.round(glowAmount * 8)),
-          amount: glowAmount * 0.25,
-          mode: "screen",
-          color: colorMode === "originalColors" ? [255, 255, 255, 255] : tintColor
+        // Build a glow layer from the glyphs alone so the dark background
+        // is not lifted by a global screen pass. The blurred glyph mask is
+        // thresholded to remove low-level bleed, then colorized and screened
+        // only where glyphs actually exist.
+        const glyphGlow = renderAscii(source, {
+          fontSize,
+          inkColor: [255, 255, 255, 255],
+          backgroundColor: [0, 0, 0, 255],
+          charset: trimmedCharset,
+          colorMode: "monochrome",
+          backgroundMode: "solid"
         });
+        const radius = Math.max(1, Math.round(glowAmount * 8));
+        applyBoxBlur(glyphGlow, radius);
+
+        const glowColor = colorMode === "originalColors" ? [100, 200, 255, 255] : tintColor;
+        const floor = 40;
+        for (let i = 0; i < glyphGlow.data.length; i += 4) {
+          const lum = Math.max(glyphGlow.data[i], glyphGlow.data[i + 1], glyphGlow.data[i + 2]);
+          if (lum < floor) {
+            glyphGlow.data[i] = 0;
+            glyphGlow.data[i + 1] = 0;
+            glyphGlow.data[i + 2] = 0;
+          } else {
+            const scale = (lum - floor) / (255 - floor);
+            glyphGlow.data[i] = clampByte(glowColor[0] * scale);
+            glyphGlow.data[i + 1] = clampByte(glowColor[1] * scale);
+            glyphGlow.data[i + 2] = clampByte(glowColor[2] * scale);
+          }
+        }
+
+        // Add the localized glow back over the crisp glyph result.
+        for (let i = 0; i < result.data.length; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const base = result.data[i + c];
+            const glow = glyphGlow.data[i + c];
+            result.data[i + c] = clampByte(
+              255 - ((255 - base) * (255 - glow)) / 255
+            );
+          }
+        }
       }
+
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);
       }
@@ -155,7 +193,10 @@ const symbolGlowPreset: EffectPreset = {
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
     { id: "symbolSet", name: "Symbol Set", type: "select", options: ["bloomSymbols", "softMath", "technical", "minimal", "custom"], defaultValue: "bloomSymbols" },
     { id: "customSymbols", name: "Custom Symbols", type: "text", defaultValue: "" },
-    { id: "glowRadius", name: "Glow Radius", type: "range", min: 0, max: 32, step: 1, defaultValue: 8 },
+    { id: "baseBlur", name: "Base Blur", type: "range", min: 0, max: 32, step: 1, defaultValue: 10 },
+    { id: "glowRadius", name: "Glow Radius", type: "range", min: 0, max: 32, step: 1, defaultValue: 10 },
+    { id: "glowIntensity", name: "Glow Intensity", type: "range", min: 0, max: 100, step: 1, defaultValue: 50 },
+    { id: "threshold", name: "Highlight Threshold", type: "range", min: 0, max: 100, step: 1, defaultValue: 55 },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["colored", "monochrome"], defaultValue: "colored" }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
@@ -164,7 +205,10 @@ const symbolGlowPreset: EffectPreset = {
     fontSize: resolveOverride(overrides, "fontSize", 12),
     symbolSet: resolveOverride(overrides, "symbolSet", "bloomSymbols"),
     customSymbols: resolveOverride(overrides, "customSymbols", ""),
-    glowRadius: resolveOverride(overrides, "glowRadius", 8),
+    baseBlur: resolveOverride(overrides, "baseBlur", 10),
+    glowRadius: resolveOverride(overrides, "glowRadius", 10),
+    glowIntensity: resolveOverride(overrides, "glowIntensity", 50),
+    threshold: resolveOverride(overrides, "threshold", 55),
     colorMode: resolveOverride(overrides, "colorMode", "colored"),
     grainAmount: resolveOverride(overrides, "grainAmount", 0),
     glowAmount: resolveOverride(overrides, "glowAmount", 0)
@@ -176,7 +220,10 @@ const symbolGlowPreset: EffectPreset = {
       const fontSize = (params.fontSize as number) ?? 12;
       const symbolSetName = (params.symbolSet as string) ?? "bloomSymbols";
       const customSymbols = (params.customSymbols as string) ?? "";
-      const glowRadius = (params.glowRadius as number) ?? 8;
+      const baseBlur = (params.baseBlur as number) ?? 10;
+      const glowRadius = (params.glowRadius as number) ?? 10;
+      const glowIntensity = ((params.glowIntensity as number) ?? 50) / 100;
+      const threshold = ((params.threshold as number) ?? 55) / 100;
       const colorMode = (params.colorMode as string) ?? "colored";
 
       const symbolSets: Record<string, string> = {
@@ -193,7 +240,12 @@ const symbolGlowPreset: EffectPreset = {
       return renderSymbolGlow(source, {
         fontSize,
         symbolSet,
+        baseBlur,
         glowRadius,
+        glowAmount: glowIntensity,
+        threshold,
+        falloff: 0.35,
+        edgeStrength: 0.5,
         colorMode: colorMode === "monochrome" ? "monochrome" : "colored"
       });
     };
@@ -206,20 +258,22 @@ const luminousAsciiBloomPreset: EffectPreset = {
   description: "ASCII characters that glow from bright areas with source-colored light.",
   category: "asciiSymbols",
   access: "premium",
-  defaultIntensity: 5,
+  defaultIntensity: 30,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
-    { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 10 }
+    { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 12 },
+    { id: "baseOpacity", name: "Base Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
     density: resolveOverride(overrides, "density", 10),
-    bloomRadius: resolveOverride(overrides, "bloomRadius", 2 + Math.round((intensity / 100) * 22)),
-    glowAmount: resolveOverride(overrides, "glowAmount", intensity),
+    bloomRadius: resolveOverride(overrides, "bloomRadius", 12),
+    baseOpacity: resolveOverride(overrides, "baseOpacity", 20),
+    glowAmount: resolveOverride(overrides, "glowAmount", 60),
     grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 15))
   }),
   createPipeline: (params): EffectPipeline => {
@@ -228,27 +282,20 @@ const luminousAsciiBloomPreset: EffectPreset = {
 
       const fontSize = (params.fontSize as number) ?? 12;
       const density = Math.max(2, Math.min(10, (params.density as number) ?? 10));
-      const bloomRadius = (params.bloomRadius as number) ?? 10;
+      const bloomRadius = (params.bloomRadius as number) ?? 12;
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
-      const charset = " .:-=+*#%@";
-      const trimmedCharset = charset.slice(0, Math.max(2, density));
+      const baseOpacity = ((params.baseOpacity as number) ?? 20) / 100;
 
-      const result = renderAscii(source, {
+      const result = renderLuminousAsciiBloom(source, {
         fontSize,
-        inkColor: [255, 255, 255, 255],
-        backgroundColor: [0, 0, 0, 0],
-        charset: trimmedCharset,
-        colorMode: "source",
-        backgroundMode: "source"
+        density,
+        bloomRadius,
+        glowAmount,
+        baseOpacity,
+        minGlyphLuminance: 0.2
       });
-      if (glowAmount > 0) {
-        applyBloom(result, {
-          radius: bloomRadius,
-          threshold: 0.55,
-          amount: glowAmount * 0.6
-        });
-      }
+
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);
       }
