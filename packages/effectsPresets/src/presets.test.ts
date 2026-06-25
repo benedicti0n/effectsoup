@@ -3,13 +3,13 @@ import { allPresets, freePresets, premiumPresets, getPresetById, migratePresetId
 import { createPixelBuffer } from "@imageeffects/core";
 
 describe("presets", () => {
-  it("has 16 presets total", () => {
-    expect(allPresets.length).toBe(16);
+  it("has 17 presets total", () => {
+    expect(allPresets.length).toBe(17);
   });
 
-  it("has 10 free and 6 premium presets", () => {
+  it("has 10 free and 7 premium presets", () => {
     expect(freePresets.length).toBe(10);
-    expect(premiumPresets.length).toBe(6);
+    expect(premiumPresets.length).toBe(7);
   });
 
   it("every preset resolves valid defaults", () => {
@@ -188,6 +188,17 @@ describe("presets", () => {
     it("migrates legacy mangaGrid to pixelGrid", () => {
       expect(migratePresetId("mangaGrid")).toBe("pixelGrid");
       expect(getPresetById("mangaGrid")?.id).toBe("pixelGrid");
+    });
+
+    it("Cubic Glass defaults to 40% intensity and glassFrost category", () => {
+      const preset = allPresets.find((p) => p.id === "cubicGlass");
+      expect(preset).toBeDefined();
+      expect(preset!.category).toBe("glassFrost");
+      expect(preset!.access).toBe("premium");
+      expect(preset!.defaultIntensity).toBe(40);
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.tileSize).toBeGreaterThanOrEqual(4);
+      expect(resolved.frost).toBeGreaterThanOrEqual(40);
     });
   });
 });

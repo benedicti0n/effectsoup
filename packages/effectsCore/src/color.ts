@@ -110,6 +110,22 @@ export function reducePalette(buffer: PixelBuffer, colorCount: number): void {
 }
 
 /**
+ * Tint a buffer in-place by blending each pixel toward a tint color.
+ * amount: 0 to 1, where 0 is unchanged and 1 is fully tinted.
+ */
+export function applyTint(buffer: PixelBuffer, tint: RgbaColor, amount: number): void {
+  if (amount <= 0) return;
+  const { data } = buffer;
+  const a = Math.min(1, Math.max(0, amount));
+  const inv = 1 - a;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = clampByte(data[i] * inv + tint[0] * a);
+    data[i + 1] = clampByte(data[i + 1] * inv + tint[1] * a);
+    data[i + 2] = clampByte(data[i + 2] * inv + tint[2] * a);
+  }
+}
+
+/**
  * Compute the average color of a buffer.
  */
 export function averageColor(buffer: PixelBuffer): RgbaColor {

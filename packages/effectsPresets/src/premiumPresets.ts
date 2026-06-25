@@ -1,6 +1,7 @@
 import {
   applyBloom,
   applyBoxBlur,
+  applyCubicGlass,
   applyDuotone,
   applyGlow,
   applyGrain,
@@ -9,6 +10,7 @@ import {
   applyPosterize,
   applyRgbShift,
   applyScanlines,
+  applyTint,
   applyVignette,
   clonePixelBuffer,
   normalizeCustomCharset,
@@ -51,6 +53,14 @@ const CYBER_TINT_PRESETS: Record<string, string> = {
   electricCyan: "#00f0ff",
   amberCrt: "#FFB000",
   violetCode: "#B388FF"
+};
+
+const ATMOSPHERE_TINT_PRESETS: Record<string, string> = {
+  warmPink: "#ff5c9a",
+  coolCyan: "#00f0ff",
+  amberCrt: "#FFB000",
+  mint: "#7CFFC4",
+  custom: "#ff5c9a"
 };
 
 const cyberAsciiPreset: EffectPreset = {
@@ -259,7 +269,9 @@ const crtDreamPreset: EffectPreset = {
     { id: "pixelCellSize", name: "Pixel Cell", type: "range", min: 2, max: 16, step: 1, defaultValue: 4 },
     { id: "scanlineStrength", name: "Scanlines", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 },
     { id: "rgbShift", name: "RGB Shift", type: "range", min: 0, max: 20, step: 1, defaultValue: 3 },
-    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ff5c9a" }
+    { id: "tintPreset", name: "Tint Preset", type: "select", options: ["warmPink", "coolCyan", "amberCrt", "mint", "custom"], defaultValue: "warmPink" },
+    { id: "tintColor", name: "Custom Tint", type: "color", defaultValue: "#ff5c9a" },
+    { id: "tintAmount", name: "Tint Amount", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
@@ -269,7 +281,9 @@ const crtDreamPreset: EffectPreset = {
     rgbShift: resolveOverride(overrides, "rgbShift", Math.round((intensity / 100) * 6)),
     glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 40)),
     vignette: resolveOverride(overrides, "vignette", Math.round((intensity / 100) * 40)),
+    tintPreset: resolveOverride(overrides, "tintPreset", "warmPink"),
     tintColor: resolveOverride(overrides, "tintColor", "#ff5c9a"),
+    tintAmount: resolveOverride(overrides, "tintAmount", Math.round((intensity / 100) * 40)),
     grainAmount: resolveOverride(overrides, "grainAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
@@ -281,7 +295,12 @@ const crtDreamPreset: EffectPreset = {
       const rgbShift = (params.rgbShift as number) ?? 0;
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const vignette = ((params.vignette as number) ?? 0) / 100;
-      const tintColor = hexToRgba((params.tintColor as string) ?? "#ff5c9a");
+      const tintPreset = (params.tintPreset as string) ?? "warmPink";
+      const tintHex = tintPreset === "custom"
+        ? ((params.tintColor as string) ?? "#ff5c9a")
+        : (ATMOSPHERE_TINT_PRESETS[tintPreset] ?? ATMOSPHERE_TINT_PRESETS.warmPink);
+      const tintColor = hexToRgba(tintHex);
+      const tintAmount = ((params.tintAmount as number) ?? 0) / 100;
 
       const smallW = Math.max(1, Math.floor(source.width / pixelCellSize));
       const smallH = Math.max(1, Math.floor(source.height / pixelCellSize));
@@ -305,6 +324,9 @@ const crtDreamPreset: EffectPreset = {
       if (vignette > 0) {
         applyVignette(result, vignette);
       }
+      if (tintAmount > 0) {
+        applyTint(result, tintColor, tintAmount);
+      }
       return result;
     };
   }
@@ -322,7 +344,9 @@ const vhsBloomPreset: EffectPreset = {
     { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 16, step: 1, defaultValue: 5 },
     { id: "chromatic", name: "Chromatic", type: "range", min: 0, max: 20, step: 1, defaultValue: 4 },
     { id: "noise", name: "Noise", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 },
-    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ff5c9a" }
+    { id: "tintPreset", name: "Tint Preset", type: "select", options: ["warmPink", "coolCyan", "amberCrt", "mint", "custom"], defaultValue: "warmPink" },
+    { id: "tintColor", name: "Custom Tint", type: "color", defaultValue: "#ff5c9a" },
+    { id: "tintAmount", name: "Tint Amount", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
@@ -331,7 +355,9 @@ const vhsBloomPreset: EffectPreset = {
     chromatic: resolveOverride(overrides, "chromatic", Math.round((intensity / 100) * 10)),
     noise: resolveOverride(overrides, "noise", Math.round((intensity / 100) * 40)),
     glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 40)),
+    tintPreset: resolveOverride(overrides, "tintPreset", "warmPink"),
     tintColor: resolveOverride(overrides, "tintColor", "#ff5c9a"),
+    tintAmount: resolveOverride(overrides, "tintAmount", Math.round((intensity / 100) * 40)),
     grainAmount: resolveOverride(overrides, "grainAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
@@ -342,7 +368,12 @@ const vhsBloomPreset: EffectPreset = {
       const chromatic = (params.chromatic as number) ?? 0;
       const noise = ((params.noise as number) ?? 0) / 100;
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
-      const tintColor = hexToRgba((params.tintColor as string) ?? "#ff5c9a");
+      const tintPreset = (params.tintPreset as string) ?? "warmPink";
+      const tintHex = tintPreset === "custom"
+        ? ((params.tintColor as string) ?? "#ff5c9a")
+        : (ATMOSPHERE_TINT_PRESETS[tintPreset] ?? ATMOSPHERE_TINT_PRESETS.warmPink);
+      const tintColor = hexToRgba(tintHex);
+      const tintAmount = ((params.tintAmount as number) ?? 0) / 100;
 
       const result = clonePixelBuffer(source);
       applyBoxBlur(result, blurAmount);
@@ -360,7 +391,45 @@ const vhsBloomPreset: EffectPreset = {
           color: tintColor
         });
       }
+      if (tintAmount > 0) {
+        applyTint(result, tintColor, tintAmount);
+      }
       return result;
+    };
+  }
+};
+
+const cubicGlassPreset: EffectPreset = {
+  id: "cubicGlass",
+  name: "Cubic Glass",
+  description: "Frosted translucent cubic tiles refracting the image beneath a soft glass grid.",
+  category: "glassFrost",
+  access: "premium",
+  defaultIntensity: 40,
+  advancedControlSchema: [
+    ...atmosphereAdvancedControls,
+    { id: "tileSize", name: "Tile Size", type: "range", min: 4, max: 64, step: 1, defaultValue: 16 },
+    { id: "distortion", name: "Distortion", type: "range", min: 0, max: 32, step: 1, defaultValue: 4 },
+    { id: "frost", name: "Frost", type: "range", min: 0, max: 100, step: 1, defaultValue: 60 }
+  ],
+  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
+    intensity,
+    advancedOverrides: overrides,
+    tileSize: resolveOverride(overrides, "tileSize", 4 + Math.round((intensity / 100) * 60)),
+    distortion: resolveOverride(overrides, "distortion", Math.round((intensity / 100) * 16)),
+    frost: resolveOverride(overrides, "frost", 40 + Math.round((intensity / 100) * 40)),
+    grainAmount: resolveOverride(overrides, "grainAmount", 0),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
+  }),
+  createPipeline: (params): EffectPipeline => {
+    return (source: PixelBuffer) => {
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
+      const tileSize = Math.max(1, (params.tileSize as number) ?? 16);
+      const distortion = (params.distortion as number) ?? 0;
+      const frost = ((params.frost as number) ?? 60) / 100;
+
+      return applyCubicGlass(source, tileSize, distortion, frost);
     };
   }
 };
@@ -416,5 +485,6 @@ export const premiumPresets: EffectPreset[] = [
   symbolGlowPreset,
   crtDreamPreset,
   vhsBloomPreset,
-  risoOffsetPreset
+  risoOffsetPreset,
+  cubicGlassPreset
 ];

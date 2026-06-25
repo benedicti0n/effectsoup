@@ -3,6 +3,7 @@ import {
   adjustBrightnessContrast,
   applyDuotone,
   applyPosterize,
+  applyTint,
   createPixelBuffer,
   reducePalette,
   toGrayscale
@@ -41,5 +42,13 @@ describe("color operations", () => {
     buffer.data[2] = 200;
     reducePalette(buffer, 8);
     expect(buffer.data[0]).not.toBe(10);
+  });
+
+  it("applies tint", () => {
+    const buffer = createPixelBuffer(1, 1, [128, 128, 128, 255]);
+    applyTint(buffer, [255, 0, 0, 255], 0.5);
+    expect(buffer.data[0]).toBeGreaterThan(128);
+    expect(buffer.data[1]).toBeLessThan(128);
+    expect(buffer.data[2]).toBeLessThan(128);
   });
 });
