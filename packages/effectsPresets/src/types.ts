@@ -3,7 +3,8 @@ import type { PixelBuffer } from "@imageeffects/core";
 export type PresetCategory =
   | "printGrid"
   | "asciiSymbols"
-  | "atmosphereGlow";
+  | "atmosphereGlow"
+  | "glassFrost";
 
 export type PresetAccess = "free" | "premium";
 

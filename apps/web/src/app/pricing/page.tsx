@@ -2,6 +2,7 @@
 
 import type { JSX } from "react";
 import { useState } from "react";
+import { allPresets, freePresets } from "@imageeffects/presets";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { Button } from "@/components/ui/button";
@@ -16,13 +17,11 @@ const billingEnabled = Boolean(env.DODO_API_KEY && env.DODO_PREMIUM_PRODUCT_ID);
 const faqs = [
   {
     question: "Can I use EffectSoup for free?",
-    answer:
-      "Yes. The free tier includes 9 presets, full upload and preview, and exports up to 1080px with no watermark."
+    answer: `Yes. The free tier includes ${freePresets.length} presets, full upload and preview, and exports up to 1080px with no watermark.`
   },
   {
     question: "What do I get with Premium?",
-    answer:
-      "Premium unlocks all 16 presets, original-resolution and 4K exports, full advanced controls, and cloud project saving."
+    answer: `Premium unlocks all ${allPresets.length} presets, original-resolution and 4K exports, full advanced controls, and cloud project saving.`
   },
   {
     question: "Where is my image processed?",
@@ -149,7 +148,7 @@ export default function PricingPage(): JSX.Element {
               period="/ forever"
               description="Everything you need to start creating beautiful effects."
               features={[
-                "9 free presets",
+                `${freePresets.length} free presets`,
                 "Upload and preview all effects",
                 "Export up to 1080px",
                 "No watermark",
@@ -167,7 +166,7 @@ export default function PricingPage(): JSX.Element {
               period="/ month"
               description="Unlock the full studio for creators who need more."
               features={[
-                "All 16 presets",
+                `All ${allPresets.length} presets`,
                 "Original-resolution export",
                 "4K export option",
                 "Full advanced controls",

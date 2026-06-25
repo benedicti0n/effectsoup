@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import type { JSX } from "react";
 
 const categoryLabels: Record<string, string> = {
-  printGrid: "Print & Grid",
+  printGrid: "Print & Dither",
   asciiSymbols: "ASCII & Symbols",
-  atmosphereGlow: "Atmosphere & Glow"
+  atmosphereGlow: "Atmosphere & Retro",
+  glassFrost: "Glass & Frost"
 };
 
 export function EffectShowcase(): JSX.Element {
-  const presets = allPresets.slice(0, 12);
+  const presets = allPresets.slice(0, 16);
 
   return (
     <section id="showcase" className="bg-canvas">
@@ -24,7 +25,7 @@ export function EffectShowcase(): JSX.Element {
               Effect showcase
             </p>
             <h2 className="font-display text-2xl font-medium tracking-tight text-ink-primary md:text-3xl">
-              16 presets tuned for real photos.
+              {allPresets.length} presets tuned for real photos.
             </h2>
           </div>
           <Button variant="outline" asChild>

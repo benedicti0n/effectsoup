@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allPresets, freePresets, premiumPresets } from "./index.js";
+import { allPresets, freePresets, premiumPresets, getPresetById, migratePresetId } from "./index.js";
 import { createPixelBuffer } from "@imageeffects/core";
 
 describe("presets", () => {
@@ -7,9 +7,9 @@ describe("presets", () => {
     expect(allPresets.length).toBe(16);
   });
 
-  it("has 9 free and 7 premium presets", () => {
-    expect(freePresets.length).toBe(9);
-    expect(premiumPresets.length).toBe(7);
+  it("has 10 free and 6 premium presets", () => {
+    expect(freePresets.length).toBe(10);
+    expect(premiumPresets.length).toBe(6);
   });
 
   it("every preset resolves valid defaults", () => {
@@ -43,9 +43,9 @@ describe("presets", () => {
   }, 15000);
 
   it("advanced overrides take precedence", () => {
-    const preset = allPresets[0];
-    if (!preset) return;
-    const resolved = preset.intensityMapper(50, { contrast: 42 });
+    const preset = allPresets.find((p) => p.id === "noirGrain");
+    expect(preset).toBeDefined();
+    const resolved = preset!.intensityMapper(50, { contrast: 42 });
     expect(resolved.contrast).toBe(42);
   });
 
@@ -68,14 +68,18 @@ describe("presets", () => {
       expect(resolved.dotSpacing).toBe(6);
     });
 
-    it("Manga Grid defaults to 5% intensity with poster levels 4, edge emphasis 25, grid opacity 20", () => {
-      const preset = allPresets.find((p) => p.id === "mangaGrid");
-      expect(preset?.defaultIntensity).toBe(5);
+    it("Error Diffusion defaults to 60% intensity", () => {
+      const preset = allPresets.find((p) => p.id === "errorDiffusionDither");
+      expect(preset?.defaultIntensity).toBe(60);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.intensity).toBe(5);
-      expect(resolved.posterLevels).toBe(4);
-      expect(resolved.edgeStrength).toBe(25);
-      expect(resolved.gridOpacity).toBe(20);
+      expect(resolved.intensity).toBe(60);
+    });
+
+    it("Ordered Dither defaults to 60% intensity", () => {
+      const preset = allPresets.find((p) => p.id === "orderedDither");
+      expect(preset?.defaultIntensity).toBe(60);
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.intensity).toBe(60);
     });
 
     it("Classic ASCII defaults to 15% intensity, Standard character set and Original Colors", () => {
@@ -174,6 +178,16 @@ describe("presets", () => {
       const output = pipeline(source, resolved);
       expect(output.width).toBe(source.width);
       expect(output.height).toBe(source.height);
+    });
+
+    it("migrates legacy monoDither to errorDiffusionDither", () => {
+      expect(migratePresetId("monoDither")).toBe("errorDiffusionDither");
+      expect(getPresetById("monoDither")?.id).toBe("errorDiffusionDither");
+    });
+
+    it("migrates legacy mangaGrid to pixelGrid", () => {
+      expect(migratePresetId("mangaGrid")).toBe("pixelGrid");
+      expect(getPresetById("mangaGrid")?.id).toBe("pixelGrid");
     });
   });
 });

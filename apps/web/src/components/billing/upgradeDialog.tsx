@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { allPresets } from "@imageeffects/presets";
 import { authClient } from "@/lib/authClient";
 import { createCheckoutSession } from "@/lib/billingClient";
 import { SignInDialog } from "@/components/auth/signInDialog";
@@ -47,7 +48,7 @@ export function UpgradeDialog({ onClose }: { onClose: () => void }): JSX.Element
         </div>
 
         <p className="mb-4 font-mono text-sm text-body">
-          Get all 16 presets, original/4K export, full advanced controls, and cloud projects for
+          Get all {allPresets.length} presets, original/4K export, full advanced controls, and cloud projects for
           $3/month.
         </p>
 

@@ -11,9 +11,10 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const categoryLabels: Record<PresetCategory, string> = {
-  printGrid: "Print & Grid",
+  printGrid: "Print & Dither",
   asciiSymbols: "ASCII & Symbols",
-  atmosphereGlow: "Atmosphere & Glow"
+  atmosphereGlow: "Atmosphere & Retro",
+  glassFrost: "Glass & Frost"
 };
 
 export function PresetGrid(): JSX.Element {
@@ -37,7 +38,7 @@ export function PresetGrid(): JSX.Element {
       acc[preset.category] = acc[preset.category] ?? [];
       acc[preset.category].push(preset);
       return acc;
-    }, { printGrid: [], asciiSymbols: [], atmosphereGlow: [] });
+    }, { printGrid: [], asciiSymbols: [], atmosphereGlow: [], glassFrost: [] });
   }, [search]);
 
   const hasResults = Object.values(grouped).some((group) => group.length > 0);

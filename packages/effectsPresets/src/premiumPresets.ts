@@ -1,10 +1,7 @@
 import {
-  adjustBrightnessContrast,
-  adjustSaturation,
   applyBloom,
   applyBoxBlur,
   applyDuotone,
-  applyEdgeDetect,
   applyGlow,
   applyGrain,
   applyGridOverlay,
@@ -15,7 +12,6 @@ import {
   applyVignette,
   clonePixelBuffer,
   normalizeCustomCharset,
-  reducePalette,
   renderAscii,
   renderSymbolGlow,
   resizeNearestNeighbor,
@@ -29,10 +25,7 @@ import type {
   ResolvedPresetParameters
 } from "./types.js";
 
-const universalAdvancedControls: AdvancedControlDefinition[] = [
-  { id: "brightness", name: "Brightness", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
-  { id: "contrast", name: "Contrast", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
-  { id: "saturation", name: "Saturation", type: "range", min: -100, max: 100, step: 1, defaultValue: 0 },
+const atmosphereAdvancedControls: AdvancedControlDefinition[] = [
   { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 },
   { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 }
 ];
@@ -68,7 +61,7 @@ const cyberAsciiPreset: EffectPreset = {
   access: "premium",
   defaultIntensity: 15,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 6 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "tint", "monochrome"], defaultValue: "originalColors" },
@@ -148,7 +141,7 @@ const symbolGlowPreset: EffectPreset = {
   access: "premium",
   defaultIntensity: 40,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
     { id: "symbolSet", name: "Symbol Set", type: "select", options: ["bloomSymbols", "softMath", "technical", "minimal", "custom"], defaultValue: "bloomSymbols" },
     { id: "customSymbols", name: "Custom Symbols", type: "text", defaultValue: "" },
@@ -162,7 +155,9 @@ const symbolGlowPreset: EffectPreset = {
     symbolSet: resolveOverride(overrides, "symbolSet", "bloomSymbols"),
     customSymbols: resolveOverride(overrides, "customSymbols", ""),
     glowRadius: resolveOverride(overrides, "glowRadius", 8),
-    colorMode: resolveOverride(overrides, "colorMode", "colored")
+    colorMode: resolveOverride(overrides, "colorMode", "colored"),
+    grainAmount: resolveOverride(overrides, "grainAmount", 0),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -203,7 +198,7 @@ const luminousAsciiBloomPreset: EffectPreset = {
   access: "premium",
   defaultIntensity: 5,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
     { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 10 }
@@ -261,10 +256,11 @@ const crtDreamPreset: EffectPreset = {
   access: "premium",
   defaultIntensity: 55,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "pixelCellSize", name: "Pixel Cell", type: "range", min: 2, max: 16, step: 1, defaultValue: 4 },
     { id: "scanlineStrength", name: "Scanlines", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 },
-    { id: "rgbShift", name: "RGB Shift", type: "range", min: 0, max: 20, step: 1, defaultValue: 3 }
+    { id: "rgbShift", name: "RGB Shift", type: "range", min: 0, max: 20, step: 1, defaultValue: 3 },
+    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ff5c9a" }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
@@ -273,7 +269,9 @@ const crtDreamPreset: EffectPreset = {
     scanlineStrength: resolveOverride(overrides, "scanlineStrength", Math.round((intensity / 100) * 60)),
     rgbShift: resolveOverride(overrides, "rgbShift", Math.round((intensity / 100) * 6)),
     glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 40)),
-    vignette: resolveOverride(overrides, "vignette", Math.round((intensity / 100) * 40))
+    vignette: resolveOverride(overrides, "vignette", Math.round((intensity / 100) * 40)),
+    tintColor: resolveOverride(overrides, "tintColor", "#ff5c9a"),
+    grainAmount: resolveOverride(overrides, "grainAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -284,6 +282,7 @@ const crtDreamPreset: EffectPreset = {
       const rgbShift = (params.rgbShift as number) ?? 0;
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const vignette = ((params.vignette as number) ?? 0) / 100;
+      const tintColor = hexToRgba((params.tintColor as string) ?? "#ff5c9a");
 
       const smallW = Math.max(1, Math.floor(source.width / pixelCellSize));
       const smallH = Math.max(1, Math.floor(source.height / pixelCellSize));
@@ -300,7 +299,8 @@ const crtDreamPreset: EffectPreset = {
         applyGlow(result, {
           radius: Math.max(1, Math.round(glowAmount * 6)),
           amount: glowAmount * 0.4,
-          mode: "screen"
+          mode: "screen",
+          color: tintColor
         });
       }
       if (vignette > 0) {
@@ -319,10 +319,11 @@ const vhsBloomPreset: EffectPreset = {
   access: "premium",
   defaultIntensity: 60,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 16, step: 1, defaultValue: 5 },
     { id: "chromatic", name: "Chromatic", type: "range", min: 0, max: 20, step: 1, defaultValue: 4 },
-    { id: "noise", name: "Noise", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 }
+    { id: "noise", name: "Noise", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 },
+    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ff5c9a" }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
@@ -331,7 +332,8 @@ const vhsBloomPreset: EffectPreset = {
     chromatic: resolveOverride(overrides, "chromatic", Math.round((intensity / 100) * 10)),
     noise: resolveOverride(overrides, "noise", Math.round((intensity / 100) * 40)),
     glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 40)),
-    saturation: resolveOverride(overrides, "saturation", Math.round((intensity / 100) * -20))
+    tintColor: resolveOverride(overrides, "tintColor", "#ff5c9a"),
+    grainAmount: resolveOverride(overrides, "grainAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -341,12 +343,9 @@ const vhsBloomPreset: EffectPreset = {
       const chromatic = (params.chromatic as number) ?? 0;
       const noise = ((params.noise as number) ?? 0) / 100;
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
-      const saturation = ((params.saturation as number) ?? 0) / 100;
+      const tintColor = hexToRgba((params.tintColor as string) ?? "#ff5c9a");
 
       const result = clonePixelBuffer(source);
-      if (saturation !== 0) {
-        adjustSaturation(result, saturation);
-      }
       applyBoxBlur(result, blurAmount);
       if (chromatic > 0) {
         applyRgbShift(result, chromatic);
@@ -358,7 +357,8 @@ const vhsBloomPreset: EffectPreset = {
         applyGlow(result, {
           radius: Math.max(1, Math.round(glowAmount * 8)),
           amount: glowAmount * 0.5,
-          mode: "screen"
+          mode: "screen",
+          color: tintColor
         });
       }
       return result;
@@ -374,7 +374,7 @@ const risoOffsetPreset: EffectPreset = {
   access: "premium",
   defaultIntensity: 70,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "channelShift", name: "Channel Shift", type: "range", min: 0, max: 20, step: 1, defaultValue: 4 },
     { id: "inkColor", name: "Ink", type: "color", defaultValue: "#ff5c5c" },
     { id: "paperColor", name: "Paper", type: "color", defaultValue: "#000000" }
@@ -384,6 +384,7 @@ const risoOffsetPreset: EffectPreset = {
     advancedOverrides: overrides,
     channelShift: resolveOverride(overrides, "channelShift", Math.round((intensity / 100) * 10)),
     grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 35)),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0),
     inkColor: resolveOverride(overrides, "inkColor", "#ff5c5c"),
     paperColor: resolveOverride(overrides, "paperColor", "#000000")
   }),
@@ -410,68 +411,11 @@ const risoOffsetPreset: EffectPreset = {
   }
 };
 
-const mangaGridPreset: EffectPreset = {
-  id: "mangaGrid",
-  name: "Manga Grid",
-  description: "Graphic portrait/panel effect inspired by manga printing.",
-  category: "printGrid",
-  access: "premium",
-  defaultIntensity: 5,
-  advancedControlSchema: [
-    ...universalAdvancedControls,
-    { id: "posterLevels", name: "Poster Levels", type: "range", min: 2, max: 8, step: 1, defaultValue: 4 },
-    { id: "edgeStrength", name: "Edge Emphasis", type: "range", min: 0, max: 100, step: 1, defaultValue: 25 },
-    { id: "gridOpacity", name: "Grid Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 }
-  ],
-  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
-    intensity,
-    advancedOverrides: overrides,
-    // At the default intensity of 5, posterLevels=4, edgeStrength=25, gridOpacity=20.
-    posterLevels: resolveOverride(overrides, "posterLevels", Math.max(2, Math.round(4 - ((intensity - 5) / 95) * 2))),
-    edgeStrength: resolveOverride(overrides, "edgeStrength", Math.min(100, Math.max(0, Math.round(25 + ((intensity - 5) / 95) * 55)))),
-    gridOpacity: resolveOverride(overrides, "gridOpacity", Math.min(100, Math.max(0, Math.round(20 + ((intensity - 5) / 95) * 40)))),
-    contrast: resolveOverride(overrides, "contrast", Math.min(100, Math.max(0, Math.round(((intensity - 5) / 95) * 30))))
-  }),
-  createPipeline: (params): EffectPipeline => {
-    return (source: PixelBuffer) => {
-      if (params.intensity === 0) return clonePixelBuffer(source);
-
-      const posterLevels = (params.posterLevels as number) ?? 4;
-      const edgeStrength = ((params.edgeStrength as number) ?? 0) / 100;
-      const gridOpacity = ((params.gridOpacity as number) ?? 0) / 100;
-      const contrast = ((params.contrast as number) ?? 0) / 100;
-
-      const result = clonePixelBuffer(source);
-      if (contrast > 0) {
-        adjustBrightnessContrast(result, 0, contrast);
-      }
-      applyPosterize(result, posterLevels);
-      // Keep some source color rather than crushing to a tiny palette.
-      reducePalette(result, Math.min(16, posterLevels * 4));
-
-      if (edgeStrength > 0) {
-        applyEdgeDetect(result, edgeStrength * 0.5);
-      }
-
-      if (gridOpacity > 0) {
-        applyGridOverlay(result, {
-          cellSize: 24,
-          opacity: gridOpacity,
-          style: "darken",
-          lineWidth: 1
-        });
-      }
-      return result;
-    };
-  }
-};
-
 export const premiumPresets: EffectPreset[] = [
   cyberAsciiPreset,
   luminousAsciiBloomPreset,
   symbolGlowPreset,
   crtDreamPreset,
   vhsBloomPreset,
-  risoOffsetPreset,
-  mangaGridPreset
+  risoOffsetPreset
 ];

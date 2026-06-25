@@ -3,25 +3,32 @@ import type { JSX } from "react";
 
 const categories = [
   {
-    title: "Print & Grid",
+    title: "Print & Dither",
     description:
-      "Halftone dots, ordered dither, pixel grids, and riso-style offsets. For that tactile, printed look.",
+      "Halftone dots, ordered dither, error diffusion, pixel grids, and riso-style offsets. For that tactile, printed look.",
     image: "/assets/showcase/img6.png",
-    presets: "Pixel Grid, Dot Halftone, Mono Dither, Riso Offset"
+    presets: "Pixel Grid, Error Diffusion, Ordered Dither, Dot Halftone, Duotone, Riso Offset"
   },
   {
     title: "ASCII & Symbols",
     description:
       "Turn photos into character art: classic ASCII, block glyphs, cyber terminals, and glowing symbols.",
     image: "/assets/showcase/img2.png",
-    presets: "Classic ASCII, Cyber ASCII, Symbol Glow, Luminous Bloom"
+    presets: "Classic ASCII, Blocks ASCII, Minimal ASCII, Cyber ASCII, Symbol Glow, Luminous Bloom"
   },
   {
-    title: "Atmosphere & Glow",
+    title: "Atmosphere & Retro",
     description:
-      "Dreamy glows, duotone washes, noir grain, CRT bloom, and VHS chromatic aberration.",
+      "Dreamy glows, noir grain, CRT bloom, and VHS chromatic aberration.",
     image: "/assets/showcase/img3.png",
-    presets: "Dream Glow, Duotone, Noir Grain, CRT Dream, VHS Bloom"
+    presets: "Dream Glow, Noir Grain, CRT Dream, VHS Bloom"
+  },
+  {
+    title: "Glass & Frost",
+    description:
+      "Frosted translucent tiles that refract the image beneath a soft glass grid.",
+    image: "/assets/showcase/img4.png",
+    presets: "Cubic Glass"
   }
 ];
 

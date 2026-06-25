@@ -1,4 +1,5 @@
 import type { JSX } from "react";
+import { allPresets } from "@imageeffects/presets";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { MiniPlayground } from "@/components/home/miniPlayground";
@@ -44,7 +45,7 @@ function Hero(): JSX.Element {
               </Button>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-muted">
-              <span>16 presets</span>
+              <span>{allPresets.length} presets</span>
               <span className="h-1 w-1 rounded-full bg-muted" />
               <span>Free forever tier</span>
               <span className="h-1 w-1 rounded-full bg-muted" />

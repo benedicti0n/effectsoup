@@ -27,12 +27,15 @@ import type {
   ResolvedPresetParameters
 } from "./types.js";
 
-const universalAdvancedControls: AdvancedControlDefinition[] = [
-  { id: "brightness", name: "Brightness", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
-  { id: "contrast", name: "Contrast", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
-  { id: "saturation", name: "Saturation", type: "range", min: -100, max: 100, step: 1, defaultValue: 0 },
+const atmosphereAdvancedControls: AdvancedControlDefinition[] = [
   { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 },
   { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 }
+];
+
+const adjustmentControls: AdvancedControlDefinition[] = [
+  { id: "brightness", name: "Brightness", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
+  { id: "contrast", name: "Contrast", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
+  { id: "saturation", name: "Saturation", type: "range", min: -100, max: 100, step: 1, defaultValue: 0 }
 ];
 
 function resolveOverride<T extends number | string | boolean>(
@@ -51,23 +54,14 @@ function hexToRgba(hex: string): RgbaColor {
   return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255, 255];
 }
 
-function applyUniversalAdjustments(
+function applyAtmosphereAdjustments(
   buffer: PixelBuffer,
   params: ResolvedPresetParameters
 ): PixelBuffer {
-  const brightness = ((params.brightness as number) ?? 0);
-  const contrast = ((params.contrast as number) ?? 0) / 100;
-  const saturation = ((params.saturation as number) ?? 0) / 100;
   const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
   const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
 
   const result = buffer;
-  if (brightness !== 0 || contrast !== 0) {
-    adjustBrightnessContrast(result, brightness, contrast);
-  }
-  if (saturation !== 0) {
-    adjustSaturation(result, saturation);
-  }
   if (glowAmount > 0) {
     applyGlow(result, {
       radius: Math.max(1, Math.round(glowAmount * 8)),
@@ -89,7 +83,7 @@ const pixelGridPreset: EffectPreset = {
   access: "free",
   defaultIntensity: 5,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "cellSize", name: "Cell Size", type: "range", min: 4, max: 64, step: 2, defaultValue: 16 },
     { id: "gridOpacity", name: "Grid Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 25 }
   ],
@@ -98,9 +92,6 @@ const pixelGridPreset: EffectPreset = {
     advancedOverrides: overrides,
     cellSize: resolveOverride(overrides, "cellSize", 4 + Math.round((intensity / 100) * 60)),
     gridOpacity: resolveOverride(overrides, "gridOpacity", Math.round((intensity / 100) * 40)),
-    brightness: resolveOverride(overrides, "brightness", 0),
-    contrast: resolveOverride(overrides, "contrast", 0),
-    saturation: resolveOverride(overrides, "saturation", 0),
     grainAmount: resolveOverride(overrides, "grainAmount", 0),
     glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
@@ -117,7 +108,7 @@ const pixelGridPreset: EffectPreset = {
       let result = resizeNearestNeighbor(source, smallW, smallH);
       result = resizeNearestNeighbor(result, source.width, source.height);
 
-      result = applyUniversalAdjustments(result, params);
+      result = applyAtmosphereAdjustments(result, params);
 
       if (gridOpacity > 0) {
         applyGridOverlay(result, { cellSize, opacity: gridOpacity, style: "darken", lineWidth: 1 });
@@ -128,50 +119,109 @@ const pixelGridPreset: EffectPreset = {
   }
 };
 
-const monoDitherPreset: EffectPreset = {
-  id: "monoDither",
-  name: "Mono Dither",
-  description: "Black-and-white ordered or threshold dither.",
+const errorDiffusionDitherPreset: EffectPreset = {
+  id: "errorDiffusionDither",
+  name: "Error Diffusion",
+  description: "Organic monochrome dithering with diffused pixel texture.",
   category: "printGrid",
   access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [
-    ...universalAdvancedControls,
-    { id: "algorithm", name: "Algorithm", type: "select", options: ["ordered", "errorDiffusion"], defaultValue: "ordered" },
+    ...adjustmentControls,
+    ...atmosphereAdvancedControls,
     { id: "threshold", name: "Threshold", type: "range", min: 0, max: 255, step: 1, defaultValue: 128 },
     { id: "invert", name: "Invert", type: "boolean", defaultValue: false }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    algorithm: resolveOverride(overrides, "algorithm", intensity > 50 ? "errorDiffusion" : "ordered"),
     threshold: resolveOverride(overrides, "threshold", 100 + Math.round((intensity / 100) * 80)),
     invert: resolveOverride(overrides, "invert", false),
     contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 30)),
     brightness: resolveOverride(overrides, "brightness", Math.round((intensity / 100) * -10)),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 10))
+    saturation: resolveOverride(overrides, "saturation", 0),
+    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 10)),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
       const result = clonePixelBuffer(source);
+      const saturation = ((params.saturation as number) ?? 0) / 100;
       const contrast = ((params.contrast as number) ?? 0) / 100;
       const brightness = (params.brightness as number) ?? 0;
       const threshold = (params.threshold as number) ?? 128;
-      const algorithm = (params.algorithm as string) ?? "ordered";
       const invert = (params.invert as boolean) ?? false;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
 
+      if (saturation !== 0) {
+        adjustSaturation(result, saturation);
+      }
       toGrayscale(result);
       if (brightness !== 0 || contrast !== 0) {
         adjustBrightnessContrast(result, brightness, contrast);
       }
-      if (algorithm === "errorDiffusion") {
-        applyFloydSteinbergDither(result, threshold);
-      } else {
-        applyOrderedDither(result, threshold);
+      applyFloydSteinbergDither(result, threshold);
+      if (invert) {
+        for (let i = 0; i < result.data.length; i += 4) {
+          result.data[i] = 255 - result.data[i];
+          result.data[i + 1] = 255 - result.data[i + 1];
+          result.data[i + 2] = 255 - result.data[i + 2];
+        }
       }
+      if (grainAmount > 0) {
+        applyGrain(result, grainAmount);
+      }
+      return result;
+    };
+  }
+};
+
+const orderedDitherPreset: EffectPreset = {
+  id: "orderedDither",
+  name: "Ordered Dither",
+  description: "Structured monochrome dithering built from a repeating threshold grid.",
+  category: "printGrid",
+  access: "free",
+  defaultIntensity: 60,
+  advancedControlSchema: [
+    ...adjustmentControls,
+    ...atmosphereAdvancedControls,
+    { id: "threshold", name: "Threshold", type: "range", min: 0, max: 255, step: 1, defaultValue: 128 },
+    { id: "invert", name: "Invert", type: "boolean", defaultValue: false }
+  ],
+  intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
+    intensity,
+    advancedOverrides: overrides,
+    threshold: resolveOverride(overrides, "threshold", 100 + Math.round((intensity / 100) * 80)),
+    invert: resolveOverride(overrides, "invert", false),
+    contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 30)),
+    brightness: resolveOverride(overrides, "brightness", Math.round((intensity / 100) * -10)),
+    saturation: resolveOverride(overrides, "saturation", 0),
+    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 10)),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
+  }),
+  createPipeline: (params): EffectPipeline => {
+    return (source: PixelBuffer) => {
+      if (params.intensity === 0) return clonePixelBuffer(source);
+
+      const result = clonePixelBuffer(source);
+      const saturation = ((params.saturation as number) ?? 0) / 100;
+      const contrast = ((params.contrast as number) ?? 0) / 100;
+      const brightness = (params.brightness as number) ?? 0;
+      const threshold = (params.threshold as number) ?? 128;
+      const invert = (params.invert as boolean) ?? false;
+      const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
+
+      if (saturation !== 0) {
+        adjustSaturation(result, saturation);
+      }
+      toGrayscale(result);
+      if (brightness !== 0 || contrast !== 0) {
+        adjustBrightnessContrast(result, brightness, contrast);
+      }
+      applyOrderedDither(result, threshold);
       if (invert) {
         for (let i = 0; i < result.data.length; i += 4) {
           result.data[i] = 255 - result.data[i];
@@ -195,7 +245,7 @@ const classicAsciiPreset: EffectPreset = {
   access: "free",
   defaultIntensity: 15,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
     { id: "characterSet", name: "Character Set", type: "select", options: ["dense", "standard", "technical", "blocks", "minimal", "custom"], defaultValue: "standard" },
     { id: "customCharset", name: "Custom Character Array", type: "text", defaultValue: "" },
@@ -213,7 +263,9 @@ const classicAsciiPreset: EffectPreset = {
     colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
     tintColor: resolveOverride(overrides, "tintColor", "#ffffff"),
     backgroundColor: resolveOverride(overrides, "backgroundColor", "#000000"),
-    inkColor: resolveOverride(overrides, "inkColor", "#ffffff")
+    inkColor: resolveOverride(overrides, "inkColor", "#ffffff"),
+    grainAmount: resolveOverride(overrides, "grainAmount", 0),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -236,13 +288,14 @@ const classicAsciiPreset: EffectPreset = {
         colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
       const renderInkColor = colorMode === "tint" ? tintColor : inkColor;
 
-      return renderAscii(source, {
+      const result = renderAscii(source, {
         fontSize,
         inkColor: renderInkColor,
         backgroundColor,
         charset,
         colorMode: renderColorMode
       });
+      return applyAtmosphereAdjustments(result, params);
     };
   }
 };
@@ -287,7 +340,7 @@ const dotHalftonePreset: EffectPreset = {
   access: "free",
   defaultIntensity: 21,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "dotSize", name: "Dot Size", type: "range", min: 2, max: 32, step: 1, defaultValue: 12 },
     { id: "dotSpacing", name: "Dot Spacing", type: "range", min: 2, max: 48, step: 1, defaultValue: 6 },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["monochrome", "source", "palette"], defaultValue: "source" },
@@ -303,7 +356,8 @@ const dotHalftonePreset: EffectPreset = {
     colorMode: resolveOverride(overrides, "colorMode", "source"),
     palette: resolveOverride(overrides, "palette", "cmyk"),
     saturationBoost: resolveOverride(overrides, "saturationBoost", Math.round((intensity / 100) * 40)),
-    grainAmount: resolveOverride(overrides, "grainAmount", 0)
+    grainAmount: resolveOverride(overrides, "grainAmount", 0),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -370,7 +424,7 @@ const duotonePreset: EffectPreset = {
   access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "shadowColor", name: "Shadow", type: "color", defaultValue: "#000000" },
     { id: "highlightColor", name: "Highlight", type: "color", defaultValue: "#ff006e" },
     { id: "contrast", name: "Contrast", type: "range", min: 0, max: 100, step: 1, defaultValue: 30 }
@@ -380,7 +434,9 @@ const duotonePreset: EffectPreset = {
     advancedOverrides: overrides,
     shadowColor: resolveOverride(overrides, "shadowColor", "#000000"),
     highlightColor: resolveOverride(overrides, "highlightColor", "#ff006e"),
-    contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 50))
+    contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 50)),
+    grainAmount: resolveOverride(overrides, "grainAmount", 0),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -395,7 +451,7 @@ const duotonePreset: EffectPreset = {
         adjustBrightnessContrast(result, 0, contrast);
       }
       applyDuotone(result, shadowColor, highlightColor);
-      return result;
+      return applyAtmosphereAdjustments(result, params);
     };
   }
 };
@@ -426,7 +482,7 @@ const dreamGlowPreset: EffectPreset = {
   access: "free",
   defaultIntensity: 50,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...atmosphereAdvancedControls,
     { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 20, step: 1, defaultValue: 6 },
     { id: "palette", name: "Palette", type: "select", options: ["goldenDusk", "roseBloom", "coolHaze"], defaultValue: "goldenDusk" }
   ],
@@ -483,7 +539,8 @@ const noirGrainPreset: EffectPreset = {
   access: "free",
   defaultIntensity: 65,
   advancedControlSchema: [
-    ...universalAdvancedControls,
+    ...adjustmentControls,
+    ...atmosphereAdvancedControls,
     { id: "vignette", name: "Vignette", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 },
     { id: "contrast", name: "Contrast", type: "range", min: 0, max: 100, step: 1, defaultValue: 50 }
   ],
@@ -492,8 +549,10 @@ const noirGrainPreset: EffectPreset = {
     advancedOverrides: overrides,
     contrast: resolveOverride(overrides, "contrast", 30 + Math.round((intensity / 100) * 50)),
     brightness: resolveOverride(overrides, "brightness", Math.round((intensity / 100) * -15)),
+    saturation: resolveOverride(overrides, "saturation", 0),
     vignette: resolveOverride(overrides, "vignette", Math.round((intensity / 100) * 70)),
-    grainAmount: resolveOverride(overrides, "grainAmount", 70)
+    grainAmount: resolveOverride(overrides, "grainAmount", 70),
+    glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -520,7 +579,8 @@ const noirGrainPreset: EffectPreset = {
 
 export const freePresets: EffectPreset[] = [
   pixelGridPreset,
-  monoDitherPreset,
+  errorDiffusionDitherPreset,
+  orderedDitherPreset,
   classicAsciiPreset,
   blocksAsciiPreset,
   minimalAsciiPreset,
