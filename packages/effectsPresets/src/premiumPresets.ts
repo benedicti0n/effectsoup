@@ -224,15 +224,14 @@ const luminousAsciiBloomPreset: EffectPreset = {
       const charset = " .:-=+*#%@";
       const trimmedCharset = charset.slice(0, Math.max(2, density));
 
-      const ascii = renderAscii(source, {
+      const result = renderAscii(source, {
         fontSize,
         inkColor: [255, 255, 255, 255],
-        backgroundColor: [0, 0, 0, 255],
+        backgroundColor: [0, 0, 0, 0],
         charset: trimmedCharset,
-        colorMode: "source"
+        colorMode: "source",
+        backgroundMode: "source"
       });
-
-      const result = ascii;
       if (glowAmount > 0) {
         applyBloom(result, {
           radius: bloomRadius,

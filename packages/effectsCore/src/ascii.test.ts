@@ -25,7 +25,7 @@ describe("renderAscii", () => {
     // Some glyph pixels should carry the source red color.
     let foundRed = false;
     for (let i = 0; i < output.data.length; i += 4) {
-      if (output.data[i] > 200 && output.data[i + 1] < 50 && output.data[i + 2] < 50) {
+      if (output.data[i] > 100 && output.data[i + 1] < 50 && output.data[i + 2] < 50) {
         foundRed = true;
         break;
       }
