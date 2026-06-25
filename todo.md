@@ -11,7 +11,7 @@
 - [x] Fix Manga Grid with controlled posterization and non-destructive grid
 - [x] Add Luminous ASCII Bloom premium effect
 - [x] Remove weak effects: posterPop, pinkDotMatrix, blueNoirDither, cloudPrint
-- [x] Reorganize categories into Print & Grid, ASCII & Symbols, Atmosphere & Glow
+- [x] Reorganize categories into Print & Dither, ASCII & Symbols, Atmosphere & Retro, Glass & Frost
 - [x] Add Replace Image and Remove Image actions
 - [x] Update `Features.md` catalog and matrix
 - [x] Update preset unit tests for new counts
@@ -189,8 +189,8 @@
 - [ ] Implement before/after compare
 - [ ] Implement Intensity system and `IntensityMapper` architecture
 - [ ] Implement advanced control schema and override resolution
-- [ ] Implement free presets (pixelGrid, monoDither, classicAscii, dotHalftone, duotone, dreamGlow, noirGrain, posterPop)
-- [ ] Implement premium presets (pinkDotMatrix, blueNoirDither, cyberAscii, cloudPrint, crtDream, vhsBloom, risoOffset, mangaGrid)
+- [x] Implement free presets (pixelGrid, errorDiffusionDither, orderedDither, classicAscii, blocksAscii, minimalAscii, dotHalftone, duotone, dreamGlow, noirGrain)
+- [x] Implement premium presets (cyberAscii, luminousAsciiBloom, symbolGlow, crtDream, vhsBloom, risoOffset, cubicGlass)
 - [ ] Implement undo/redo with configuration snapshots
 - [ ] Implement reset effect / reset all
 - [ ] Implement export dialog and local export
