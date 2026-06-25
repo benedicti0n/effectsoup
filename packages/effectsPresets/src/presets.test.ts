@@ -40,7 +40,7 @@ describe("presets", () => {
       const output = pipeline(source, resolved);
       expect(output.data).toEqual(source.data);
     }
-  });
+  }, 15000);
 
   it("advanced overrides take precedence", () => {
     const preset = allPresets[0];

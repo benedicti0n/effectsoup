@@ -12,3 +12,4 @@ export * from "./blend.js";
 export * from "./ascii.js";
 export * from "./grid.js";
 export * from "./glow.js";
+export * from "./viewportTransform.js";
