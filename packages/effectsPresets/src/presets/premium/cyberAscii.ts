@@ -4,6 +4,7 @@ import {
   applyGridOverlay,
   clampByte,
   clonePixelBuffer,
+  createPixelBuffer,
   renderAscii,
   type PixelBuffer,
   type RgbaColor
@@ -29,7 +30,8 @@ export const cyberAsciiPreset: EffectPreset = {
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "tint", "monochrome"], defaultValue: "originalColors" },
     { id: "tintPreset", name: "Tint Preset", type: "select", options: ["terminalGreen", "electricCyan", "amberCrt", "violetCode"], defaultValue: "terminalGreen" },
-    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#00FF88" }
+    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#00FF88" },
+    { id: "baseOpacity", name: "Base Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => {
     const tintPreset = resolveOverride(overrides, "tintPreset", "terminalGreen");
@@ -43,7 +45,8 @@ export const cyberAsciiPreset: EffectPreset = {
       tintPreset,
       tintColor: resolveOverride(overrides, "tintColor", defaultTintColor),
       glowAmount: resolveOverride(overrides, "glowAmount", 40 + Math.round((intensity / 100) * 30)),
-      grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20))
+      grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20)),
+      baseOpacity: resolveOverride(overrides, "baseOpacity", 40)
     };
   },
   createPipeline: (params): EffectPipeline => {
@@ -56,6 +59,7 @@ export const cyberAsciiPreset: EffectPreset = {
       const tintColor = hexToRgba((params.tintColor as string) ?? "#00FF88");
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
+      const baseOpacity = ((params.baseOpacity as number) ?? 40) / 100;
       // Technical glyph set with more symbols for detail.
       const charset = " .:-=+*#%@01/\\|<>[]{}";
       const trimmedCharset = charset.slice(0, Math.max(2, density + 12));
@@ -64,14 +68,41 @@ export const cyberAsciiPreset: EffectPreset = {
         colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
       const inkColor = colorMode === "tint" ? tintColor : [100, 200, 255, 255] as RgbaColor;
 
-      const result = renderAscii(source, {
+      const { width, height } = source;
+      let backgroundLayer: PixelBuffer;
+      if (baseOpacity > 0) {
+        backgroundLayer = clonePixelBuffer(source);
+        for (let i = 0; i < backgroundLayer.data.length; i += 4) {
+          backgroundLayer.data[i] = Math.round(backgroundLayer.data[i] * baseOpacity);
+          backgroundLayer.data[i + 1] = Math.round(backgroundLayer.data[i + 1] * baseOpacity);
+          backgroundLayer.data[i + 2] = Math.round(backgroundLayer.data[i + 2] * baseOpacity);
+        }
+      } else {
+        backgroundLayer = createPixelBuffer(width, height, [2, 2, 8, 255]);
+      }
+
+      const glyphLayer = renderAscii(source, {
         fontSize,
         inkColor,
-        backgroundColor: [2, 2, 8, 255],
+        backgroundColor: [0, 0, 0, 0],
         charset: trimmedCharset,
         colorMode: renderColorMode,
-        minGlyphLuminance: 0.25
+        minGlyphLuminance: 0.25,
+        backgroundMode: "transparent"
       });
+
+      const result = clonePixelBuffer(backgroundLayer);
+      for (let i = 0; i < result.data.length; i += 4) {
+        const alpha = glyphLayer.data[i + 3] / 255;
+        if (alpha > 0) {
+          for (let c = 0; c < 3; c++) {
+            result.data[i + c] = Math.round(
+              glyphLayer.data[i + c] + backgroundLayer.data[i + c] * (1 - alpha)
+            );
+          }
+        }
+        result.data[i + 3] = 255;
+      }
 
       // Subtle scanline grid.
       applyGridOverlay(result, {

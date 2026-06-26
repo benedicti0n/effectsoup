@@ -74,9 +74,13 @@ export function renderSymbolGlow(
 
   const output = createPixelBuffer(width, height);
   for (let i = 0; i < output.data.length; i += 4) {
-    // Start with the blurred base image.
+    // Start with the sharp source, then blend in the blurred base only where
+    // the symbol mask is active so the blur sits behind the glyphs.
+    const maskAlpha = mask.data[i] / 255;
     for (let c = 0; c < 3; c++) {
-      output.data[i + c] = blurredBase.data[i + c];
+      output.data[i + c] = clampByte(
+        blurredBase.data[i + c] * maskAlpha + source.data[i + c] * (1 - maskAlpha)
+      );
     }
 
     // Add localized glow using a screen blend (background stays black where no glow).

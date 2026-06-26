@@ -22,7 +22,7 @@ function isControlVisible(
     return resolvedValues.symbolSet === "custom";
   }
   if (control.id === "tintColor" || control.id === "tintPreset") {
-    return resolvedValues.colorMode === "tint";
+    return resolvedValues.colorMode === "tint" || resolvedValues.colorMode === undefined;
   }
   if (control.id === "inkColor") {
     return resolvedValues.colorMode === "monochrome";

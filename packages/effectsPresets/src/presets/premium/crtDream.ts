@@ -22,28 +22,28 @@ export const crtDreamPreset: EffectPreset = {
   description: "Soft retro display effect.",
   category: "atmosphereGlow",
   access: "premium",
-  defaultIntensity: 55,
+  defaultIntensity: 1,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
-    { id: "pixelCellSize", name: "Pixel Cell", type: "range", min: 2, max: 16, step: 1, defaultValue: 4 },
-    { id: "scanlineStrength", name: "Scanlines", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 },
-    { id: "rgbShift", name: "RGB Shift", type: "range", min: 0, max: 20, step: 1, defaultValue: 3 },
-    { id: "tintPreset", name: "Tint Preset", type: "select", options: ["warmPink", "coolCyan", "amberCrt", "mint", "custom"], defaultValue: "warmPink" },
-    { id: "tintColor", name: "Custom Tint", type: "color", defaultValue: "#ff5c9a" },
-    { id: "tintAmount", name: "Tint Amount", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
+    { id: "pixelCellSize", name: "Pixel Cell", type: "range", min: 2, max: 16, step: 1, defaultValue: 3 },
+    { id: "scanlineStrength", name: "Scanlines", type: "range", min: 0, max: 100, step: 1, defaultValue: 35 },
+    { id: "rgbShift", name: "RGB Shift", type: "range", min: 0, max: 20, step: 1, defaultValue: 4 },
+    { id: "tintPreset", name: "Tint Preset", type: "select", options: ["warmPink", "coolCyan", "amberCrt", "mint", "custom"], defaultValue: "custom" },
+    { id: "tintColor", name: "Custom Tint", type: "color", defaultValue: "#000000" },
+    { id: "tintAmount", name: "Tint Amount", type: "range", min: 0, max: 100, step: 1, defaultValue: 15 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    pixelCellSize: resolveOverride(overrides, "pixelCellSize", 2 + Math.round((intensity / 100) * 14)),
-    scanlineStrength: resolveOverride(overrides, "scanlineStrength", Math.round((intensity / 100) * 60)),
-    rgbShift: resolveOverride(overrides, "rgbShift", Math.round((intensity / 100) * 6)),
-    glowAmount: resolveOverride(overrides, "glowAmount", Math.round((intensity / 100) * 40)),
+    pixelCellSize: resolveOverride(overrides, "pixelCellSize", 3),
+    scanlineStrength: resolveOverride(overrides, "scanlineStrength", 35),
+    rgbShift: resolveOverride(overrides, "rgbShift", 4),
+    glowAmount: resolveOverride(overrides, "glowAmount", 10),
     vignette: resolveOverride(overrides, "vignette", Math.round((intensity / 100) * 40)),
-    tintPreset: resolveOverride(overrides, "tintPreset", "warmPink"),
-    tintColor: resolveOverride(overrides, "tintColor", "#ff5c9a"),
-    tintAmount: resolveOverride(overrides, "tintAmount", Math.round((intensity / 100) * 40)),
-    grainAmount: resolveOverride(overrides, "grainAmount", 0)
+    tintPreset: resolveOverride(overrides, "tintPreset", "custom"),
+    tintColor: resolveOverride(overrides, "tintColor", "#000000"),
+    tintAmount: resolveOverride(overrides, "tintAmount", 15),
+    grainAmount: resolveOverride(overrides, "grainAmount", 20)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {

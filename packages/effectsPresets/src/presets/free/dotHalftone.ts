@@ -17,11 +17,11 @@ export const dotHalftonePreset: EffectPreset = {
   description: "Colored dot halftone inspired by newsprint and Risograph screens.",
   category: "printGrid",
   access: "free",
-  defaultIntensity: 21,
+  defaultIntensity: 5,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
-    { id: "dotSize", name: "Dot Size", type: "range", min: 2, max: 32, step: 1, defaultValue: 12 },
-    { id: "dotSpacing", name: "Dot Spacing", type: "range", min: 2, max: 48, step: 1, defaultValue: 6 },
+    { id: "dotSize", name: "Dot Size", type: "range", min: 2, max: 32, step: 1, defaultValue: 5 },
+    { id: "dotSpacing", name: "Dot Spacing", type: "range", min: 2, max: 48, step: 1, defaultValue: 2 },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["monochrome", "source", "palette"], defaultValue: "source" },
     { id: "palette", name: "Palette", type: "select", options: ["cmyk", "warm", "cool", "mono"], defaultValue: "cmyk" },
     { id: "saturationBoost", name: "Saturation", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 }
@@ -29,13 +29,12 @@ export const dotHalftonePreset: EffectPreset = {
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    // At the default intensity of 21, dotSize should be 12 and dotSpacing 6.
-    dotSize: resolveOverride(overrides, "dotSize", Math.min(32, Math.max(2, Math.round(12 + ((intensity - 21) / 79) * 20)))),
-    dotSpacing: resolveOverride(overrides, "dotSpacing", Math.min(48, Math.max(2, Math.round(6 + ((intensity - 21) / 79) * 42)))),
+    dotSize: resolveOverride(overrides, "dotSize", 5),
+    dotSpacing: resolveOverride(overrides, "dotSpacing", 2),
     colorMode: resolveOverride(overrides, "colorMode", "source"),
     palette: resolveOverride(overrides, "palette", "cmyk"),
     saturationBoost: resolveOverride(overrides, "saturationBoost", Math.round((intensity / 100) * 40)),
-    grainAmount: resolveOverride(overrides, "grainAmount", 0),
+    grainAmount: resolveOverride(overrides, "grainAmount", 10),
     glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {

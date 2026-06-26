@@ -3,6 +3,7 @@ import {
   applyGrain,
   applyPosterize,
   applyRgbShift,
+  applyTint,
   clonePixelBuffer,
   type PixelBuffer
 } from "@imageeffects/core";
@@ -24,7 +25,9 @@ export const risoOffsetPreset: EffectPreset = {
     ...atmosphereAdvancedControls,
     { id: "channelShift", name: "Channel Shift", type: "range", min: 0, max: 20, step: 1, defaultValue: 4 },
     { id: "inkColor", name: "Ink", type: "color", defaultValue: "#ff5c5c" },
-    { id: "paperColor", name: "Paper", type: "color", defaultValue: "#000000" }
+    { id: "paperColor", name: "Paper", type: "color", defaultValue: "#000000" },
+    { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ffffff" },
+    { id: "tintAmount", name: "Tint Amount", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
@@ -33,7 +36,9 @@ export const risoOffsetPreset: EffectPreset = {
     grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 35)),
     glowAmount: resolveOverride(overrides, "glowAmount", 0),
     inkColor: resolveOverride(overrides, "inkColor", "#ff5c5c"),
-    paperColor: resolveOverride(overrides, "paperColor", "#000000")
+    paperColor: resolveOverride(overrides, "paperColor", "#000000"),
+    tintColor: resolveOverride(overrides, "tintColor", "#ffffff"),
+    tintAmount: resolveOverride(overrides, "tintAmount", 0)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -43,12 +48,17 @@ export const risoOffsetPreset: EffectPreset = {
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
       const inkColor = hexToRgba((params.inkColor as string) ?? "#ff5c5c");
       const paperColor = hexToRgba((params.paperColor as string) ?? "#fff8e7");
+      const tintColor = hexToRgba((params.tintColor as string) ?? "#ffffff");
+      const tintAmount = ((params.tintAmount as number) ?? 0) / 100;
 
       const result = clonePixelBuffer(source);
       applyPosterize(result, 3);
       applyDuotone(result, paperColor, inkColor);
       if (channelShift > 0) {
         applyRgbShift(result, channelShift);
+      }
+      if (tintAmount > 0) {
+        applyTint(result, tintColor, tintAmount);
       }
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);

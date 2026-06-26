@@ -17,17 +17,17 @@ export const pixelGridPreset: EffectPreset = {
   description: "Deliberate square cells with subtle grid lines while keeping source colors.",
   category: "printGrid",
   access: "free",
-  defaultIntensity: 5,
+  defaultIntensity: 4,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
     { id: "cellSize", name: "Cell Size", type: "range", min: 4, max: 64, step: 2, defaultValue: 16 },
-    { id: "gridOpacity", name: "Grid Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 25 }
+    { id: "gridOpacity", name: "Grid Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 50 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
     cellSize: resolveOverride(overrides, "cellSize", 4 + Math.round((intensity / 100) * 60)),
-    gridOpacity: resolveOverride(overrides, "gridOpacity", Math.round((intensity / 100) * 40)),
+    gridOpacity: resolveOverride(overrides, "gridOpacity", 50),
     grainAmount: resolveOverride(overrides, "grainAmount", 0),
     glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),

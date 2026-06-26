@@ -50,22 +50,24 @@ describe("presets", () => {
   });
 
   describe("default configurations", () => {
-    it("Pixel Grid defaults to 5% intensity", () => {
+    it("Pixel Grid defaults to 4% intensity and 50% grid opacity", () => {
       const preset = allPresets.find((p) => p.id === "pixelGrid");
+      expect(preset?.defaultIntensity).toBe(4);
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.intensity).toBe(4);
+      expect(resolved.gridOpacity).toBe(50);
+    });
+
+    it("Dot Halftone defaults to 5% intensity, source color, CMYK palette, dot size 5, dot spacing 2, grain 10", () => {
+      const preset = allPresets.find((p) => p.id === "dotHalftone");
       expect(preset?.defaultIntensity).toBe(5);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(5);
-    });
-
-    it("Dot Halftone defaults to 21% intensity, source color, CMYK palette, dot size 12, dot spacing 6", () => {
-      const preset = allPresets.find((p) => p.id === "dotHalftone");
-      expect(preset?.defaultIntensity).toBe(21);
-      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.intensity).toBe(21);
       expect(resolved.colorMode).toBe("source");
       expect(resolved.palette).toBe("cmyk");
-      expect(resolved.dotSize).toBe(12);
-      expect(resolved.dotSpacing).toBe(6);
+      expect(resolved.dotSize).toBe(5);
+      expect(resolved.dotSpacing).toBe(2);
+      expect(resolved.grainAmount).toBe(10);
     });
 
     it("Error Diffusion defaults to 60% intensity", () => {
@@ -82,27 +84,40 @@ describe("presets", () => {
       expect(resolved.intensity).toBe(60);
     });
 
-    it("Classic ASCII defaults to 15% intensity, Standard character set and Original Colors", () => {
+    it("Classic ASCII defaults to 1% intensity, font size 6, base opacity 40, Standard character set and Original Colors", () => {
       const preset = allPresets.find((p) => p.id === "classicAscii");
-      expect(preset?.defaultIntensity).toBe(15);
+      expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.intensity).toBe(15);
+      expect(resolved.intensity).toBe(1);
+      expect(resolved.fontSize).toBe(6);
+      expect(resolved.baseOpacity).toBe(40);
       expect(resolved.characterSet).toBe("standard");
       expect(resolved.colorMode).toBe("originalColors");
     });
 
-    it("Blocks ASCII defaults to blocks character set", () => {
+    it("Blocks ASCII defaults to 1% intensity, blocks character set, font size 6, base opacity 40, grain 15 and glow 0", () => {
       const preset = allPresets.find((p) => p.id === "blocksAscii");
+      expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.characterSet).toBe("blocks");
       expect(resolved.colorMode).toBe("originalColors");
+      expect(resolved.fontSize).toBe(6);
+      expect(resolved.baseOpacity).toBe(40);
+      expect(resolved.grainAmount).toBe(15);
+      expect(resolved.glowAmount).toBe(0);
     });
 
-    it("Minimal ASCII defaults to minimal character set", () => {
+    it("Minimal ASCII defaults to 1% intensity, minimal character set, font size 6, base opacity 40, density 2, grain 5 and glow 100", () => {
       const preset = allPresets.find((p) => p.id === "minimalAscii");
+      expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.characterSet).toBe("minimal");
       expect(resolved.colorMode).toBe("originalColors");
+      expect(resolved.fontSize).toBe(6);
+      expect(resolved.baseOpacity).toBe(40);
+      expect(resolved.density).toBe(2);
+      expect(resolved.grainAmount).toBe(5);
+      expect(resolved.glowAmount).toBe(100);
     });
 
     it("Cyber ASCII defaults to 15% intensity, font size 6, and Original Colors", () => {
@@ -137,14 +152,16 @@ describe("presets", () => {
       expect(resolved.paperColor).toBe("#000000");
     });
 
-    it("Luminous ASCII Bloom defaults to 30% intensity, density 10, bloom radius 12, and base opacity 20", () => {
+    it("Luminous ASCII Bloom defaults to 1% intensity, density 10, bloom radius 24, base opacity 40, grain 5 and glow 6", () => {
       const preset = allPresets.find((p) => p.id === "luminousAsciiBloom");
-      expect(preset?.defaultIntensity).toBe(30);
+      expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.intensity).toBe(30);
+      expect(resolved.intensity).toBe(1);
       expect(resolved.density).toBe(10);
-      expect(resolved.bloomRadius).toBe(12);
-      expect(resolved.baseOpacity).toBe(20);
+      expect(resolved.bloomRadius).toBe(24);
+      expect(resolved.baseOpacity).toBe(40);
+      expect(resolved.grainAmount).toBe(5);
+      expect(resolved.glowAmount).toBe(6);
     });
 
     it("Duotone defaults to black shadow", () => {
@@ -242,7 +259,8 @@ describe("presets", () => {
         }
       }
 
-      const resolved = preset.intensityMapper(preset.defaultIntensity, {});
+      // Disable atmosphere glow/grain and base opacity so the test measures glyph placement only.
+      const resolved = preset.intensityMapper(preset.defaultIntensity, { glowAmount: 0, grainAmount: 0, baseOpacity: 0 });
       const pipeline = preset.createPipeline(resolved);
       const output = pipeline(source, resolved);
 
@@ -266,8 +284,9 @@ describe("presets", () => {
       const classic = allPresets.find((p) => p.id === "classicAscii")!;
       const source = createPixelBuffer(60, 60, [120, 120, 120, 255]);
 
-      const minimalResolved = minimal.intensityMapper(minimal.defaultIntensity, {});
-      const classicResolved = classic.intensityMapper(classic.defaultIntensity, {});
+      // Disable atmosphere glow/grain and base opacity so the comparison is based on glyph coverage.
+      const minimalResolved = minimal.intensityMapper(minimal.defaultIntensity, { glowAmount: 0, grainAmount: 0, baseOpacity: 0 });
+      const classicResolved = classic.intensityMapper(classic.defaultIntensity, { glowAmount: 0, grainAmount: 0, baseOpacity: 0 });
 
       const minimalOutput = minimal.createPipeline(minimalResolved)(source, minimalResolved);
       const classicOutput = classic.createPipeline(classicResolved)(source, classicResolved);

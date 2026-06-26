@@ -16,23 +16,23 @@ export const luminousAsciiBloomPreset: EffectPreset = {
   description: "ASCII characters that glow from bright areas with source-colored light.",
   category: "asciiSymbols",
   access: "premium",
-  defaultIntensity: 30,
+  defaultIntensity: 1,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
-    { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 12 },
-    { id: "baseOpacity", name: "Base Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 }
+    { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 24 },
+    { id: "baseOpacity", name: "Base Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
     density: resolveOverride(overrides, "density", 10),
-    bloomRadius: resolveOverride(overrides, "bloomRadius", 12),
-    baseOpacity: resolveOverride(overrides, "baseOpacity", 20),
-    glowAmount: resolveOverride(overrides, "glowAmount", 60),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 15))
+    bloomRadius: resolveOverride(overrides, "bloomRadius", 24),
+    baseOpacity: resolveOverride(overrides, "baseOpacity", 40),
+    glowAmount: resolveOverride(overrides, "glowAmount", 6),
+    grainAmount: resolveOverride(overrides, "grainAmount", 5)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {

@@ -41,15 +41,15 @@ export const dreamGlowPreset: EffectPreset = {
   defaultIntensity: 50,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
-    { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 20, step: 1, defaultValue: 6 },
+    { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 20, step: 1, defaultValue: 8 },
     { id: "palette", name: "Palette", type: "select", options: ["goldenDusk", "roseBloom", "coolHaze"], defaultValue: "goldenDusk" }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    blurAmount: resolveOverride(overrides, "blurAmount", 2 + Math.round((intensity / 100) * 14)),
-    glowAmount: resolveOverride(overrides, "glowAmount", intensity),
-    grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20)),
+    blurAmount: resolveOverride(overrides, "blurAmount", 8),
+    glowAmount: resolveOverride(overrides, "glowAmount", 10),
+    grainAmount: resolveOverride(overrides, "grainAmount", 10),
     palette: resolveOverride(overrides, "palette", "goldenDusk")
   }),
   createPipeline: (params): EffectPipeline => {
