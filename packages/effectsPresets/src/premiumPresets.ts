@@ -5,6 +5,9 @@ import { crtDreamPreset } from "./presets/premium/crtDream.js";
 import { vhsBloomPreset } from "./presets/premium/vhsBloom.js";
 import { risoOffsetPreset } from "./presets/premium/risoOffset.js";
 import { cubicGlassPreset } from "./presets/premium/cubicGlass.js";
+import { bitmapPreset } from "./presets/premium/bitmap.js";
+import { electricDreamPreset } from "./presets/premium/electricDream.js";
+import { mangaScanlinesPreset } from "./presets/premium/mangaScanlines.js";
 import type { EffectPreset } from "./types.js";
 
 export const premiumPresets: EffectPreset[] = [
@@ -14,5 +17,8 @@ export const premiumPresets: EffectPreset[] = [
   crtDreamPreset,
   vhsBloomPreset,
   risoOffsetPreset,
-  cubicGlassPreset
+  cubicGlassPreset,
+  bitmapPreset,
+  electricDreamPreset,
+  mangaScanlinesPreset
 ];

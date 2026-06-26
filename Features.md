@@ -32,12 +32,15 @@ Effects are built from reusable, deterministic image-processing primitives. Each
 
 ### Categories
 
-Presets are grouped into four visual families:
+Presets are grouped into seven visual families:
 
 - **Print & Dither** — pixel, halftone, dither, and grid-driven looks
 - **ASCII & Symbols** — text-based rendering with luminance-to-glyph mapping
 - **Atmosphere & Retro** — color grading, bloom, grain, CRT/VHS nostalgia, and tint presets
 - **Glass & Frost** — translucent refractive tiles and frosted surfaces
+- **Print Lab** — analog print processes such as LED matrices, stippling, and bitmap posterization
+- **Signal Lab** — signal-degradation and screen-print looks including CRT glitch, electric neon edges, and manga tones
+- **Light Lab** — directional glow, smear, and light-trail effects
 
 ### Free Presets
 
@@ -53,6 +56,10 @@ Presets are grouped into four visual families:
 | `duotone` | Duotone | Atmosphere & Retro | luminance mapping, two-color interpolation |
 | `dreamGlow` | Dream Glow | Atmosphere & Retro | blur, soft glow, palette presets, grain |
 | `noirGrain` | Noir Grain | Atmosphere & Retro | monochrome, contrast, grain, vignette |
+| `ledMatrix` | LED Matrix | Print Lab | cell averaging, shaped LEDs, optional glow |
+| `stipplePrint` | Stipple Print | Print Lab | density-based dot placement, ink/paper colors |
+| `crtGlitch` | CRT Glitch | Signal Lab | sliced horizontal shifts, RGB separation, scanlines, noise |
+| `neonSmear` | Neon Smear | Light Lab | directional motion smear, neon tint, screen blend |
 
 ### Premium Presets
 
@@ -65,6 +72,9 @@ Presets are grouped into four visual families:
 | `vhsBloom` | VHS Bloom | Atmosphere & Retro | chromatic aberration, haze, noise, bloom, tint presets |
 | `risoOffset` | Riso Offset | Print & Dither | duotone, channel offset, grain, registration shift |
 | `cubicGlass` | Cubic Glass | Glass & Frost | frosted cubic tiles, deterministic refraction, beveled edges |
+| `bitmap` | Bitmap | Print Lab | heavy pixelation, palette reduction, optional ordered dither |
+| `electricDream` | Electric Dream | Signal Lab | Sobel edges, neon tint, thresholded bloom, screen blend |
+| `mangaScanlines` | Manga Scanlines | Signal Lab | rotated screen-tone lines, ink/paper colors, threshold |
 
 Premium effects are previewable by free users; premium export and full advanced controls are gated.
 
@@ -73,7 +83,7 @@ Premium effects are previewable by free users; premium export and full advanced 
 | Capability | Guest / Free | Premium |
 |------------|--------------|---------|
 | Upload & crop | Yes | Yes |
-| Free presets | 10 | 10 |
+| Free presets | 14 | 14 |
 | Premium preview | Yes | Yes |
 | Premium export | No | Yes |
 | Export up to 1080px | Yes | Yes |

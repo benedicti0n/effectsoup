@@ -14,7 +14,10 @@ const categoryLabels: Record<PresetCategory, string> = {
   printGrid: "Print & Dither",
   asciiSymbols: "ASCII & Symbols",
   atmosphereGlow: "Atmosphere & Retro",
-  glassFrost: "Glass & Frost"
+  glassFrost: "Glass & Frost",
+  printLab: "Print Lab",
+  signalLab: "Signal Lab",
+  lightLab: "Light Lab"
 };
 
 export function PresetGrid(): JSX.Element {
@@ -38,7 +41,7 @@ export function PresetGrid(): JSX.Element {
       acc[preset.category] = acc[preset.category] ?? [];
       acc[preset.category].push(preset);
       return acc;
-    }, { printGrid: [], asciiSymbols: [], atmosphereGlow: [], glassFrost: [] });
+    }, { printGrid: [], asciiSymbols: [], atmosphereGlow: [], glassFrost: [], printLab: [], signalLab: [], lightLab: [] });
   }, [search]);
 
   const hasResults = Object.values(grouped).some((group) => group.length > 0);

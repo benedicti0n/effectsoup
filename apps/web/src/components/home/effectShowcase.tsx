@@ -10,7 +10,10 @@ const categoryLabels: Record<string, string> = {
   printGrid: "Print & Dither",
   asciiSymbols: "ASCII & Symbols",
   atmosphereGlow: "Atmosphere & Retro",
-  glassFrost: "Glass & Frost"
+  glassFrost: "Glass & Frost",
+  printLab: "Print Lab",
+  signalLab: "Signal Lab",
+  lightLab: "Light Lab"
 };
 
 export function EffectShowcase(): JSX.Element {

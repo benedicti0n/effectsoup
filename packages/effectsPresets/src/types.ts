@@ -4,7 +4,10 @@ export type PresetCategory =
   | "printGrid"
   | "asciiSymbols"
   | "atmosphereGlow"
-  | "glassFrost";
+  | "glassFrost"
+  | "printLab"
+  | "signalLab"
+  | "lightLab";
 
 export type PresetAccess = "free" | "premium";
 

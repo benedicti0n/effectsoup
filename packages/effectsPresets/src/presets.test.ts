@@ -3,13 +3,13 @@ import { allPresets, freePresets, premiumPresets, getPresetById, migratePresetId
 import { createPixelBuffer } from "@imageeffects/core";
 
 describe("presets", () => {
-  it("has 17 presets total", () => {
-    expect(allPresets.length).toBe(17);
+  it("has 24 presets total", () => {
+    expect(allPresets.length).toBe(24);
   });
 
-  it("has 10 free and 7 premium presets", () => {
-    expect(freePresets.length).toBe(10);
-    expect(premiumPresets.length).toBe(7);
+  it("has 14 free and 10 premium presets", () => {
+    expect(freePresets.length).toBe(14);
+    expect(premiumPresets.length).toBe(10);
   });
 
   it("every preset resolves valid defaults", () => {

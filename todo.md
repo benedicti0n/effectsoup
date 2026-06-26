@@ -259,3 +259,29 @@
 - [ ] Resolve known issues
 - [x] Update docs and todo status
 - [ ] Provide release-readiness report
+
+## New Mathematical Effect Expansion
+
+### Phase 1 — Print Lab, Signal Lab, Light Lab Foundations (completed)
+
+- [x] Extend `PresetCategory` with `printLab`, `signalLab`, `lightLab`
+- [x] Add UI category labels in preset grid and showcase
+- [x] Implement core utilities: `applyLedMatrix`, `applyBitmap`, `renderStipple`, `applyElectricDream`, `applyCrtGlitch`, `applyMangaScreen`, `applyNeonSmear`
+- [x] Add `renderEdgeBuffer` helper to `edge.ts`
+- [x] Implement presets: `ledMatrix`, `bitmap`, `stipplePrint`, `electricDream`, `crtGlitch`, `mangaScanlines`, `neonSmear`
+- [x] Register presets in free/premium lists
+- [x] Update preset count tests
+- [x] Add core effect smoke tests
+- [x] Update `Features.md` catalog and categories
+- [x] Run full test/typecheck/lint/build verification
+
+### Phase 2 — Remaining Effects (pending)
+
+- [ ] Implement `waveSlice`
+- [ ] Implement `pencilGrain`
+- [ ] Implement `contourHatch`
+- [ ] Implement `neonPointCloud`
+- [ ] Implement `flowlineGlow`
+- [ ] Add core tests for Phase 2 effects
+- [ ] Update docs and showcase assets
+- [ ] Run full verification
