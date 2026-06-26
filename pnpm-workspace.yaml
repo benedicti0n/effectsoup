@@ -8,7 +8,3 @@ settings:
     - esbuild
     - sharp
     - unrs-resolver
-allowBuilds:
-  esbuild: true
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
