@@ -122,6 +122,13 @@
 - [x] Update `Features.md`, `README.md`, `architecture.md`, `DESIGN.md`
 - [x] Run full test/typecheck/lint/build verification
 
+## Best-Practices Refactor (in progress)
+
+- [x] Split `packages/effectsCore/src/ascii.ts` into `ascii/` submodule (font, types, utils, weight maps, renderAscii, symbolGlow, luminousAsciiBloom)
+- [x] Split `packages/effectsPresets/src/freePresets.ts` and `premiumPresets.ts` into per-preset files plus shared helpers
+- [x] Extract web hooks/components from oversized React files (`advancedControls`, `miniPlayground`, `exportDialog`, `pricing`, webhook route, `editorStore`)
+- [x] Run full test/typecheck/lint/build verification after each block
+
 ## Phase 0 — Audit and Planning
 
 - [x] Inspect repository state

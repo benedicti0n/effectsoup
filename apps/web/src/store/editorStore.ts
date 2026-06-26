@@ -1,88 +1,14 @@
 import { create } from "zustand";
-import type { CropConfig } from "@imageeffects/core";
 import { getPresetById } from "@imageeffects/presets";
+import {
+  defaultCrop,
+  defaultEffect,
+  defaultOutput,
+  type EditorState
+} from "./editorTypes";
+import { createSnapshot, revokeSourceUrl } from "./editorUtils";
 
-export type EditorDocument = {
-  source: {
-    localId: string;
-    fileName: string;
-    width: number;
-    height: number;
-    objectUrl: string;
-  } | null;
-  crop: CropConfig;
-  effect: {
-    presetId: string;
-    intensity: number;
-    advancedOverrides: Record<string, number | string | boolean>;
-  };
-  output: {
-    format: "png" | "jpeg" | "webp";
-    width: number;
-    backgroundColor?: string;
-  };
-};
-
-type HistoryEntry = {
-  crop: CropConfig;
-  effect: EditorDocument["effect"];
-  output: EditorDocument["output"];
-};
-
-type EditorState = EditorDocument & {
-  isRendering: boolean;
-  compareBefore: boolean;
-  history: HistoryEntry[];
-  historyIndex: number;
-  setSource: (source: EditorDocument["source"]) => void;
-  replaceSource: (source: EditorDocument["source"]) => void;
-  removeSource: () => void;
-  setCrop: (crop: CropConfig) => void;
-  setPresetId: (presetId: string) => void;
-  setIntensity: (intensity: number) => void;
-  setAdvancedOverride: (key: string, value: number | string | boolean) => void;
-  resetAdvancedOverrides: () => void;
-  setOutput: (output: Partial<EditorDocument["output"]>) => void;
-  setIsRendering: (isRendering: boolean) => void;
-  setCompareBefore: (compare: boolean) => void;
-  undo: () => void;
-  redo: () => void;
-  resetEffect: () => void;
-  resetAll: () => void;
-  snapshotHistory: () => void;
-};
-
-const defaultCrop: CropConfig = {
-  aspectRatio: "original",
-  zoom: 1,
-  offsetX: 0,
-  offsetY: 0
-};
-
-const defaultEffect: EditorDocument["effect"] = {
-  presetId: "pixelGrid",
-  intensity: 5,
-  advancedOverrides: {}
-};
-
-const defaultOutput: EditorDocument["output"] = {
-  format: "png",
-  width: 1080
-};
-
-function revokeSourceUrl(source: EditorDocument["source"]): void {
-  if (source?.objectUrl) {
-    URL.revokeObjectURL(source.objectUrl);
-  }
-}
-
-function createSnapshot(state: EditorState): HistoryEntry {
-  return {
-    crop: state.crop,
-    effect: state.effect,
-    output: state.output
-  };
-}
+export * from "./editorTypes";
 
 export const useEditorStore = create<EditorState>((set) => ({
   source: null,

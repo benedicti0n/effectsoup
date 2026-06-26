@@ -9,7 +9,7 @@ export * from "./vignette.js";
 export * from "./scanlines.js";
 export * from "./edge.js";
 export * from "./blend.js";
-export * from "./ascii.js";
+export * from "./ascii/index.js";
 export * from "./grid.js";
 export * from "./glow.js";
 export * from "./glass.js";
