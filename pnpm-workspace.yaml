@@ -2,10 +2,7 @@ packages:
   - apps/*
   - packages/*
 
-settings:
-  ignoreBuildScripts: false
-  onlyBuiltDependencies:
-    - sharp
-  ignoredBuiltDependencies:
-    - esbuild
-    - unrs-resolver
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
