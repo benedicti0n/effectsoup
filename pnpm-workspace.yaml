@@ -5,10 +5,7 @@ packages:
 settings:
   ignoreBuildScripts: false
   onlyBuiltDependencies:
-    - esbuild
     - sharp
-    - unrs-resolver
   ignoredBuiltDependencies:
     - esbuild
-    - sharp
     - unrs-resolver
