@@ -8,6 +8,9 @@ import { cubicGlassPreset } from "./presets/premium/cubicGlass.js";
 import { bitmapPreset } from "./presets/premium/bitmap.js";
 import { electricDreamPreset } from "./presets/premium/electricDream.js";
 import { mangaScanlinesPreset } from "./presets/premium/mangaScanlines.js";
+import { waveSlicePreset } from "./presets/premium/waveSlice.js";
+import { contourHatchPreset } from "./presets/premium/contourHatch.js";
+import { neonPointCloudPreset } from "./presets/premium/neonPointCloud.js";
 import type { EffectPreset } from "./types.js";
 
 export const premiumPresets: EffectPreset[] = [
@@ -20,5 +23,8 @@ export const premiumPresets: EffectPreset[] = [
   cubicGlassPreset,
   bitmapPreset,
   electricDreamPreset,
-  mangaScanlinesPreset
+  mangaScanlinesPreset,
+  waveSlicePreset,
+  contourHatchPreset,
+  neonPointCloudPreset
 ];

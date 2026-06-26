@@ -12,6 +12,8 @@ import { ledMatrixPreset } from "./presets/free/ledMatrix.js";
 import { stipplePrintPreset } from "./presets/free/stipplePrint.js";
 import { crtGlitchPreset } from "./presets/free/crtGlitch.js";
 import { neonSmearPreset } from "./presets/free/neonSmear.js";
+import { pencilGrainPreset } from "./presets/free/pencilGrain.js";
+import { flowlineGlowPreset } from "./presets/free/flowlineGlow.js";
 import type { EffectPreset } from "./types.js";
 
 export const freePresets: EffectPreset[] = [
@@ -28,5 +30,7 @@ export const freePresets: EffectPreset[] = [
   ledMatrixPreset,
   stipplePrintPreset,
   crtGlitchPreset,
-  neonSmearPreset
+  neonSmearPreset,
+  pencilGrainPreset,
+  flowlineGlowPreset
 ];

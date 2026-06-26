@@ -275,13 +275,13 @@
 - [x] Update `Features.md` catalog and categories
 - [x] Run full test/typecheck/lint/build verification
 
-### Phase 2 — Remaining Effects (pending)
+### Phase 2 — Remaining Effects (completed)
 
-- [ ] Implement `waveSlice`
-- [ ] Implement `pencilGrain`
-- [ ] Implement `contourHatch`
-- [ ] Implement `neonPointCloud`
-- [ ] Implement `flowlineGlow`
-- [ ] Add core tests for Phase 2 effects
-- [ ] Update docs and showcase assets
-- [ ] Run full verification
+- [x] Implement `waveSlice`
+- [x] Implement `pencilGrain`
+- [x] Implement `contourHatch`
+- [x] Implement `neonPointCloud`
+- [x] Implement `flowlineGlow`
+- [x] Add core tests for Phase 2 effects
+- [x] Update docs and showcase assets
+- [x] Run full verification

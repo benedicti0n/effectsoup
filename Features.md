@@ -60,6 +60,8 @@ Presets are grouped into seven visual families:
 | `stipplePrint` | Stipple Print | Print Lab | density-based dot placement, ink/paper colors |
 | `crtGlitch` | CRT Glitch | Signal Lab | sliced horizontal shifts, RGB separation, scanlines, noise |
 | `neonSmear` | Neon Smear | Light Lab | directional motion smear, neon tint, screen blend |
+| `pencilGrain` | Pencil Grain | Print Lab | Sobel edges, paper color, graphite darkening, film grain |
+| `flowlineGlow` | Flowline Glow | Light Lab | per-pixel flow field, directional smear, neon glow |
 
 ### Premium Presets
 
@@ -75,6 +77,9 @@ Presets are grouped into seven visual families:
 | `bitmap` | Bitmap | Print Lab | heavy pixelation, palette reduction, optional ordered dither |
 | `electricDream` | Electric Dream | Signal Lab | Sobel edges, neon tint, thresholded bloom, screen blend |
 | `mangaScanlines` | Manga Scanlines | Signal Lab | rotated screen-tone lines, ink/paper colors, threshold |
+| `waveSlice` | Wave Slice | Signal Lab | sine-wave displacement across horizontal or vertical slices |
+| `contourHatch` | Contour Hatch | Print Lab | gradient-aligned hatch strokes following image contours |
+| `neonPointCloud` | Neon Point Cloud | Light Lab | brightness-weighted points connected by neon lines |
 
 Premium effects are previewable by free users; premium export and full advanced controls are gated.
 
@@ -83,7 +88,8 @@ Premium effects are previewable by free users; premium export and full advanced 
 | Capability | Guest / Free | Premium |
 |------------|--------------|---------|
 | Upload & crop | Yes | Yes |
-| Free presets | 14 | 14 |
+| Free presets | 16 | 16 |
+| Premium presets | Preview only | 13 |
 | Premium preview | Yes | Yes |
 | Premium export | No | Yes |
 | Export up to 1080px | Yes | Yes |
