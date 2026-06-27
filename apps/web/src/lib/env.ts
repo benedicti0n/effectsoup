@@ -3,7 +3,16 @@ import { z } from "zod";
 const envSchema = z.object({
   DATABASE_URL: z.string().default(""),
   BETTER_AUTH_SECRET: z.string().default("build-time-placeholder-not-for-production-use-a-real-secret"),
-  BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
+  BETTER_AUTH_URL: z.preprocess(
+    (val) => {
+      if (val === "" || val === undefined) {
+        const vercelUrl = process.env.VERCEL_URL;
+        if (vercelUrl) return `https://${vercelUrl}`;
+      }
+      return val;
+    },
+    z.string().url().default("http://localhost:3000")
+  ),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   R2_ACCOUNT_ID: z.string().optional(),

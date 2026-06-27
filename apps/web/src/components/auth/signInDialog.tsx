@@ -56,10 +56,15 @@ export function SignInDialog({
 
   const signInWithGoogle = async () => {
     setLoading(true);
+    setError(null);
     try {
-      await authClient.signIn.social({ provider: "google" });
+      const result = await authClient.signIn.social({ provider: "google" });
+      if (result && "error" in result && result.error) {
+        setError(result.error.message ?? "Google sign in failed");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign in failed");
+    } finally {
       setLoading(false);
     }
   };
