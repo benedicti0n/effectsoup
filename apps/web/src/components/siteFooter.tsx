@@ -8,7 +8,7 @@ export function SiteFooter(): JSX.Element {
     { href: "/playground", label: "Playground" },
     { href: "/docs", label: "Docs" },
     { href: "/account", label: "Account" },
-    { href: "https://github.com", label: "GitHub" }
+    { href: "https://github.com/benedicti0n/effectsoup", label: "GitHub" }
   ];
 
   return (

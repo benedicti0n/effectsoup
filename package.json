@@ -14,7 +14,8 @@
     "loadtest": "k6 run performance/loadtest.js",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "clean": "turbo run clean && rm -rf node_modules",
+    "publish-packages": "pnpm -r publish --access public"
   },
   "devDependencies": {
     "@turbo/gen": "^2.4.0",

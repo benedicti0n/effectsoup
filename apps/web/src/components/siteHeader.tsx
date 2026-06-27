@@ -42,7 +42,7 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
 
           <div className="hidden items-center gap-4 md:flex">
             <Link
-              href="https://github.com"
+              href="https://github.com/benedicti0n/effectsoup"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium text-ink hover:text-muted transition-colors"
