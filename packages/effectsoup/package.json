@@ -1,0 +1,53 @@
+{
+  "name": "@effectsoup/effectsoup",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "All-in-one EffectSoup image engine: core, presets, and worker",
+  "license": "MIT",
+  "author": "benedicti0n",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benedicti0n/effectsoup.git",
+    "directory": "packages/effectsoup"
+  },
+  "bugs": {
+    "url": "https://github.com/benedicti0n/effectsoup/issues"
+  },
+  "homepage": "https://github.com/benedicti0n/effectsoup#readme",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "echo \"No tests\"",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@effectsoup/core": "workspace:*",
+    "@effectsoup/presets": "workspace:*",
+    "@effectsoup/worker": "workspace:*"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/node": "^22.13.0",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.22.0"
+  }
+}

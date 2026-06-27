@@ -13,7 +13,9 @@ function CodeBlock({ code }: { code: string }): JSX.Element {
   );
 }
 
-const installSnippet = `pnpm add @effectsoup/core @effectsoup/presets @effectsoup/worker`;
+const installSnippet = `pnpm add @effectsoup/effectsoup`;
+
+const individualInstallSnippet = `pnpm add @effectsoup/core @effectsoup/presets @effectsoup/worker`;
 
 const coreSnippet = `import { createPixelBuffer, toGrayscale } from "@effectsoup/core";
 import type { PixelBuffer } from "@effectsoup/core";
@@ -179,7 +181,15 @@ export default function DocsPage(): JSX.Element {
         </section>
 
         <section className="mx-auto max-w-container px-4 py-12 lg:px-8 lg:py-16">
+          <p className="mb-3 text-sm leading-relaxed text-body-muted">
+            Install everything with the meta-package:
+          </p>
           <CodeBlock code={installSnippet} />
+          <p className="mb-3 mt-6 text-sm leading-relaxed text-body-muted">
+            Or install the individual packages if you only need part of the
+            engine:
+          </p>
+          <CodeBlock code={individualInstallSnippet} />
 
           <div className="mt-12 space-y-12">
             <PackageCard
