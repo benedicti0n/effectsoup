@@ -7,8 +7,9 @@ import { Menu01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/authClient";
 import { SignInDialog } from "@/components/auth/signInDialog";
+import { cn } from "@/lib/utils";
 
-export function SiteHeader(): JSX.Element {
+export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const { data: session } = authClient.useSession();
@@ -22,7 +23,7 @@ export function SiteHeader(): JSX.Element {
     <>
       {showSignIn && <SignInDialog onClose={() => setShowSignIn(false)} />}
       <header className="sticky top-0 z-50 border-b border-hairline bg-canvas/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-container items-center justify-between px-4 lg:px-8">
+        <div className={cn("mx-auto flex h-16 max-w-container items-center justify-between", !noPadding && "px-4 lg:px-8")}>
           <Link href="/" className="font-display text-xl font-medium tracking-tight text-ink-primary">
             EffectSoup
           </Link>
@@ -74,7 +75,7 @@ export function SiteHeader(): JSX.Element {
 
         {menuOpen && (
           <div className="border-t border-hairline bg-canvas md:hidden">
-            <div className="mx-auto max-w-container space-y-1 px-4 py-4">
+            <div className={cn("mx-auto max-w-container space-y-1 py-4", !noPadding && "px-4")}>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}

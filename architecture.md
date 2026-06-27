@@ -29,10 +29,9 @@ effectLab/
 - TanStack Query for server state
 - Better Auth, Drizzle ORM, Neon PostgreSQL
 - Upstash Redis for rate limiting
-- Cloudflare R2 signed uploads for cloud projects
 - Sentry, PostHog
 
-This package owns UI, routing, auth, storage orchestration, and project metadata. It must never contain pixel-processing algorithms. Public routes include `/` (homepage + mini-playground), `/playground` (full editor), `/docs`, and `/account`.
+This package owns UI, routing, auth, and project metadata. It must never contain pixel-processing algorithms. Public routes include `/` (homepage + mini-playground), `/playground` (full editor), `/docs`, and `/account`.
 
 ### Editor UI Components
 
@@ -127,19 +126,9 @@ sequenceDiagram
 - Sign-in triggered only by cloud-save actions.
 - Account page shows auth methods and sign-out.
 
-## Storage / Cloud Project Flow
-
-- Signed-in users can save cloud projects.
-- Server creates signed R2 upload URLs for source images.
-- Project metadata stored in Neon via Drizzle.
-- Thumbnails generated client-side and uploaded via signed URL.
-- Object keys scoped by `userId/projectId`.
-- Ownership enforced on every read/update/delete.
-
 ## Security Boundaries
 
 - `effectsCore` has no network, auth, or UI dependencies.
-- All storage credentials stay server-side.
 - Environment variables validated with Zod.
 - Rate limiting on upload and project routes.
 - Project operations require ownership checks.

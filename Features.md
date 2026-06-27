@@ -17,7 +17,6 @@ Users are never forced to sign in before trying the product.
 - Compare before/after
 
 **Sign-in is required only when users attempt to:**
-- Save a cloud project
 - Access full advanced controls (some presets expose these inline)
 
 No watermark on exports.

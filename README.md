@@ -13,7 +13,6 @@ Browser-based, non-AI image transformation studio. Upload a photo, choose a retr
 - **Auth:** Better Auth (Google OAuth + email/password)
 - **Database:** Neon PostgreSQL + Drizzle ORM
 - **Payments:** Dodo Payments
-- **Storage:** Cloudflare R2
 - **Cache/Rate Limits:** Upstash Redis
 - **Tests:** Vitest + Playwright
 
@@ -58,11 +57,6 @@ GOOGLE_CLIENT_SECRET=
 Optional depending on features:
 
 ```text
-R2_ACCOUNT_ID=
-R2_ACCESS_KEY_ID=
-R2_SECRET_ACCESS_KEY=
-R2_BUCKET_NAME=
-R2_PUBLIC_BASE_URL=
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -100,4 +94,4 @@ pnpm --filter web db:migrate
 
 ## Architecture Summary
 
-All image effects run in the user's browser. The backend handles auth, project metadata, and storage orchestration. See `architecture.md` for detailed diagrams and scaling notes.
+All image effects run in the user's browser. The backend handles auth and project metadata. See `architecture.md` for detailed diagrams and scaling notes.

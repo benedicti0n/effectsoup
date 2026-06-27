@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 
 function HeroEyebrow(): JSX.Element {
   return (
-    <div className="mb-4 inline-flex items-center gap-2 rounded-pill border border-hairline bg-soft-stone/50 px-3 py-1">
+    <div className="mb-4 inline-flex items-center gap-2 rounded-pill border border-hairline bg-soft-stone/50 pl-1 pr-3 py-1">
       <Badge variant="coral">New</Badge>
       <span className="text-xs font-medium text-body-muted">
         Browser-only image effects studio

@@ -229,13 +229,10 @@
 
 ## Phase 6 — Cloud Projects
 
-- [ ] Configure Cloudflare R2 client
-- [ ] Implement `POST /api/uploads/createSignedUpload`
 - [ ] Implement `POST /api/projects` and `GET/PUT/DELETE /api/projects/[projectId]`
 - [ ] Implement project save/open/update/delete UI
 - [ ] Generate and store project thumbnails
 - [ ] Enforce ownership and Premium access
-- [ ] Implement storage safeguards (per-user cap)
 - [ ] Add project API tests
 
 ## Phase 7 — Performance Hardening

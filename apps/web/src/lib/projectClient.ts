@@ -66,26 +66,3 @@ export async function deleteProject(projectId: string): Promise<void> {
   });
   if (!response.ok) throw new Error("Failed to delete project");
 }
-
-export async function createSignedUploadUrl(payload: {
-  fileName: string;
-  contentType: "image/jpeg" | "image/png" | "image/webp";
-  fileSize: number;
-}): Promise<{ key: string; uploadUrl: string }> {
-  const response = await fetch("/api/uploads/createSignedUpload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  if (!response.ok) throw new Error("Failed to create upload URL");
-  return (await response.json()) as { key: string; uploadUrl: string };
-}
-
-export async function uploadToSignedUrl(url: string, file: Blob): Promise<void> {
-  const response = await fetch(url, {
-    method: "PUT",
-    body: file,
-    headers: { "Content-Type": file.type }
-  });
-  if (!response.ok) throw new Error("Failed to upload file");
-}

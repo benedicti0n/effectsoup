@@ -9,7 +9,6 @@ import {
   ArrowLeft01Icon,
   Cancel01Icon,
   Download01Icon,
-  Folder01Icon,
   RedoIcon,
   UndoIcon,
   Upload01Icon
@@ -20,7 +19,6 @@ import { CanvasPreview } from "./canvasPreview";
 import { EffectControls } from "./effectControls";
 import { ExportDialog } from "./exportDialog";
 import { PresetGrid } from "./presetGrid";
-import { SaveProjectDialog } from "./saveProjectDialog";
 import { UploadPanel } from "./uploadPanel";
 import { IconButton } from "./iconButton";
 
@@ -36,7 +34,6 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
   const replaceSource = useEditorStore((state) => state.replaceSource);
   const removeSource = useEditorStore((state) => state.removeSource);
   const [showExport, setShowExport] = useState(false);
-  const [showSave, setShowSave] = useState(false);
   const [showMobileLibrary, setShowMobileLibrary] = useState(false);
   const replaceInputRef = useRef<HTMLInputElement>(null);
 
@@ -132,13 +129,6 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
             </>
           )}
 
-          <IconButton
-            onClick={() => setShowSave(true)}
-            label="Save"
-            disabled={!source}
-            icon={<HugeiconsIcon icon={Folder01Icon} className="h-4 w-4" />}
-          />
-
           <Button
             onClick={() => setShowExport(true)}
             disabled={!source}
@@ -189,7 +179,6 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
       )}
 
       {showExport && <ExportDialog onClose={() => setShowExport(false)} />}
-      {showSave && <SaveProjectDialog onClose={() => setShowSave(false)} />}
     </div>
   );
 }

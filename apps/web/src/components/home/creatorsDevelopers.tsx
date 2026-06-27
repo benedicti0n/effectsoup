@@ -1,6 +1,5 @@
 import type { JSX } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export function CreatorsDevelopers(): JSX.Element {
   return (
@@ -42,9 +41,6 @@ export function CreatorsDevelopers(): JSX.Element {
               <Button variant="outline" className="border-on-dark/30 text-on-dark hover:bg-on-dark/10" asChild>
                 <a href="/docs">Read the docs</a>
               </Button>
-              <Badge variant="outline" className="border-on-dark/30 text-on-dark/80">
-                Coming soon
-              </Badge>
             </div>
           </div>
         </div>

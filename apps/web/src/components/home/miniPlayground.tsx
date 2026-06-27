@@ -52,7 +52,7 @@ export function MiniPlayground(): JSX.Element {
         />
       )}
       <div className="rounded-sm border border-card-border bg-canvas p-4 shadow-sm md:p-6">
-      <div className="mb-4 grid gap-4 md:grid-cols-[1fr_280px]">
+      <div className="grid gap-4 md:grid-cols-[1fr_280px]">
         <div className="relative flex items-center justify-center overflow-hidden rounded-sm bg-soft-stone">
           {error && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-canvas/90 p-4 text-center text-sm text-error">
@@ -158,17 +158,14 @@ export function MiniPlayground(): JSX.Element {
               <HugeiconsIcon icon={Download01Icon} className="h-4 w-4" />
               Download preview
             </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-4">
-        <Button variant="outline" asChild>
+            <Button variant="outline" asChild>
           <Link href="/playground">
             Open full playground
             <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
           </Link>
         </Button>
+          </div>
+        </div>
       </div>
     </div>
     </>
