@@ -15,7 +15,6 @@ export function SiteHeader(): JSX.Element {
 
   const navLinks = [
     { href: "/playground", label: "Playground" },
-    { href: "/#showcase", label: "Effects" },
     { href: "/docs", label: "Docs" }
   ];
 

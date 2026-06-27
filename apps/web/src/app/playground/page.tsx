@@ -4,9 +4,9 @@ import type { JSX } from "react";
 
 export default function PlaygroundPage(): JSX.Element {
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col overflow-hidden">
       <SiteHeader />
-      <EditorShell className="flex-1" />
+      <EditorShell className="flex-1 overflow-hidden" />
     </div>
   );
 }

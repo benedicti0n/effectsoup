@@ -89,7 +89,7 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
   );
 
   return (
-    <div className={cn("flex flex-col bg-canvas text-ink", className ?? "h-screen")}>
+    <div className={cn("flex flex-col overflow-hidden bg-canvas text-ink", className ?? "h-screen")}>
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-hairline px-4">
         <div className="flex items-center gap-4">
           <Link
@@ -151,11 +151,11 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-72 flex-col gap-4 overflow-y-auto border-r border-hairline bg-soft-stone/20 p-4 md:flex">
+        <aside className="hidden min-h-0 w-72 flex-col gap-4 overflow-y-auto border-r border-hairline bg-soft-stone/20 p-4 md:flex">
           <PresetGrid />
         </aside>
 
-        <main className="relative flex flex-1 flex-col p-4">
+        <main className="relative flex min-h-0 flex-1 flex-col p-4">
           {!source ? <UploadPanel /> : <CanvasPreview />}
           {isRendering && (
             <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-sm border border-hairline bg-canvas px-4 py-2 text-xs font-medium text-muted shadow-sm">
@@ -164,7 +164,7 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
           )}
         </main>
 
-        <aside className="hidden w-80 overflow-y-auto border-l border-hairline bg-canvas p-4 lg:block">
+        <aside className="hidden min-h-0 w-80 overflow-y-auto border-l border-hairline bg-canvas p-4 lg:block">
           <EffectControls />
         </aside>
       </div>

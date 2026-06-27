@@ -53,7 +53,7 @@ export function MiniPlayground(): JSX.Element {
       )}
       <div className="rounded-sm border border-card-border bg-canvas p-4 shadow-sm md:p-6">
       <div className="mb-4 grid gap-4 md:grid-cols-[1fr_280px]">
-        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-sm bg-soft-stone">
+        <div className="relative flex items-center justify-center overflow-hidden rounded-sm bg-soft-stone">
           {error && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-canvas/90 p-4 text-center text-sm text-error">
               {error}

@@ -4,7 +4,6 @@ import { allPresets } from "@imageeffects/presets";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { MiniPlayground } from "@/components/home/miniPlayground";
-import { EffectShowcase } from "@/components/home/effectShowcase";
 import { HowItWorks } from "@/components/home/howItWorks";
 import { CreatorsDevelopers } from "@/components/home/creatorsDevelopers";
 import { Button } from "@/components/ui/button";
@@ -24,36 +23,49 @@ function HeroEyebrow(): JSX.Element {
 function Hero(): JSX.Element {
   return (
     <section className="bg-canvas">
-      <div className="mx-auto max-w-container px-4 py-16 lg:px-8 lg:py-24">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          <div>
-            <HeroEyebrow />
-            <h1 className="mb-6 font-display text-4xl font-medium leading-[1.1] tracking-tight text-ink-primary md:text-5xl lg:text-6xl">
-              Beautiful image effects. <br />
-              <span className="text-muted">Made in your browser.</span>
-            </h1>
-            <p className="mb-8 max-w-md text-lg leading-relaxed text-body-muted">
-              Upload a photo, pick a look, and export in seconds. No AI, no
-              uploads to a server — every pixel is processed right here.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild>
-                <Link href="/playground">Open Playground</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/#showcase">Browse effects</Link>
-              </Button>
-            </div>
-            <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-muted">
-              <span>{allPresets.length} presets</span>
-              <span className="h-1 w-1 rounded-full bg-muted" />
-              <span>Every effect free</span>
-              <span className="h-1 w-1 rounded-full bg-muted" />
-              <span>PNG / JPEG / WebP</span>
-            </div>
-          </div>
-          <MiniPlayground />
+      <div className="mx-auto max-w-container px-4 py-16 text-center lg:px-8 lg:py-24">
+        <HeroEyebrow />
+        <h1 className="mx-auto mb-6 max-w-3xl font-display text-4xl font-medium leading-[1.1] tracking-tight text-ink-primary md:text-5xl lg:text-6xl">
+          Beautiful image effects. <br />
+          <span className="text-muted">Made in your browser.</span>
+        </h1>
+        <p className="mx-auto mb-8 max-w-xl text-lg leading-relaxed text-body-muted">
+          Upload a photo, pick a look, and export in seconds. No AI, no uploads
+          to a server — every pixel is processed right here.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button asChild>
+            <Link href="/playground">Open Playground</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/#try-it">Try it</Link>
+          </Button>
         </div>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted">
+          <span>{allPresets.length} presets</span>
+          <span className="h-1 w-1 rounded-full bg-muted" />
+          <span>Every effect free</span>
+          <span className="h-1 w-1 rounded-full bg-muted" />
+          <span>PNG / JPEG / WebP</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MiniPlaygroundSection(): JSX.Element {
+  return (
+    <section id="try-it" className="bg-soft-stone/30">
+      <div className="mx-auto max-w-container px-4 py-16 lg:px-8 lg:py-24">
+        <div className="mb-8 text-center">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted">
+            Try it
+          </p>
+          <h2 className="font-display text-2xl font-medium tracking-tight text-ink-primary md:text-3xl">
+            Play with a demo photo.
+          </h2>
+        </div>
+        <MiniPlayground />
       </div>
     </section>
   );
@@ -120,9 +132,9 @@ export default function HomePage(): JSX.Element {
       <SiteHeader />
       <main className="flex-1">
         <Hero />
+        <MiniPlaygroundSection />
         <CreatorsDevelopers />
         <Features />
-        <EffectShowcase />
         <HowItWorks />
       </main>
       <SiteFooter />
