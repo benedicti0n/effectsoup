@@ -10,13 +10,22 @@ const envSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().optional(),
-  R2_PUBLIC_BASE_URL: z.string().url().optional(),
-  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  R2_PUBLIC_BASE_URL: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.string().url().optional()
+  ),
+  UPSTASH_REDIS_REST_URL: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.string().url().optional()
+  ),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   SENTRY_DSN: z.string().optional(),
   NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-  NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional()
+  NEXT_PUBLIC_POSTHOG_HOST: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.string().url().optional()
+  )
 });
 
 export const env = envSchema.parse(process.env);
