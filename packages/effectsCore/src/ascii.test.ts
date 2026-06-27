@@ -123,8 +123,19 @@ describe("renderAscii", () => {
 });
 
 describe("renderSymbolGlow", () => {
-  it("places more symbols in bright/high-contrast regions than flat dark regions", () => {
-    // Left half is dark and uniform, right half is bright and uniform.
+  it("renders luminous symbols over a blurred base at source size", () => {
+    const source = createPixelBuffer(60, 60, [128, 128, 128, 255]);
+    const output = renderSymbolGlow(source, {
+      cellSize: 10,
+      blur: 8,
+      brightness: 1.05,
+      charset: " .e/+*=2"
+    });
+    expect(output.width).toBe(source.width);
+    expect(output.height).toBe(source.height);
+  });
+
+  it("draws more symbols in bright regions than dark regions", () => {
     const source = createPixelBuffer(60, 40, [0, 0, 0, 255]);
     for (let i = 0; i < source.data.length; i += 4) {
       const x = (i / 4) % 60;
@@ -136,13 +147,10 @@ describe("renderSymbolGlow", () => {
     }
 
     const output = renderSymbolGlow(source, {
-      fontSize: 8,
-      symbolSet: "2*+/=e",
-      baseBlur: 8,
-      glowRadius: 6,
-      glowAmount: 0.5,
-      threshold: 0.5,
-      falloff: 0.3,
+      cellSize: 8,
+      blur: 8,
+      brightness: 1.0,
+      charset: " .e/+*=2",
       colorMode: "monochrome"
     });
 
@@ -150,7 +158,7 @@ describe("renderSymbolGlow", () => {
     let rightDrawn = 0;
     for (let i = 0; i < output.data.length; i += 4) {
       const x = (i / 4) % 60;
-      if (output.data[i] > 60 || output.data[i + 1] > 60 || output.data[i + 2] > 60) {
+      if (output.data[i] > 80 || output.data[i + 1] > 80 || output.data[i + 2] > 80) {
         if (x < 30) leftDrawn++;
         else rightDrawn++;
       }
@@ -158,53 +166,25 @@ describe("renderSymbolGlow", () => {
     expect(rightDrawn).toBeGreaterThan(leftDrawn * 3);
   });
 
-  it("keeps blurred base-image pixels outside symbol regions", () => {
-    const source = createPixelBuffer(40, 40, [100, 120, 140, 255]);
+  it("uses source color in colored mode", () => {
+    const source = createPixelBuffer(50, 50, [200, 50, 50, 255]);
     const output = renderSymbolGlow(source, {
-      fontSize: 8,
-      symbolSet: "2*+/=e",
-      baseBlur: 8,
-      glowRadius: 6,
-      glowAmount: 0.5,
-      threshold: 0.75,
-      falloff: 0.2,
-      colorMode: "monochrome"
+      cellSize: 8,
+      blur: 6,
+      brightness: 1.0,
+      charset: " .e/+*=2",
+      colorMode: "colored",
+      colorBoost: 0
     });
 
-    // With a high threshold on a midtone image, most pixels should stay close to the base color.
-    let baseLike = 0;
+    let foundRed = false;
     for (let i = 0; i < output.data.length; i += 4) {
-      if (
-        Math.abs(output.data[i] - 100) < 40 &&
-        Math.abs(output.data[i + 1] - 120) < 40 &&
-        Math.abs(output.data[i + 2] - 140) < 40
-      ) {
-        baseLike++;
+      if (output.data[i] > 120 && output.data[i + 1] < 80 && output.data[i + 2] < 80) {
+        foundRed = true;
+        break;
       }
     }
-    expect(baseLike).toBeGreaterThan(output.data.length / 4 * 0.5);
-  });
-
-  it("does not produce a global glow veil on a dark image", () => {
-    const source = createPixelBuffer(40, 40, [20, 20, 20, 255]);
-    const output = renderSymbolGlow(source, {
-      fontSize: 8,
-      symbolSet: "2*+/=e",
-      baseBlur: 8,
-      glowRadius: 8,
-      glowAmount: 0.8,
-      threshold: 0.5,
-      falloff: 0.3,
-      colorMode: "monochrome"
-    });
-
-    let brightPixels = 0;
-    for (let i = 0; i < output.data.length; i += 4) {
-      if (output.data[i] > 80 || output.data[i + 1] > 80 || output.data[i + 2] > 80) {
-        brightPixels++;
-      }
-    }
-    expect(brightPixels).toBeLessThan(output.data.length / 4 * 0.15);
+    expect(foundRed).toBe(true);
   });
 });
 

@@ -22,16 +22,12 @@ export type AsciiOptions = {
 };
 
 export type SymbolGlowOptions = {
-  fontSize: number;
-  symbolSet: string;
-  baseBlur: number;
-  glowRadius: number;
-  glowAmount: number;
-  threshold: number;
-  falloff: number;
-  edgeStrength?: number;
-  colorMode: "monochrome" | "colored";
-  antialias?: boolean;
+  cellSize: number;
+  blur: number;
+  brightness: number;
+  charset: string;
+  colorBoost?: number;
+  colorMode?: "colored" | "monochrome";
 };
 
 export type LuminousAsciiBloomOptions = {

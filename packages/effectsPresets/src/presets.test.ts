@@ -141,7 +141,7 @@ describe("presets", () => {
       const preset = allPresets.find((p) => p.id === "symbolGlow");
       expect(preset).toBeDefined();
       expect(preset!.category).toBe("asciiSymbols");
-      expect(preset!.defaultIntensity).toBe(40);
+      expect(preset!.defaultIntensity).toBe(1);
     });
 
     it("Riso Offset defaults to 70% intensity and black paper", () => {
