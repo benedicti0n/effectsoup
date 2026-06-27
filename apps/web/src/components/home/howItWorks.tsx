@@ -14,7 +14,7 @@ const steps = [
   {
     number: "03",
     title: "Export in seconds",
-    description: "Download a high-resolution PNG, JPEG, or WebP. Free exports up to 1080px; Premium unlocks original and 4K."
+    description: "Download a high-resolution PNG, JPEG, or WebP. Choose from 1080px, original, or up to 4K."
   }
 ];
 

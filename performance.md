@@ -92,7 +92,7 @@ k6 run performance/loadtest.js
 
 ## Load Test
 
-`performance/loadtest.js` simulates up to 1,000 virtual users hitting `/api/me/entitlements`. The backend intentionally does no image processing; this validates entitlement-read scalability. Run after `pnpm dev`:
+`performance/loadtest.js` simulates up to 1,000 virtual users hitting `/api/auth/get-session`. The backend intentionally does no image processing; this validates session-read scalability. Run after `pnpm dev`:
 
 ```bash
 k6 run performance/loadtest.js
@@ -100,7 +100,7 @@ k6 run performance/loadtest.js
 
 ## Rollout Metrics to Monitor
 
-- First Contentful Paint on `/` and `/editor`
+- First Contentful Paint on `/` and `/playground`
 - Time to first preview after upload
 - 95th percentile render duration by preset
 - Worker cancellation rate

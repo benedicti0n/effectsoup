@@ -15,6 +15,7 @@ import {
   Upload01Icon
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { CanvasPreview } from "./canvasPreview";
 import { EffectControls } from "./effectControls";
 import { ExportDialog } from "./exportDialog";
@@ -26,7 +27,7 @@ import { IconButton } from "./iconButton";
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export function EditorShell(): JSX.Element {
+export function EditorShell({ className }: { className?: string } = {}): JSX.Element {
   const source = useEditorStore((state) => state.source);
   const isRendering = useEditorStore((state) => state.isRendering);
   const undo = useEditorStore((state) => state.undo);
@@ -88,7 +89,7 @@ export function EditorShell(): JSX.Element {
   );
 
   return (
-    <div className="flex h-screen flex-col bg-canvas text-ink">
+    <div className={cn("flex flex-col bg-canvas text-ink", className ?? "h-screen")}>
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-hairline px-4">
         <div className="flex items-center gap-4">
           <Link

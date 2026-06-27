@@ -9,13 +9,4 @@ export const redis: Redis | null =
       })
     : null;
 
-export async function getCachedEntitlement(userId: string): Promise<boolean | null> {
-  if (!redis) return null;
-  const value = await redis.get<boolean>(`entitlement:${userId}`);
-  return value ?? null;
-}
 
-export async function setCachedEntitlement(userId: string, isPremium: boolean): Promise<void> {
-  if (!redis) return;
-  await redis.set(`entitlement:${userId}`, isPremium, { ex: 60 });
-}

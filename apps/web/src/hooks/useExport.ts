@@ -13,7 +13,6 @@ import {
 } from "@/lib/imageExport";
 
 const PREMIUM_EXPORT_LONGEST = 4096;
-const FREE_EXPORT_LONGEST = 1080;
 
 export type ExportFormat = "png" | "jpeg" | "webp";
 export type ExportResolution = "1080" | "original" | "4k";
@@ -27,17 +26,12 @@ export function useExport(onClose: () => void) {
   const [resolution, setResolution] = useState<ExportResolution>("1080");
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const { data: session } = authClient.useSession();
   const { showToast } = useToast();
 
-  const isPremium = false;
-  const selectedPreset = getPresetById(effect.presetId);
-  const isPremiumPreset = selectedPreset?.access === "premium";
-  const requiresUpgrade = isPremiumPreset || resolution === "original" || resolution === "4k";
-
   const exportImage = useCallback(async () => {
     if (!source) return;
+    if (!session) return;
     setIsExporting(true);
     setError(null);
 
@@ -48,11 +42,9 @@ export function useExport(onClose: () => void) {
 
       const resolved = preset.intensityMapper(effect.intensity, effect.advancedOverrides);
 
-      let longest = FREE_EXPORT_LONGEST;
-      if (isPremium) {
-        if (resolution === "4k") longest = PREMIUM_EXPORT_LONGEST;
-        else if (resolution === "original") longest = Math.max(sourceBuffer.width, sourceBuffer.height);
-      }
+      let longest = 1080;
+      if (resolution === "4k") longest = PREMIUM_EXPORT_LONGEST;
+      else if (resolution === "original") longest = Math.max(sourceBuffer.width, sourceBuffer.height);
 
       const { width, height } = getExportDimensions(sourceBuffer.width, sourceBuffer.height, longest);
       const output = renderEffectSync(sourceBuffer, crop, effect.presetId, resolved, width, height);
@@ -73,11 +65,10 @@ export function useExport(onClose: () => void) {
     } finally {
       setIsExporting(false);
     }
-  }, [source, crop, effect, format, quality, resolution, isPremium, onClose, showToast]);
+  }, [source, crop, effect, format, quality, resolution, session, onClose, showToast]);
 
   return {
     session,
-    isPremium,
     format,
     setFormat,
     quality,
@@ -86,9 +77,6 @@ export function useExport(onClose: () => void) {
     setResolution,
     isExporting,
     error,
-    showUpgrade,
-    setShowUpgrade,
-    requiresUpgrade,
     exportImage
   };
 }

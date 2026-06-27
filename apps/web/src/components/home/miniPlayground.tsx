@@ -1,6 +1,7 @@
 "use client";
 
-import type { JSX } from "react";
+import { useState, type JSX } from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowRight01Icon,
@@ -9,7 +10,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { SignInDialog } from "@/components/auth/signInDialog";
+import { authClient } from "@/lib/authClient";
 import NextImage from "next/image";
 import { cn } from "@/lib/utils";
 import { useMiniPlayground } from "@/hooks/useMiniPlayground";
@@ -30,9 +32,26 @@ export function MiniPlayground(): JSX.Element {
     setIntensity,
     setSelectedDemo
   } = useMiniPlayground();
+  const [showSignIn, setShowSignIn] = useState(false);
+  const { data: session } = authClient.useSession();
+
+  const onDownload = () => {
+    if (session) {
+      void handleDownload();
+    } else {
+      setShowSignIn(true);
+    }
+  };
 
   return (
-    <div className="rounded-sm border border-card-border bg-canvas p-4 shadow-sm md:p-6">
+    <>
+      {showSignIn && (
+        <SignInDialog
+          onClose={() => setShowSignIn(false)}
+          onSuccess={() => setShowSignIn(false)}
+        />
+      )}
+      <div className="rounded-sm border border-card-border bg-canvas p-4 shadow-sm md:p-6">
       <div className="mb-4 grid gap-4 md:grid-cols-[1fr_280px]">
         <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-sm bg-soft-stone">
           {error && (
@@ -135,7 +154,7 @@ export function MiniPlayground(): JSX.Element {
               <HugeiconsIcon icon={Upload01Icon} className="h-4 w-4" />
               Upload your image
             </Button>
-            <Button className="w-full" onClick={handleDownload} disabled={isRendering}>
+            <Button className="w-full" onClick={onDownload} disabled={isRendering}>
               <HugeiconsIcon icon={Download01Icon} className="h-4 w-4" />
               Download preview
             </Button>
@@ -144,17 +163,14 @@ export function MiniPlayground(): JSX.Element {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-4">
-        <p className="text-sm text-body-muted">
-          <Badge variant="muted">Free preview</Badge>
-          <span className="ml-2">Exports up to 1080px. Premium presets in the playground.</span>
-        </p>
         <Button variant="outline" asChild>
-          <a href="/playground">
+          <Link href="/playground">
             Open full playground
             <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
-          </a>
+          </Link>
         </Button>
       </div>
     </div>
+    </>
   );
 }

@@ -6,7 +6,9 @@ import { freePresets } from "./freePresets.js";
 import { premiumPresets } from "./premiumPresets.js";
 import type { EffectPreset } from "./types.js";
 
-export const allPresets: EffectPreset[] = [...freePresets, ...premiumPresets];
+export const allPresets: EffectPreset[] = [...freePresets, ...premiumPresets].map(
+  (preset) => ({ ...preset, access: "free" as const })
+);
 
 const legacyPresetMap: Record<string, string> = {
   monoDither: "errorDiffusionDither",

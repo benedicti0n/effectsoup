@@ -28,11 +28,11 @@ effectLab/
 - Zustand for local editor UI state
 - TanStack Query for server state
 - Better Auth, Drizzle ORM, Neon PostgreSQL
-- Upstash Redis for rate limiting and cached entitlements
+- Upstash Redis for rate limiting
 - Cloudflare R2 signed uploads for cloud projects
 - Sentry, PostHog
 
-This package owns UI, routing, auth, billing, storage orchestration, and project metadata. It must never contain pixel-processing algorithms. Public routes include `/` (homepage + mini-playground), `/playground` (full editor), `/pricing`, `/docs`, `/account`, `/billing/success`, and `/billing/cancel`.
+This package owns UI, routing, auth, storage orchestration, and project metadata. It must never contain pixel-processing algorithms. Public routes include `/` (homepage + mini-playground), `/playground` (full editor), `/docs`, and `/account`.
 
 ### Editor UI Components
 
@@ -62,13 +62,15 @@ type EffectPreset = {
   id: string;
   name: string;
   description: string;
-  category: "printGrid" | "asciiSymbols" | "atmosphereGlow" | "glassFrost";
+  category: "printGrid" | "asciiSymbols" | "atmosphereGlow" | "glassFrost" | "printLab" | "signalLab" | "lightLab";
   access: "free" | "premium";
   defaultIntensity: number;
   intensityMapper: IntensityMapper;
   advancedControlSchema: AdvancedControlDefinition[];
   createPipeline: (resolvedParameters: ResolvedPresetParameters) => EffectPipeline;
 };
+
+All public presets are overridden to `access: "free"` at runtime.
 ```
 
 ### `packages/effectsWorker`
@@ -114,7 +116,7 @@ sequenceDiagram
 |--------|---------------------|--------------|
 | Trigger | preset/intensity/crop change | Export button |
 | Source | preview-size cached buffer | original decoded source |
-| Max size | 1400px desktop / 960px mobile | original or up to 4K Premium |
+| Max size | 1400px desktop / 960px mobile | original or up to 4K |
 | Quality | approximate while dragging, refined on pause | full quality |
 | Location | Web Worker | Web Worker / OffscreenCanvas fallback |
 
@@ -122,51 +124,24 @@ sequenceDiagram
 
 - Better Auth manages sessions via `/api/auth/[...all]`.
 - Guests use local-only editing.
-- Sign-in triggered only by premium actions (export premium, high-res export, save project, advanced controls).
+- Sign-in triggered only by cloud-save actions.
 - Account page shows auth methods and sign-out.
-
-## Dodo Billing Flow
-
-```mermaid
-flowchart LR
-    A[User clicks Unlock Premium] --> B{Signed in?}
-    B -->|No| C[Sign-in dialog]
-    B -->|Yes| D[POST /api/billing/createCheckout]
-    D --> E[Dodo hosted checkout]
-    E --> F[User completes payment]
-    F --> G[Dodo POST /api/webhooks/dodo]
-    G --> H[Verify signature]
-    H --> I[Store subscription]
-    I --> J[Redirect to app]
-    J --> K[Refresh /api/me/entitlements]
-```
-
-Webhook processing is idempotent: duplicate `providerEventId` values are ignored.
 
 ## Storage / Cloud Project Flow
 
-- Premium users can save cloud projects.
+- Signed-in users can save cloud projects.
 - Server creates signed R2 upload URLs for source images.
 - Project metadata stored in Neon via Drizzle.
 - Thumbnails generated client-side and uploaded via signed URL.
 - Object keys scoped by `userId/projectId`.
 - Ownership enforced on every read/update/delete.
 
-## Entitlement Flow
-
-1. Client requests `/api/me/entitlements`.
-2. Server checks subscription table.
-3. Result cached in Upstash Redis with short TTL.
-4. Client uses cached entitlement for UI gates.
-5. Server re-checks entitlement on protected actions.
-
 ## Security Boundaries
 
 - `effectsCore` has no network, auth, or UI dependencies.
 - All storage credentials stay server-side.
 - Environment variables validated with Zod.
-- Rate limiting on checkout, upload, project, and webhook routes.
-- Webhook signatures verified with raw request body.
+- Rate limiting on upload and project routes.
 - Project operations require ownership checks.
 - No secrets in client bundles, logs, or error payloads.
 
@@ -174,9 +149,8 @@ Webhook processing is idempotent: duplicate `providerEventId` values are ignored
 
 Because every user’s browser performs its own image rendering, there is no shared image-processing bottleneck. The backend only handles:
 
-- Session/entitlement reads (cached in Redis)
+- Session reads
 - Occasional project metadata writes
-- Billing webhook events
-- Rate-limited checkout creation
+- Rate-limited upload URL creation
 
 This architecture scales horizontally by adding standard Next.js compute. The image engine scales with each user’s device, protected by adaptive preview quality and worker cancellation.

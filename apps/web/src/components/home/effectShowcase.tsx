@@ -2,7 +2,6 @@
 
 import NextImage from "next/image";
 import { allPresets } from "@imageeffects/presets";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { JSX } from "react";
 
@@ -13,7 +12,7 @@ const categoryLabels: Record<string, string> = {
   glassFrost: "Glass & Frost",
   printLab: "Print Lab",
   signalLab: "Signal Lab",
-  lightLab: "Light Lab"
+  lightLab: "Glow & Light"
 };
 
 export function EffectShowcase(): JSX.Element {
@@ -58,18 +57,9 @@ export function EffectShowcase(): JSX.Element {
                   <p className="mb-1 text-xs font-medium text-on-dark/70">
                     {categoryLabels[preset.category] ?? preset.category}
                   </p>
-                  <h3 className="mb-2 font-display text-lg font-medium text-on-dark">
+                  <h3 className="font-display text-lg font-medium text-on-dark">
                     {preset.name}
                   </h3>
-                  <div className="flex items-center gap-2">
-                    {preset.access === "premium" ? (
-                      <Badge variant="premium">Premium</Badge>
-                    ) : (
-                      <Badge variant="outline" className="border-on-dark/30 text-on-dark">
-                        Free
-                      </Badge>
-                    )}
-                  </div>
                 </div>
               </a>
             );

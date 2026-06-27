@@ -285,3 +285,31 @@
 - [x] Add core tests for Phase 2 effects
 - [x] Update docs and showcase assets
 - [x] Run full verification
+
+## Effect Cleanup & UI Tuning (completed)
+
+- [x] Remove `electricDream`, `neonSmear`, `flowlineGlow`, `neonPointCloud`, `contourHatch`
+- [x] Remove unused shared utilities `flow.ts` and `draw.ts`
+- [x] Add `invertedGlow` core effect and premium preset
+- [x] Add `lighten` blend mode
+- [x] Update Bitmap defaults (pixel size 2, color levels 32, dither threshold 200)
+- [x] Update Stipple Print defaults (intensity 100%, dot size 1, spacing 4, density slider)
+- [x] Update LED Matrix defaults (cell size 10, glow 1)
+- [x] Update Symbol Glow defaults (intensity 100%, cell size 6, blur 5, brightness 0.5, color boost 120)
+- [x] Add lowercase `e` glyph to bitmap font
+- [x] Reorganize categories: LED Matrix -> Glow & Light, rename Light Lab to Glow & Light
+- [x] Add `usesIntensity` preset flag
+- [x] Hide intensity slider and show advanced controls inline for `bitmap`, `stipplePrint`, `ledMatrix`, `symbolGlow`
+- [x] Update preset counts, tests, `Features.md`, and `todo.md`
+- [x] Run full verification
+
+## Pricing Update (completed)
+
+- [x] Update pricing page monthly price to $1.99
+- [x] Add monthly/yearly/lifetime toggle on pricing page
+- [x] Apply 20% yearly discount ($19.10/year)
+- [x] Add lifetime one-time purchase ($29.99)
+- [x] Update checkout API to accept `plan` and use corresponding product IDs
+- [x] Add new Dodo env vars (`DODO_PREMIUM_YEARLY_PRODUCT_ID`, `DODO_PREMIUM_LIFETIME_PRODUCT_ID`)
+- [x] Update upgrade dialog and `Features.md` pricing copy
+- [x] Run full verification

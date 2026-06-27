@@ -58,9 +58,6 @@ GOOGLE_CLIENT_SECRET=
 Optional depending on features:
 
 ```text
-DODO_API_KEY=
-DODO_WEBHOOK_SECRET=
-DODO_PREMIUM_PRODUCT_ID=
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
@@ -94,21 +91,13 @@ pnpm --filter web db:generate
 pnpm --filter web db:migrate
 ```
 
-## Billing Local Test Setup
-
-1. Create a Dodo Payments test account.
-2. Create a subscription product for Premium.
-3. Set `DODO_API_KEY`, `DODO_WEBHOOK_SECRET`, and `DODO_PREMIUM_PRODUCT_ID`.
-4. Use the Dodo CLI or dashboard to send test webhooks to `/api/webhooks/dodo`.
-
 ## Key Routes
 
 - `/` — Marketing homepage with interactive mini-playground
 - `/playground` — Full image editor workspace
-- `/pricing` — Free and Premium plans
 - `/docs` — Documentation shell
-- `/account` — User account and subscription status
+- `/account` — User account and saved projects
 
 ## Architecture Summary
 
-All image effects run in the user's browser. The backend handles auth, billing, project metadata, and storage orchestration. See `architecture.md` for detailed diagrams and scaling notes.
+All image effects run in the user's browser. The backend handles auth, project metadata, and storage orchestration. See `architecture.md` for detailed diagrams and scaling notes.

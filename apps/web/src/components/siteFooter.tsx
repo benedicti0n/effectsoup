@@ -6,7 +6,6 @@ import type { JSX } from "react";
 export function SiteFooter(): JSX.Element {
   const links = [
     { href: "/playground", label: "Playground" },
-    { href: "/pricing", label: "Pricing" },
     { href: "/docs", label: "Docs" },
     { href: "/account", label: "Account" },
     { href: "https://github.com", label: "GitHub" }

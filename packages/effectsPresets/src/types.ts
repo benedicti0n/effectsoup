@@ -52,6 +52,8 @@ export type EffectPreset = {
   category: PresetCategory;
   access: PresetAccess;
   defaultIntensity: number;
+  /** Whether the main Intensity slider is shown for this preset. Defaults to true. */
+  usesIntensity?: boolean;
   intensityMapper: IntensityMapper;
   advancedControlSchema: AdvancedControlDefinition[];
   createPipeline: (resolvedParameters: ResolvedPresetParameters) => EffectPipeline;

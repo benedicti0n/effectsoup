@@ -12,26 +12,27 @@ export const bitmapPreset: EffectPreset = {
   description: "Heavy pixelation with palette reduction for a retro 8-bit look.",
   category: "printLab",
   access: "premium",
-  defaultIntensity: 50,
+  defaultIntensity: 100,
+  usesIntensity: false,
   advancedControlSchema: [
-    { id: "pixelSize", name: "Pixel Size", type: "range", min: 2, max: 64, step: 1, defaultValue: 12 },
-    { id: "colorLevels", name: "Color Levels", type: "range", min: 2, max: 32, step: 1, defaultValue: 8 },
-    { id: "ditherThreshold", name: "Dither Threshold", type: "range", min: 0, max: 255, step: 1, defaultValue: 0 }
+    { id: "pixelSize", name: "Pixel Size", type: "range", min: 2, max: 64, step: 1, defaultValue: 2 },
+    { id: "colorLevels", name: "Color Levels", type: "range", min: 2, max: 32, step: 1, defaultValue: 32 },
+    { id: "ditherThreshold", name: "Dither Threshold", type: "range", min: 0, max: 255, step: 1, defaultValue: 200 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    pixelSize: resolveOverride(overrides, "pixelSize", Math.max(2, Math.round(32 - (intensity / 100) * 28))),
-    colorLevels: resolveOverride(overrides, "colorLevels", Math.max(2, Math.round(2 + (intensity / 100) * 22))),
-    ditherThreshold: resolveOverride(overrides, "ditherThreshold", 0)
+    pixelSize: resolveOverride(overrides, "pixelSize", 2),
+    colorLevels: resolveOverride(overrides, "colorLevels", 32),
+    ditherThreshold: resolveOverride(overrides, "ditherThreshold", 200)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
-      const pixelSize = (params.pixelSize as number) ?? 12;
-      const colorLevels = (params.colorLevels as number) ?? 8;
-      const ditherThreshold = (params.ditherThreshold as number) ?? 0;
+      const pixelSize = (params.pixelSize as number) ?? 2;
+      const colorLevels = (params.colorLevels as number) ?? 32;
+      const ditherThreshold = (params.ditherThreshold as number) ?? 200;
 
       return applyBitmap(source, {
         pixelSize,

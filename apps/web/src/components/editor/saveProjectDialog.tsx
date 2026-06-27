@@ -8,7 +8,6 @@ import { authClient } from "@/lib/authClient";
 import { createProject, createSignedUploadUrl, uploadToSignedUrl } from "@/lib/projectClient";
 import { useEditorStore } from "@/store/editorStore";
 import { SignInDialog } from "@/components/auth/signInDialog";
-import { UpgradeDialog } from "@/components/billing/upgradeDialog";
 import { useToast } from "@/components/ui/toast";
 
 function dataUrlToBlob(dataUrl: string): Blob {
@@ -58,18 +57,11 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSignIn, setShowSignIn] = useState(false);
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const { showToast } = useToast();
-
-  const isPremium = false;
 
   const save = async () => {
     if (!session) {
       setShowSignIn(true);
-      return;
-    }
-    if (!isPremium) {
-      setShowUpgrade(true);
       return;
     }
     if (!source) return;
@@ -134,10 +126,6 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
     );
   }
 
-  if (showUpgrade) {
-    return <UpgradeDialog onClose={() => setShowUpgrade(false)} />;
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
       <div className="w-full max-w-md rounded-sm border border-hairline bg-canvas p-6 shadow-sm">
@@ -149,8 +137,7 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
         </div>
 
         <p className="mb-4 font-mono text-sm text-body">
-          Cloud projects are a Premium feature. Your source image, crop, preset, and settings are
-          saved so you can edit later.
+          Your source image, crop, preset, and settings are saved so you can edit later.
         </p>
 
         <label className="mb-1 block font-mono text-xs text-mute">Project title</label>
@@ -175,13 +162,7 @@ export function SaveProjectDialog({ onClose }: { onClose: () => void }): JSX.Ele
             disabled={loading}
             className="h-9 rounded-sm bg-ink px-6 font-mono text-sm font-medium text-canvas hover:bg-ink-deep disabled:bg-surface-card disabled:text-ash"
           >
-            {loading
-              ? "Saving…"
-              : session
-                ? isPremium
-                  ? "Save"
-                  : "Upgrade to Save"
-                : "Sign in to Save"}
+            {loading ? "Saving…" : session ? "Save" : "Sign in to Save"}
           </button>
         </div>
       </div>

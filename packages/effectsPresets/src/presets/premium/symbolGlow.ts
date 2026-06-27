@@ -13,7 +13,8 @@ export const symbolGlowPreset: EffectPreset = {
   description: "Luminous ASCII symbols over a soft blurred image.",
   category: "asciiSymbols",
   access: "premium",
-  defaultIntensity: 1,
+  defaultIntensity: 100,
+  usesIntensity: false,
   advancedControlSchema: [
     { id: "cellSize", name: "Cell Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 6 },
     { id: "blur", name: "Background Blur", type: "range", min: 0, max: 24, step: 1, defaultValue: 5 },

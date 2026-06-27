@@ -11,20 +11,16 @@ Users are never forced to sign in before trying the product.
 **Guests can:**
 - Upload JPEG, PNG, and WebP images
 - Crop and reposition images
-- Preview all free and premium effects
-- Use all free effects
-- Export free effects locally at up to 1080px
+- Preview and use every effect
+- Export effects locally at up to 1080px
 - Use the main Intensity slider
 - Compare before/after
 
 **Sign-in is required only when users attempt to:**
 - Save a cloud project
-- Export a premium effect
-- Export at original resolution or 4K
-- Access full advanced controls
-- Subscribe to Premium
+- Access full advanced controls (some presets expose these inline)
 
-No watermark on free exports.
+No watermark on exports.
 
 ## Launch Effect Catalog
 
@@ -38,9 +34,9 @@ Presets are grouped into seven visual families:
 - **ASCII & Symbols** — text-based rendering with luminance-to-glyph mapping
 - **Atmosphere & Retro** — color grading, bloom, grain, CRT/VHS nostalgia, and tint presets
 - **Glass & Frost** — translucent refractive tiles and frosted surfaces
-- **Print Lab** — analog print processes such as LED matrices, stippling, and bitmap posterization
-- **Signal Lab** — signal-degradation and screen-print looks including CRT glitch, electric neon edges, and manga tones
-- **Light Lab** — directional glow, smear, and light-trail effects
+- **Print Lab** — analog print processes such as stippling, bitmap posterization, and pencil grain
+- **Signal Lab** — signal-degradation and screen-print looks including CRT glitch, manga tones, and wave displacement
+- **Glow & Light** — LED matrices and inverted glow looks
 
 ### Free Presets
 
@@ -56,49 +52,12 @@ Presets are grouped into seven visual families:
 | `duotone` | Duotone | Atmosphere & Retro | luminance mapping, two-color interpolation |
 | `dreamGlow` | Dream Glow | Atmosphere & Retro | blur, soft glow, palette presets, grain |
 | `noirGrain` | Noir Grain | Atmosphere & Retro | monochrome, contrast, grain, vignette |
-| `ledMatrix` | LED Matrix | Print Lab | cell averaging, shaped LEDs, optional glow |
+| `ledMatrix` | LED Matrix | Glow & Light | cell averaging, shaped LEDs, optional glow |
 | `stipplePrint` | Stipple Print | Print Lab | density-based dot placement, ink/paper colors |
 | `crtGlitch` | CRT Glitch | Signal Lab | sliced horizontal shifts, RGB separation, scanlines, noise |
-| `neonSmear` | Neon Smear | Light Lab | directional motion smear, neon tint, screen blend |
 | `pencilGrain` | Pencil Grain | Print Lab | Sobel edges, paper color, graphite darkening, film grain |
-| `flowlineGlow` | Flowline Glow | Light Lab | per-pixel flow field, directional smear, neon glow |
 
-### Premium Presets
-
-| ID | Name | Category | Core Primitives |
-|----|------|----------|-----------------|
-| `cyberAscii` | Cyber ASCII | ASCII & Symbols | technical glyph set, colored glyphs, scanline grid, glow |
-| `luminousAsciiBloom` | Luminous ASCII Bloom | ASCII & Symbols | source-colored ASCII, thresholded bloom |
-| `symbolGlow` | Symbol Glow | ASCII & Symbols | glowing symbols over a blurred source image |
-| `crtDream` | CRT Dream | Atmosphere & Retro | pixel grid, scanlines, bloom, RGB shift, vignette, tint presets |
-| `vhsBloom` | VHS Bloom | Atmosphere & Retro | chromatic aberration, haze, noise, bloom, tint presets |
-| `risoOffset` | Riso Offset | Print & Dither | duotone, channel offset, grain, registration shift |
-| `cubicGlass` | Cubic Glass | Glass & Frost | frosted cubic tiles, deterministic refraction, beveled edges |
-| `bitmap` | Bitmap | Print Lab | heavy pixelation, palette reduction, optional ordered dither |
-| `electricDream` | Electric Dream | Signal Lab | Sobel edges, neon tint, thresholded bloom, screen blend |
-| `mangaScanlines` | Manga Scanlines | Signal Lab | rotated screen-tone lines, ink/paper colors, threshold |
-| `waveSlice` | Wave Slice | Signal Lab | sine-wave displacement across horizontal or vertical slices |
-| `contourHatch` | Contour Hatch | Print Lab | gradient-aligned hatch strokes following image contours |
-| `neonPointCloud` | Neon Point Cloud | Light Lab | brightness-weighted points connected by neon lines |
-
-Premium effects are previewable by free users; premium export and full advanced controls are gated.
-
-## Free vs Premium Matrix
-
-| Capability | Guest / Free | Premium |
-|------------|--------------|---------|
-| Upload & crop | Yes | Yes |
-| Free presets | 16 | 16 |
-| Premium presets | Preview only | 13 |
-| Premium preview | Yes | Yes |
-| Premium export | No | Yes |
-| Export up to 1080px | Yes | Yes |
-| Export original / 4K | No | Yes |
-| Advanced controls teaser | Yes | Yes |
-| Full advanced controls | No | Yes |
-| Cloud projects | No | Yes |
-| Saved custom presets | No | Yes |
-| Watermark | None | None |
+All presets are free.
 
 ## Editor Capabilities
 
@@ -106,7 +65,7 @@ Premium effects are previewable by free users; premium export and full advanced 
 - Replace Image and Remove Image actions in the editor header
 - Non-destructive crop with aspect ratios: Original, 1:1, 4:5, 9:16, 16:9
 - Pan and zoom inside crop frame
-- Preset grid with free/premium labels
+- Preset grid with category grouping and search
 - Primary Intensity slider (0–100) per preset
 - Double-click any slider value to type a precise number
 - Before/after compare
@@ -119,8 +78,8 @@ Premium effects are previewable by free users; premium export and full advanced 
 ## Export Behavior
 
 - All exports happen locally in the browser.
-- Free: PNG/JPEG/WebP, longest side up to 1080px, free presets only.
-- Premium: PNG/JPEG/WebP, original resolution or up to 4K, all presets, full advanced controls.
+- PNG/JPEG/WebP export formats.
+- Longest side presets: 1080px, original, or up to 4K.
 - Meaningful filename based on original image and preset.
 - JPEG background fallback when alpha is present.
 
@@ -129,15 +88,6 @@ Premium effects are previewable by free users; premium export and full advanced 
 - Better Auth with Google OAuth and email/password.
 - Guest-first: no login modal before value.
 - Account page with sign-out.
-- Premium gating derived from subscription state.
-
-## Billing Behavior
-
-- Dodo Payments subscription at $3/month.
-- Checkout created server-side; webhook verified.
-- Premium granted only after verified webhook.
-- Customer portal for subscription management.
-- Local development uses isolated test mode; production requires real webhooks.
 
 ## Non-Goals
 

@@ -1,10 +1,10 @@
 import type { JSX } from "react";
+import Link from "next/link";
 import { allPresets } from "@imageeffects/presets";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { MiniPlayground } from "@/components/home/miniPlayground";
 import { EffectShowcase } from "@/components/home/effectShowcase";
-import { CategoryCards } from "@/components/home/categoryCards";
 import { HowItWorks } from "@/components/home/howItWorks";
 import { CreatorsDevelopers } from "@/components/home/creatorsDevelopers";
 import { Button } from "@/components/ui/button";
@@ -38,16 +38,16 @@ function Hero(): JSX.Element {
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild>
-                <a href="/playground">Open Playground</a>
+                <Link href="/playground">Open Playground</Link>
               </Button>
               <Button variant="outline" asChild>
-                <a href="/pricing">See pricing</a>
+                <Link href="/#showcase">Browse effects</Link>
               </Button>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-muted">
               <span>{allPresets.length} presets</span>
               <span className="h-1 w-1 rounded-full bg-muted" />
-              <span>Free forever tier</span>
+              <span>Every effect free</span>
               <span className="h-1 w-1 rounded-full bg-muted" />
               <span>PNG / JPEG / WebP</span>
             </div>
@@ -120,11 +120,10 @@ export default function HomePage(): JSX.Element {
       <SiteHeader />
       <main className="flex-1">
         <Hero />
+        <CreatorsDevelopers />
         <Features />
         <EffectShowcase />
-        <CategoryCards />
         <HowItWorks />
-        <CreatorsDevelopers />
       </main>
       <SiteFooter />
     </div>

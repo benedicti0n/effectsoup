@@ -2,11 +2,8 @@
 
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { CrownIcon } from "@hugeicons/core-free-icons";
 import { allPresets, type EffectPreset, type PresetCategory } from "@imageeffects/presets";
 import { useEditorStore } from "@/store/editorStore";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +14,7 @@ const categoryLabels: Record<PresetCategory, string> = {
   glassFrost: "Glass & Frost",
   printLab: "Print Lab",
   signalLab: "Signal Lab",
-  lightLab: "Light Lab"
+  lightLab: "Glow & Light"
 };
 
 export function PresetGrid(): JSX.Element {
@@ -92,15 +89,6 @@ export function PresetGrid(): JSX.Element {
                       {preset.description}
                     </span>
                   </div>
-                  {preset.access === "premium" && (
-                    <HugeiconsIcon
-                      icon={CrownIcon}
-                      className={cn(
-                        "h-4 w-4 shrink-0",
-                        presetId === preset.id ? "text-on-dark/70" : "text-muted"
-                      )}
-                    />
-                  )}
                 </button>
               ))}
             </div>
@@ -108,12 +96,6 @@ export function PresetGrid(): JSX.Element {
         );
       })}
 
-      <div className="rounded-sm border border-card-border bg-soft-stone/50 p-3">
-        <p className="text-xs text-body-muted">
-          <Badge variant="premium" className="mr-2">Premium</Badge>
-          presets require a subscription.
-        </p>
-      </div>
     </div>
   );
 }

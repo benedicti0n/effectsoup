@@ -13,7 +13,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get("http://localhost:3000/api/me/entitlements");
+  const res = http.get("http://localhost:3000/api/auth/get-session");
   check(res, {
     "status is 200": (r) => r.status === 200
   });

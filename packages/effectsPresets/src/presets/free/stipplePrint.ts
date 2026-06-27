@@ -12,19 +12,21 @@ export const stipplePrintPreset: EffectPreset = {
   description: "Hand-drawn stipple illustration using dot density to model tone.",
   category: "printLab",
   access: "free",
-  defaultIntensity: 50,
+  defaultIntensity: 100,
+  usesIntensity: false,
   advancedControlSchema: [
-    { id: "dotSize", name: "Dot Size", type: "range", min: 1, max: 8, step: 1, defaultValue: 2 },
-    { id: "spacing", name: "Spacing", type: "range", min: 4, max: 32, step: 1, defaultValue: 12 },
+    { id: "dotSize", name: "Dot Size", type: "range", min: 1, max: 8, step: 1, defaultValue: 1 },
+    { id: "spacing", name: "Spacing", type: "range", min: 2, max: 32, step: 1, defaultValue: 4 },
+    { id: "density", name: "Density", type: "range", min: 0, max: 100, step: 1, defaultValue: 100 },
     { id: "inkColor", name: "Ink Color", type: "color", defaultValue: "#1a1a1a" },
     { id: "paperColor", name: "Paper Color", type: "color", defaultValue: "#f5f2eb" }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    dotSize: resolveOverride(overrides, "dotSize", 2),
-    spacing: resolveOverride(overrides, "spacing", Math.max(4, Math.round(32 - (intensity / 100) * 20))),
-    density: intensity / 100,
+    dotSize: resolveOverride(overrides, "dotSize", 1),
+    spacing: resolveOverride(overrides, "spacing", 4),
+    density: resolveOverride(overrides, "density", 100) / 100,
     inkColor: resolveOverride(overrides, "inkColor", "#1a1a1a"),
     paperColor: resolveOverride(overrides, "paperColor", "#f5f2eb")
   }),
@@ -32,9 +34,9 @@ export const stipplePrintPreset: EffectPreset = {
     return (source: PixelBuffer) => {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
-      const dotSize = (params.dotSize as number) ?? 2;
-      const spacing = (params.spacing as number) ?? 12;
-      const density = (params.density as number) ?? 0.5;
+      const dotSize = (params.dotSize as number) ?? 1;
+      const spacing = (params.spacing as number) ?? 4;
+      const density = (params.density as number) ?? 1;
       const inkColor = hexToRgba((params.inkColor as string) ?? "#1a1a1a");
       const paperColor = hexToRgba((params.paperColor as string) ?? "#f5f2eb");
 

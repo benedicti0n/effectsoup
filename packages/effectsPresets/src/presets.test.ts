@@ -3,13 +3,19 @@ import { allPresets, freePresets, premiumPresets, getPresetById, migratePresetId
 import { createPixelBuffer } from "@imageeffects/core";
 
 describe("presets", () => {
-  it("has 29 presets total", () => {
-    expect(allPresets.length).toBe(29);
+  it("has 25 presets total", () => {
+    expect(allPresets.length).toBe(25);
   });
 
-  it("has 16 free and 13 premium presets", () => {
-    expect(freePresets.length).toBe(16);
-    expect(premiumPresets.length).toBe(13);
+  it("has 14 free and 11 premium source presets", () => {
+    expect(freePresets.length).toBe(14);
+    expect(premiumPresets.length).toBe(11);
+  });
+
+  it("every public preset is free", () => {
+    for (const preset of allPresets) {
+      expect(preset.access).toBe("free");
+    }
   });
 
   it("every preset resolves valid defaults", () => {
@@ -141,7 +147,7 @@ describe("presets", () => {
       const preset = allPresets.find((p) => p.id === "symbolGlow");
       expect(preset).toBeDefined();
       expect(preset!.category).toBe("asciiSymbols");
-      expect(preset!.defaultIntensity).toBe(1);
+      expect(preset!.defaultIntensity).toBe(100);
     });
 
     it("Riso Offset defaults to 70% intensity and black paper", () => {
@@ -213,7 +219,7 @@ describe("presets", () => {
       const preset = allPresets.find((p) => p.id === "cubicGlass");
       expect(preset).toBeDefined();
       expect(preset!.category).toBe("glassFrost");
-      expect(preset!.access).toBe("premium");
+      expect(preset!.access).toBe("free");
       expect(preset!.defaultIntensity).toBe(40);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.tileSize).toBeGreaterThanOrEqual(4);

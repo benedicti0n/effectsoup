@@ -100,7 +100,7 @@ export default function AccountPage(): JSX.Element {
           ) : (
             <div className="space-y-4">
               <p className="font-mono text-base text-body">
-                Sign in to save projects and unlock Premium features.
+                Sign in to save projects and access them across devices.
               </p>
               <button
                 onClick={() => setShowSignIn(true)}
