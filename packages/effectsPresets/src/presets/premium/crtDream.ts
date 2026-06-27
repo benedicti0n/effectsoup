@@ -20,7 +20,7 @@ export const crtDreamPreset: EffectPreset = {
   id: "crtDream",
   name: "CRT Dream",
   description: "Soft retro display effect.",
-  category: "atmosphereGlow",
+  category: "retroSignal",
   access: "premium",
   defaultIntensity: 1,
   advancedControlSchema: [

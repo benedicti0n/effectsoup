@@ -18,7 +18,7 @@ export const orderedDitherPreset: EffectPreset = {
   id: "orderedDither",
   name: "Ordered Dither",
   description: "Structured monochrome dithering built from a repeating threshold grid.",
-  category: "printGrid",
+  category: "pixelDither",
   access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [

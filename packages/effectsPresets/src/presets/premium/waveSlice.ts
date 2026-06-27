@@ -10,7 +10,7 @@ export const waveSlicePreset: EffectPreset = {
   id: "waveSlice",
   name: "Wave Slice",
   description: "Sine-wave displacement across horizontal or vertical slices.",
-  category: "signalLab",
+  category: "distortionGlass",
   access: "premium",
   defaultIntensity: 40,
   advancedControlSchema: [

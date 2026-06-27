@@ -10,7 +10,7 @@ export const stipplePrintPreset: EffectPreset = {
   id: "stipplePrint",
   name: "Stipple Print",
   description: "Hand-drawn stipple illustration using dot density to model tone.",
-  category: "printLab",
+  category: "printPaper",
   access: "free",
   defaultIntensity: 100,
   usesIntensity: false,

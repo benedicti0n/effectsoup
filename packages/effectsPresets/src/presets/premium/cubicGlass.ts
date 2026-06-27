@@ -13,7 +13,7 @@ export const cubicGlassPreset: EffectPreset = {
   id: "cubicGlass",
   name: "Cubic Glass",
   description: "Frosted translucent cubic tiles refracting the image beneath a soft glass grid.",
-  category: "glassFrost",
+  category: "distortionGlass",
   access: "premium",
   defaultIntensity: 40,
   advancedControlSchema: [

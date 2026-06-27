@@ -10,7 +10,7 @@ export const crtGlitchPreset: EffectPreset = {
   id: "crtGlitch",
   name: "CRT Glitch",
   description: "Sliced horizontal shifts, RGB separation, and analog scanlines.",
-  category: "signalLab",
+  category: "retroSignal",
   access: "free",
   defaultIntensity: 40,
   advancedControlSchema: [

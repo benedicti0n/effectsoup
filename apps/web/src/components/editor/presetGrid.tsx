@@ -7,14 +7,22 @@ import { useEditorStore } from "@/store/editorStore";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+const categoryOrder: PresetCategory[] = [
+  "pixelDither",
+  "asciiSymbols",
+  "printPaper",
+  "distortionGlass",
+  "colorGlow",
+  "retroSignal"
+];
+
 const categoryLabels: Record<PresetCategory, string> = {
-  printGrid: "Print & Dither",
+  pixelDither: "Pixel & Dither",
   asciiSymbols: "ASCII & Symbols",
-  atmosphereGlow: "Atmosphere & Retro",
-  glassFrost: "Glass & Frost",
-  printLab: "Print Lab",
-  signalLab: "Signal Lab",
-  lightLab: "Glow & Light"
+  printPaper: "Print & Paper",
+  distortionGlass: "Distortion & Glass",
+  colorGlow: "Color & Glow",
+  retroSignal: "Retro Signal"
 };
 
 export function PresetGrid(): JSX.Element {
@@ -34,11 +42,18 @@ export function PresetGrid(): JSX.Element {
         preset.name.toLowerCase().includes(search.toLowerCase()) ||
         preset.description.toLowerCase().includes(search.toLowerCase())
     );
-    return filtered.reduce<Record<PresetCategory, EffectPreset[]>>((acc, preset) => {
-      acc[preset.category] = acc[preset.category] ?? [];
-      acc[preset.category].push(preset);
-      return acc;
-    }, { printGrid: [], asciiSymbols: [], atmosphereGlow: [], glassFrost: [], printLab: [], signalLab: [], lightLab: [] });
+    const map: Record<PresetCategory, EffectPreset[]> = {
+      pixelDither: [],
+      asciiSymbols: [],
+      printPaper: [],
+      distortionGlass: [],
+      colorGlow: [],
+      retroSignal: []
+    };
+    filtered.forEach((preset) => {
+      map[preset.category].push(preset);
+    });
+    return map;
   }, [search]);
 
   const hasResults = Object.values(grouped).some((group) => group.length > 0);
@@ -58,7 +73,7 @@ export function PresetGrid(): JSX.Element {
         <p className="text-sm text-muted">No presets match your search.</p>
       )}
 
-      {(Object.keys(grouped) as PresetCategory[]).map((category) => {
+      {categoryOrder.map((category) => {
         const presets = grouped[category];
         if (presets.length === 0) return null;
         return (

@@ -215,10 +215,10 @@ describe("presets", () => {
       expect(getPresetById("mangaGrid")?.id).toBe("pixelGrid");
     });
 
-    it("Cubic Glass defaults to 40% intensity and glassFrost category", () => {
+    it("Cubic Glass defaults to 40% intensity and distortionGlass category", () => {
       const preset = allPresets.find((p) => p.id === "cubicGlass");
       expect(preset).toBeDefined();
-      expect(preset!.category).toBe("glassFrost");
+      expect(preset!.category).toBe("distortionGlass");
       expect(preset!.access).toBe("free");
       expect(preset!.defaultIntensity).toBe(40);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});

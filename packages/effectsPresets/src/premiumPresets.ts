@@ -12,15 +12,15 @@ import { invertedGlowPreset } from "./presets/premium/invertedGlow.js";
 import type { EffectPreset } from "./types.js";
 
 export const premiumPresets: EffectPreset[] = [
+  bitmapPreset,
   cyberAsciiPreset,
   luminousAsciiBloomPreset,
   symbolGlowPreset,
-  crtDreamPreset,
-  vhsBloomPreset,
   risoOffsetPreset,
-  cubicGlassPreset,
-  bitmapPreset,
   mangaScanlinesPreset,
   waveSlicePreset,
-  invertedGlowPreset
+  cubicGlassPreset,
+  invertedGlowPreset,
+  crtDreamPreset,
+  vhsBloomPreset
 ];

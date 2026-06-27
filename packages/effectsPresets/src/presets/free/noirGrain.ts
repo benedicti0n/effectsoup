@@ -17,7 +17,7 @@ export const noirGrainPreset: EffectPreset = {
   id: "noirGrain",
   name: "Noir Grain",
   description: "Moody black-and-white contrast and film texture.",
-  category: "atmosphereGlow",
+  category: "colorGlow",
   access: "free",
   defaultIntensity: 65,
   advancedControlSchema: [

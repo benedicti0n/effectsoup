@@ -19,7 +19,7 @@ export const vhsBloomPreset: EffectPreset = {
   id: "vhsBloom",
   name: "VHS Bloom",
   description: "Blurry compressed nostalgic digital effect.",
-  category: "atmosphereGlow",
+  category: "retroSignal",
   access: "premium",
   defaultIntensity: 1,
   advancedControlSchema: [

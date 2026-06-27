@@ -15,7 +15,7 @@ export const dotHalftonePreset: EffectPreset = {
   id: "dotHalftone",
   name: "Dot Halftone",
   description: "Colored dot halftone inspired by newsprint and Risograph screens.",
-  category: "printGrid",
+  category: "pixelDither",
   access: "free",
   defaultIntensity: 5,
   advancedControlSchema: [

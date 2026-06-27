@@ -16,7 +16,7 @@ export const duotonePreset: EffectPreset = {
   id: "duotone",
   name: "Duotone",
   description: "High-impact two-color palette mapping.",
-  category: "atmosphereGlow",
+  category: "colorGlow",
   access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [

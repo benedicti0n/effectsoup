@@ -18,15 +18,15 @@ export const freePresets: EffectPreset[] = [
   pixelGridPreset,
   errorDiffusionDitherPreset,
   orderedDitherPreset,
+  dotHalftonePreset,
   classicAsciiPreset,
   blocksAsciiPreset,
   minimalAsciiPreset,
-  dotHalftonePreset,
+  stipplePrintPreset,
+  pencilGrainPreset,
   duotonePreset,
   dreamGlowPreset,
-  noirGrainPreset,
   ledMatrixPreset,
-  stipplePrintPreset,
-  crtGlitchPreset,
-  pencilGrainPreset
+  noirGrainPreset,
+  crtGlitchPreset
 ];

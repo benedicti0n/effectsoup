@@ -15,7 +15,7 @@ export const pixelGridPreset: EffectPreset = {
   id: "pixelGrid",
   name: "Pixel Grid",
   description: "Deliberate square cells with subtle grid lines while keeping source colors.",
-  category: "printGrid",
+  category: "pixelDither",
   access: "free",
   defaultIntensity: 4,
   advancedControlSchema: [

@@ -10,7 +10,7 @@ export const bitmapPreset: EffectPreset = {
   id: "bitmap",
   name: "Bitmap",
   description: "Heavy pixelation with palette reduction for a retro 8-bit look.",
-  category: "printLab",
+  category: "pixelDither",
   access: "premium",
   defaultIntensity: 100,
   usesIntensity: false,

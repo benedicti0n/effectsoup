@@ -10,7 +10,7 @@ export const mangaScanlinesPreset: EffectPreset = {
   id: "mangaScanlines",
   name: "Manga Scanlines",
   description: "Screen-tone line pattern inspired by manga printing.",
-  category: "signalLab",
+  category: "printPaper",
   access: "premium",
   defaultIntensity: 50,
   advancedControlSchema: [

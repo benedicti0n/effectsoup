@@ -10,7 +10,7 @@ export const pencilGrainPreset: EffectPreset = {
   id: "pencilGrain",
   name: "Pencil Grain",
   description: "Graphite sketch on textured paper with film grain.",
-  category: "printLab",
+  category: "printPaper",
   access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [

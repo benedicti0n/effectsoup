@@ -36,7 +36,7 @@ export const dreamGlowPreset: EffectPreset = {
   id: "dreamGlow",
   name: "Dream Glow",
   description: "Soft, hazy, nostalgic image treatment with palette presets.",
-  category: "atmosphereGlow",
+  category: "colorGlow",
   access: "free",
   defaultIntensity: 50,
   advancedControlSchema: [

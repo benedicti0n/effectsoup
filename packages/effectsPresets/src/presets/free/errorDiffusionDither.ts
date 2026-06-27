@@ -18,7 +18,7 @@ export const errorDiffusionDitherPreset: EffectPreset = {
   id: "errorDiffusionDither",
   name: "Error Diffusion",
   description: "Organic monochrome dithering with diffused pixel texture.",
-  category: "printGrid",
+  category: "pixelDither",
   access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [

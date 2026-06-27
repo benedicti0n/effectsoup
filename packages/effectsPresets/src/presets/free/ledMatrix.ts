@@ -13,7 +13,7 @@ export const ledMatrixPreset: EffectPreset = {
   id: "ledMatrix",
   name: "LED Matrix",
   description: "Glowing LED dot matrix with color, white, or tinted dots.",
-  category: "lightLab",
+  category: "colorGlow",
   access: "free",
   defaultIntensity: 100,
   usesIntensity: false,

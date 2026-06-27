@@ -1,13 +1,12 @@
 import type { PixelBuffer } from "@effectsoup/core";
 
 export type PresetCategory =
-  | "printGrid"
+  | "pixelDither"
   | "asciiSymbols"
-  | "atmosphereGlow"
-  | "glassFrost"
-  | "printLab"
-  | "signalLab"
-  | "lightLab";
+  | "printPaper"
+  | "distortionGlass"
+  | "colorGlow"
+  | "retroSignal";
 
 export type PresetAccess = "free" | "premium";
 
