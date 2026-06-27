@@ -3,7 +3,13 @@
 import type { JSX } from "react";
 import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import {
+  Cancel01Icon,
+  GoogleIcon,
+  LockPasswordIcon,
+  Mail01Icon,
+  UserIcon
+} from "@hugeicons/core-free-icons";
 import { authClient } from "@/lib/authClient";
 
 export function SignInDialog({
@@ -71,49 +77,75 @@ export function SignInDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
-      <div className="w-full max-w-md rounded-sm border border-hairline bg-canvas p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between border-b border-hairline pb-3">
-          <h2 className="font-mono text-xl font-bold text-ink">
+      <div className="w-full max-w-md rounded-sm border border-hairline bg-surface-soft p-6 shadow-sm md:p-8">
+        <div className="mb-6 flex items-center justify-between border-b border-hairline pb-3">
+          <h2 className="font-mono text-2xl font-bold text-ink">
             {mode === "signin" ? "Sign In" : "Create Account"}
           </h2>
-          <button onClick={onClose} className="text-mute hover:text-ink" aria-label="Close">
+          <button
+            onClick={onClose}
+            className="text-mute hover:text-ink"
+            aria-label="Close"
+          >
             <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
           </button>
         </div>
 
-        {error && <p className="mb-3 font-mono text-sm text-danger">{error}</p>}
+        {error && <p className="mb-4 font-mono text-sm text-danger">{error}</p>}
 
         <div className="space-y-3">
           {mode === "signup" && (
-            <input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="h-10 w-full rounded-sm border border-hairline bg-surface-soft px-3 font-mono text-sm text-ink outline-none focus:border-ink"
-            />
+            <div className="relative">
+              <HugeiconsIcon
+                icon={UserIcon}
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+              />
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="h-10 w-full rounded-sm border border-hairline bg-canvas py-2 pl-10 pr-3 font-mono text-sm text-ink outline-none focus:border-ink"
+              />
+            </div>
           )}
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-10 w-full rounded-sm border border-hairline bg-surface-soft px-3 font-mono text-sm text-ink outline-none focus:border-ink"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-10 w-full rounded-sm border border-hairline bg-surface-soft px-3 font-mono text-sm text-ink outline-none focus:border-ink"
-          />
+          <div className="relative">
+            <HugeiconsIcon
+              icon={Mail01Icon}
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-10 w-full rounded-sm border border-hairline bg-canvas py-2 pl-10 pr-3 font-mono text-sm text-ink outline-none focus:border-ink"
+            />
+          </div>
+          <div className="relative">
+            <HugeiconsIcon
+              icon={LockPasswordIcon}
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-10 w-full rounded-sm border border-hairline bg-canvas py-2 pl-10 pr-3 font-mono text-sm text-ink outline-none focus:border-ink"
+            />
+          </div>
         </div>
 
         <button
           onClick={submit}
           disabled={loading}
-          className="mt-4 h-9 w-full rounded-sm bg-ink font-mono text-sm font-medium text-canvas hover:bg-ink-deep disabled:bg-surface-card disabled:text-ash"
+          className="mt-4 inline-flex h-9 w-full items-center justify-center gap-2 rounded-sm bg-ink px-5 font-mono text-sm font-medium text-canvas hover:bg-ink-deep disabled:bg-surface-card disabled:text-ash"
         >
+          <HugeiconsIcon
+            icon={mode === "signin" ? Mail01Icon : UserIcon}
+            className="h-4 w-4"
+          />
           {loading ? "Please wait…" : mode === "signin" ? "Sign In" : "Sign Up"}
         </button>
 
@@ -126,8 +158,9 @@ export function SignInDialog({
         <button
           onClick={signInWithGoogle}
           disabled={loading}
-          className="h-9 w-full rounded-sm border border-hairline bg-canvas font-mono text-sm text-ink hover:bg-surface-soft disabled:bg-surface-card disabled:text-ash"
+          className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-sm border border-hairline bg-canvas px-5 font-mono text-sm text-ink hover:bg-soft-stone disabled:bg-surface-card disabled:text-ash"
         >
+          <HugeiconsIcon icon={GoogleIcon} className="h-4 w-4" />
           Continue with Google
         </button>
 

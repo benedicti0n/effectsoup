@@ -26,7 +26,13 @@ export default function AccountPage(): JSX.Element {
   }, [session]);
 
   const signOut = async () => {
-    await authClient.signOut();
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.reload();
+        }
+      }
+    });
   };
 
   const handleDelete = async (projectId: string) => {
