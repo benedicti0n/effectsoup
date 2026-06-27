@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getPresetById } from "@imageeffects/presets";
+import { getPresetById } from "@effectsoup/presets";
 import {
   defaultCrop,
   defaultEffect,

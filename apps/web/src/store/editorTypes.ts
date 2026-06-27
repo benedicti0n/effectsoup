@@ -1,4 +1,4 @@
-import type { CropConfig } from "@imageeffects/core";
+import type { CropConfig } from "@effectsoup/core";
 
 export type EditorDocument = {
   source: {

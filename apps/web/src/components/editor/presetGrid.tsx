@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-import { allPresets, type EffectPreset, type PresetCategory } from "@imageeffects/presets";
+import { allPresets, type EffectPreset, type PresetCategory } from "@effectsoup/presets";
 import { useEditorStore } from "@/store/editorStore";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";

@@ -7,9 +7,9 @@ Browser-based, non-AI image transformation studio. Upload a photo, choose a retr
 - **Monorepo:** pnpm workspaces + Turborepo
 - **App:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS
 - **Image Engine:**
-  - `@imageeffects/core` — pure TypeScript image-processing primitives
-  - `@imageeffects/presets` — product preset definitions and pipelines
-  - `@imageeffects/worker` — Web Worker communication layer
+  - `@effectsoup/core` — pure TypeScript image-processing primitives
+  - `@effectsoup/presets` — product preset definitions and pipelines
+  - `@effectsoup/worker` — Web Worker communication layer
 - **Auth:** Better Auth (Google OAuth + email/password)
 - **Database:** Neon PostgreSQL + Drizzle ORM
 - **Payments:** Dodo Payments
@@ -30,9 +30,9 @@ Browser-based, non-AI image transformation studio. Upload a photo, choose a retr
 3. Build internal packages:
 
    ```bash
-   pnpm --filter @imageeffects/core build
-   pnpm --filter @imageeffects/presets build
-   pnpm --filter @imageeffects/worker build
+   pnpm --filter @effectsoup/core build
+   pnpm --filter @effectsoup/presets build
+   pnpm --filter @effectsoup/worker build
    ```
 
 4. Run the development server:

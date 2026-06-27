@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
-import { clonePixelBuffer, type CropConfig, type PixelBuffer } from "@imageeffects/core";
-import type { ResolvedPresetParameters } from "@imageeffects/presets";
+import { clonePixelBuffer, type CropConfig, type PixelBuffer } from "@effectsoup/core";
+import type { ResolvedPresetParameters } from "@effectsoup/presets";
 import type {
   RenderErrorMessage,
   RenderResultMessage,
   WorkerRequestMessage
-} from "@imageeffects/worker";
+} from "@effectsoup/worker";
 
 export type RenderOptions = {
   source: PixelBuffer;

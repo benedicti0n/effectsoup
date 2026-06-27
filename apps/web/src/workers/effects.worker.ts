@@ -1,1 +1,1 @@
-import "@imageeffects/worker/worker";
+import "@effectsoup/worker/worker";

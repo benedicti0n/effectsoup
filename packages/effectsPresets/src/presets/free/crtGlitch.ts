@@ -2,7 +2,7 @@ import {
   applyCrtGlitch,
   clonePixelBuffer,
   type PixelBuffer
-} from "@imageeffects/core";
+} from "@effectsoup/core";
 import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../../types.js";
 import { resolveOverride } from "../shared.js";
 

@@ -5,7 +5,7 @@ import {
   normalizeCustomCharset,
   renderAscii,
   type PixelBuffer
-} from "@imageeffects/core";
+} from "@effectsoup/core";
 import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../../types.js";
 import {
   atmosphereAdvancedControls,

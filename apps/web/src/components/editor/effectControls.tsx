@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 import { useState } from "react";
-import { getPresetById } from "@imageeffects/presets";
+import { getPresetById } from "@effectsoup/presets";
 import { useEditorStore } from "@/store/editorStore";
 import { Button } from "@/components/ui/button";
 import { AdvancedControls } from "./advancedControls";

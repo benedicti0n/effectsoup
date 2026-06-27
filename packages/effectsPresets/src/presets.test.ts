@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { allPresets, freePresets, premiumPresets, getPresetById, migratePresetId } from "./index.js";
-import { createPixelBuffer } from "@imageeffects/core";
+import { createPixelBuffer } from "@effectsoup/core";
 
 describe("presets", () => {
   it("has 25 presets total", () => {

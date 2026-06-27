@@ -1,7 +1,7 @@
-import type { CropConfig, PixelBuffer } from "@imageeffects/core";
-import { applyViewportTransform } from "@imageeffects/core";
-import { getPresetById } from "@imageeffects/presets";
-import type { ResolvedPresetParameters } from "@imageeffects/presets";
+import type { CropConfig, PixelBuffer } from "@effectsoup/core";
+import { applyViewportTransform } from "@effectsoup/core";
+import { getPresetById } from "@effectsoup/presets";
+import type { ResolvedPresetParameters } from "@effectsoup/presets";
 
 export function renderEffectSync(
   source: PixelBuffer,

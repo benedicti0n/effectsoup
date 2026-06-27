@@ -35,13 +35,13 @@ importers:
       '@hugeicons/react':
         specifier: ^1.1.7
         version: 1.1.7(react@19.2.7)
-      '@imageeffects/core':
+      '@effectsoup/core':
         specifier: workspace:*
         version: link:../../packages/effectsCore
-      '@imageeffects/presets':
+      '@effectsoup/presets':
         specifier: workspace:*
         version: link:../../packages/effectsPresets
-      '@imageeffects/worker':
+      '@effectsoup/worker':
         specifier: workspace:*
         version: link:../../packages/effectsWorker
       '@tanstack/react-query':
@@ -165,7 +165,7 @@ importers:
 
   packages/effectsPresets:
     dependencies:
-      '@imageeffects/core':
+      '@effectsoup/core':
         specifier: workspace:*
         version: link:../effectsCore
     devDependencies:
@@ -190,10 +190,10 @@ importers:
 
   packages/effectsWorker:
     dependencies:
-      '@imageeffects/core':
+      '@effectsoup/core':
         specifier: workspace:*
         version: link:../effectsCore
-      '@imageeffects/presets':
+      '@effectsoup/presets':
         specifier: workspace:*
         version: link:../effectsPresets
     devDependencies:

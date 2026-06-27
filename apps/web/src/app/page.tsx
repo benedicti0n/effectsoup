@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import Link from "next/link";
-import { allPresets } from "@imageeffects/presets";
+import { allPresets } from "@effectsoup/presets";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { MiniPlayground } from "@/components/home/miniPlayground";

@@ -1,7 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
-import { getPresetById, type AdvancedControlDefinition } from "@imageeffects/presets";
+import { getPresetById, type AdvancedControlDefinition } from "@effectsoup/presets";
 import { useEditorStore } from "@/store/editorStore";
 import {
   RangeControl,

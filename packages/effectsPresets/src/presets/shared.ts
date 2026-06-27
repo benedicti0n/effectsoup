@@ -3,7 +3,7 @@ import {
   applyGrain,
   type PixelBuffer,
   type RgbaColor
-} from "@imageeffects/core";
+} from "@effectsoup/core";
 import type { AdvancedControlDefinition, ResolvedPresetParameters } from "../types.js";
 
 export const atmosphereAdvancedControls: AdvancedControlDefinition[] = [

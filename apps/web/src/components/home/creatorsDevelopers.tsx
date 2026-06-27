@@ -36,7 +36,7 @@ export function CreatorsDevelopers(): JSX.Element {
               packages. Bring EffectSoup into your own app, script, or automation workflow.
             </p>
             <div className="mb-6 rounded-sm bg-on-dark/10 p-4 font-mono text-sm text-on-dark">
-              <span className="text-on-dark/50">$</span> npm install @imageeffects/core
+              <span className="text-on-dark/50">$</span> npm install @effectsoup/core
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="outline" className="border-on-dark/30 text-on-dark hover:bg-on-dark/10" asChild>

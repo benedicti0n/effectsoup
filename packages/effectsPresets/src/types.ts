@@ -1,4 +1,4 @@
-import type { PixelBuffer } from "@imageeffects/core";
+import type { PixelBuffer } from "@effectsoup/core";
 
 export type PresetCategory =
   | "printGrid"

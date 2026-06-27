@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { getPresetById } from "@imageeffects/presets";
+import { getPresetById } from "@effectsoup/presets";
 import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
 import { authClient } from "@/lib/authClient";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CropConfig, PixelBuffer } from "@imageeffects/core";
-import { allPresets, getPresetById } from "@imageeffects/presets";
+import type { CropConfig, PixelBuffer } from "@effectsoup/core";
+import { allPresets, getPresetById } from "@effectsoup/presets";
 import { useEffectsWorker } from "@/hooks/useEffectsWorker";
 import { renderEffectSync } from "@/lib/renderEffect";
 import { useToast } from "@/components/ui/toast";

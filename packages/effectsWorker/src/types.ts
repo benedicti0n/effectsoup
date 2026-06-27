@@ -1,5 +1,5 @@
-import type { CropConfig, PixelBuffer } from "@imageeffects/core";
-import type { ResolvedPresetParameters } from "@imageeffects/presets";
+import type { CropConfig, PixelBuffer } from "@effectsoup/core";
+import type { ResolvedPresetParameters } from "@effectsoup/presets";
 
 export type RenderJob = {
   renderVersion: number;

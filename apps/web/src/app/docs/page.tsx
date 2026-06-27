@@ -13,10 +13,10 @@ function CodeBlock({ code }: { code: string }): JSX.Element {
   );
 }
 
-const installSnippet = `pnpm add @imageeffects/core @imageeffects/presets @imageeffects/worker`;
+const installSnippet = `pnpm add @effectsoup/core @effectsoup/presets @effectsoup/worker`;
 
-const coreSnippet = `import { createPixelBuffer, toGrayscale } from "@imageeffects/core";
-import type { PixelBuffer } from "@imageeffects/core";
+const coreSnippet = `import { createPixelBuffer, toGrayscale } from "@effectsoup/core";
+import type { PixelBuffer } from "@effectsoup/core";
 
 // Create a buffer and fill it from a canvas.
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
@@ -39,8 +39,8 @@ ctx.putImageData(
   0
 );`;
 
-const presetSnippet = `import { getPresetById } from "@imageeffects/presets";
-import type { PixelBuffer } from "@imageeffects/core";
+const presetSnippet = `import { getPresetById } from "@effectsoup/presets";
+import type { PixelBuffer } from "@effectsoup/core";
 
 const preset = getPresetById("dotHalftone")!;
 
@@ -68,12 +68,12 @@ overrides.dotSize = 8;
 const params = preset.intensityMapper(75, overrides);
 const output = preset.createPipeline(params)(source, params);`;
 
-const workerSnippet = `import { EffectsWorkerClient } from "@imageeffects/worker";
+const workerSnippet = `import { EffectsWorkerClient } from "@effectsoup/worker";
 
 // Point the client at the worker script. The exact path depends on your
 // bundler (Vite, webpack, esbuild, Next.js, etc.).
 const client = new EffectsWorkerClient(
-  new URL("@imageeffects/worker/dist/worker.js", import.meta.url)
+  new URL("@effectsoup/worker/dist/worker.js", import.meta.url)
 );
 
 const output = await client.render({
@@ -93,9 +93,9 @@ const output = await client.render({
 // Clean up when you're done.
 client.terminate();`;
 
-const endToEndSnippet = `import { EffectsWorkerClient } from "@imageeffects/worker";
-import { getPresetById } from "@imageeffects/presets";
-import { createPixelBuffer } from "@imageeffects/core";
+const endToEndSnippet = `import { EffectsWorkerClient } from "@effectsoup/worker";
+import { getPresetById } from "@effectsoup/presets";
+import { createPixelBuffer } from "@effectsoup/core";
 
 async function renderPhoto(canvas: HTMLCanvasElement, presetId: string) {
   const ctx = canvas.getContext("2d")!;
@@ -106,7 +106,7 @@ async function renderPhoto(canvas: HTMLCanvasElement, presetId: string) {
   const params = preset.intensityMapper(80, {});
 
   const client = new EffectsWorkerClient(
-    new URL("@imageeffects/worker/dist/worker.js", import.meta.url)
+    new URL("@effectsoup/worker/dist/worker.js", import.meta.url)
   );
 
   const output = await client.render({
@@ -183,7 +183,7 @@ export default function DocsPage(): JSX.Element {
 
           <div className="mt-12 space-y-12">
             <PackageCard
-              name="@imageeffects/core"
+              name="@effectsoup/core"
               description="Pure TypeScript image-processing primitives. No DOM, no framework dependencies, and safe to run in a browser or Node.js."
               exports="PixelBuffer, createPixelBuffer, clonePixelBuffer, toGrayscale, adjustBrightnessContrast, applyDuotone, dither, halftone, noise, glow, edge, ascii, stipple, glitch, waveSlice, ..."
             >
@@ -197,7 +197,7 @@ export default function DocsPage(): JSX.Element {
             </PackageCard>
 
             <PackageCard
-              name="@imageeffects/presets"
+              name="@effectsoup/presets"
               description="Product presets that bundle core primitives into tunable pipelines. Each preset exposes an Intensity slider and optional advanced controls."
               exports="allPresets, freePresets, premiumPresets, getPresetById, migratePresetId, EffectPreset, ResolvedPresetParameters"
             >
@@ -213,7 +213,7 @@ export default function DocsPage(): JSX.Element {
             </PackageCard>
 
             <PackageCard
-              name="@imageeffects/worker"
+              name="@effectsoup/worker"
               description="Web Worker client that runs heavy rendering off the main thread. Handles job versioning, cancellation of stale renders, and buffer transfer."
               exports="EffectsWorkerClient, RenderOptions, RenderCallbacks"
             >

@@ -1,7 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
-import type { AdvancedControlDefinition } from "@imageeffects/presets";
+import type { AdvancedControlDefinition } from "@effectsoup/presets";
 import { EditableSlider } from "./editableSlider";
 
 const TINT_PRESET_COLORS: Record<string, string> = {

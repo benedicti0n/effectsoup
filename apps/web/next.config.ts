@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["@imageeffects/core", "@imageeffects/presets", "@imageeffects/worker"]
+  transpilePackages: ["@effectsoup/core", "@effectsoup/presets", "@effectsoup/worker"]
 };
 
 export default nextConfig;

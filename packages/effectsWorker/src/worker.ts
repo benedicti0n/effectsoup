@@ -1,5 +1,5 @@
-import { applyViewportTransform, type PixelBuffer } from "@imageeffects/core";
-import { getPresetById } from "@imageeffects/presets";
+import { applyViewportTransform, type PixelBuffer } from "@effectsoup/core";
+import { getPresetById } from "@effectsoup/presets";
 import type { RenderJob, WorkerRequestMessage, WorkerResponseMessage } from "./types.js";
 
 let currentVersion = 0;

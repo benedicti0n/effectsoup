@@ -2,8 +2,8 @@
 
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
-import type { PixelBuffer } from "@imageeffects/core";
-import { getPresetById } from "@imageeffects/presets";
+import type { PixelBuffer } from "@effectsoup/core";
+import { getPresetById } from "@effectsoup/presets";
 import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
 import { useEffectsWorker } from "@/hooks/useEffectsWorker";

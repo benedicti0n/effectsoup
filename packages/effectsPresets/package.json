@@ -1,5 +1,5 @@
 {
-  "name": "@imageeffects/presets",
+  "name": "@effectsoup/presets",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -23,7 +23,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@imageeffects/core": "workspace:*"
+    "@effectsoup/core": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
