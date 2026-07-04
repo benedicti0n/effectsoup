@@ -1,11 +1,13 @@
 "use client";
 
 import type { JSX } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { PixelBuffer } from "@effectsoup/core";
+import { applyViewportTransform } from "@effectsoup/core";
 import { getPresetById } from "@effectsoup/presets";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { EyeIcon } from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
 import { useEffectsWorker } from "@/hooks/useEffectsWorker";
@@ -49,8 +51,12 @@ async function loadSourceBuffer(
   return { width: image.width, height: image.height, data: imageData.data };
 }
 
+// Quick taps toggle (click) — sustained presses (>this) hold to view.
+// Matches what desktop image editors and other "eye" toggles feel like.
+const HOLD_THRESHOLD_MS = 180;
+
 export function CanvasPreview(): JSX.Element {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const processedRef = useRef<HTMLCanvasElement>(null);
   const originalRef = useRef<HTMLCanvasElement>(null);
   const source = useEditorStore((state) => state.source);
   const crop = useEditorStore((state) => state.crop);
@@ -60,11 +66,66 @@ export function CanvasPreview(): JSX.Element {
   const { scale: qualityScale, reportDuration } = useAdaptiveQuality();
   const [showingOriginal, setShowingOriginal] = useState(false);
 
-  // Render the processed effect whenever inputs change.
-  useEffect(() => {
-    if (!source || !canvasRef.current) return;
+  // Disambiguate "click to toggle" from "hold to view".
+  // - pressStartRef: timestamp of the most recent pointer-down
+  // - isHoldingRef: true once the press has lasted past HOLD_THRESHOLD_MS
+  // - longPressTimerRef: timer that flips isHoldingRef to true
+  const pressStartRef = useRef<number | null>(null);
+  const isHoldingRef = useRef(false);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const canvas = canvasRef.current;
+  const cancelLongPressTimer = useCallback(() => {
+    if (longPressTimerRef.current !== null) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const handlePressStart = useCallback(() => {
+    cancelLongPressTimer();
+    pressStartRef.current = Date.now();
+    isHoldingRef.current = false;
+    longPressTimerRef.current = setTimeout(() => {
+      isHoldingRef.current = true;
+      setShowingOriginal(true);
+    }, HOLD_THRESHOLD_MS);
+  }, [cancelLongPressTimer]);
+
+  const handlePressEnd = useCallback(() => {
+    cancelLongPressTimer();
+    const wasHolding = isHoldingRef.current;
+    isHoldingRef.current = false;
+    pressStartRef.current = null;
+    if (wasHolding) {
+      setShowingOriginal(false);
+    } else {
+      // Short press: treat as a click toggle.
+      setShowingOriginal((s) => !s);
+    }
+  }, [cancelLongPressTimer]);
+
+  const handlePressCancel = useCallback(() => {
+    // Pointer left the button while still pressed: revert to processed view.
+    cancelLongPressTimer();
+    if (isHoldingRef.current) {
+      isHoldingRef.current = false;
+      setShowingOriginal(false);
+    }
+    pressStartRef.current = null;
+  }, [cancelLongPressTimer]);
+
+  // Clean up the long-press timer if the component unmounts mid-press.
+  useEffect(() => {
+    return () => {
+      cancelLongPressTimer();
+    };
+  }, [cancelLongPressTimer]);
+
+  // Render the processed effect whenever its inputs change.
+  useEffect(() => {
+    if (!source || !processedRef.current) return;
+
+    const canvas = processedRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -135,9 +196,9 @@ export function CanvasPreview(): JSX.Element {
     };
   }, [source, crop, effect, setIsRendering, renderInWorker, qualityScale, reportDuration]);
 
-  // Render the original image (cropped + downscaled to preview size) into a
-  // separate hidden canvas. Painted into the visible canvas whenever the user
-  // holds or toggles the eye button.
+  // Render the cropped original into its own canvas. Both canvases are
+  // layered with absolute positioning — toggling the eye just swaps their
+  // visibility, so neither one's pixel data is ever destroyed.
   useEffect(() => {
     if (!source || !originalRef.current) return;
 
@@ -163,9 +224,6 @@ export function CanvasPreview(): JSX.Element {
           qualityScale
         );
 
-        // Apply only the crop (no effect) so what you see matches what was
-        // rendered before any effect was applied.
-        const { applyViewportTransform } = await import("@effectsoup/core");
         const cropped = applyViewportTransform(sourceBuffer, crop, width, height);
 
         canvas.width = cropped.width;
@@ -189,19 +247,19 @@ export function CanvasPreview(): JSX.Element {
     };
   }, [source, crop, qualityScale]);
 
-  // While the eye is "held" we paint the original buffer on top of the
-  // processed canvas using an offscreen draw — small enough to do sync.
+  // Escape key dismisses the held preview for keyboard users.
   useEffect(() => {
     if (!showingOriginal) return;
-    if (!canvasRef.current || !originalRef.current) return;
-    const ctx = canvasRef.current.getContext("2d");
-    const originalCtx = originalRef.current.getContext("2d");
-    if (!ctx || !originalCtx) return;
-    if (originalRef.current.width === 0 || originalRef.current.height === 0) return;
-    canvasRef.current.width = originalRef.current.width;
-    canvasRef.current.height = originalRef.current.height;
-    ctx.drawImage(originalRef.current, 0, 0);
-  }, [showingOriginal]);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        isHoldingRef.current = false;
+        cancelLongPressTimer();
+        setShowingOriginal(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showingOriginal, cancelLongPressTimer]);
 
   if (!source) {
     return (
@@ -211,35 +269,38 @@ export function CanvasPreview(): JSX.Element {
     );
   }
 
-  const onEyePress = () => setShowingOriginal(true);
-  const onEyeRelease = () => setShowingOriginal(false);
+  const processedVisible = !showingOriginal;
 
   return (
-    <div className="relative flex h-full items-center justify-center overflow-hidden rounded-sm border border-hairline bg-surface-soft">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-sm border border-hairline bg-surface-soft">
       <canvas
-        ref={canvasRef}
+        ref={processedRef}
         className="max-h-full max-w-full object-contain"
-        aria-hidden={showingOriginal}
+        aria-hidden={!processedVisible}
+        style={{ visibility: processedVisible ? "visible" : "hidden" }}
       />
-      <canvas ref={originalRef} className="hidden" aria-hidden="true" />
+      <canvas
+        ref={originalRef}
+        aria-hidden={showingOriginal}
+        className="max-h-full max-w-full object-contain"
+        style={{ visibility: showingOriginal ? "visible" : "hidden", position: "absolute", inset: 0, margin: "auto" }}
+      />
 
       <button
         type="button"
-        onMouseDown={onEyePress}
-        onMouseUp={onEyeRelease}
-        onMouseLeave={onEyeRelease}
-        onTouchStart={(e) => {
-          e.preventDefault();
-          onEyePress();
-        }}
-        onTouchEnd={(e) => {
-          e.preventDefault();
-          onEyeRelease();
-        }}
-        onClick={() => setShowingOriginal((s) => !s)}
+        onPointerDown={handlePressStart}
+        onPointerUp={handlePressEnd}
+        onPointerLeave={handlePressCancel}
+        onPointerCancel={handlePressCancel}
+        onContextMenu={(e) => e.preventDefault()}
+        onClick={(e) => e.preventDefault()}
         aria-label={showingOriginal ? "Show processed image" : "Show original image"}
         aria-pressed={showingOriginal}
-        className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-hairline bg-canvas/90 text-ink shadow-sm backdrop-blur transition-colors hover:bg-canvas"
+        title={showingOriginal ? "Showing original — release to compare" : "Click to toggle, hold to compare"}
+        className={cn(
+          "absolute right-3 top-3 z-10 inline-flex h-9 w-9 select-none items-center justify-center rounded-full border border-hairline bg-canvas/90 text-ink shadow-sm backdrop-blur transition-colors hover:bg-canvas",
+          showingOriginal && "bg-ink-primary text-on-primary border-ink-primary hover:bg-ink-primary"
+        )}
       >
         <HugeiconsIcon icon={EyeIcon} className="h-4 w-4" />
       </button>
