@@ -2,12 +2,12 @@
 
 import { useCallback, useState } from "react";
 import { getPresetById } from "@effectsoup/presets";
+import { getCroppedOutputSize } from "@effectsoup/core";
 import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
 import { authClient } from "@/lib/authClient";
 import { useToast } from "@/components/ui/toast";
 import {
-  getExportDimensions,
   loadImageSource,
   pixelBufferToBlob
 } from "@/lib/imageExport";
@@ -46,7 +46,12 @@ export function useExport(onClose: () => void) {
       if (resolution === "4k") longest = PREMIUM_EXPORT_LONGEST;
       else if (resolution === "original") longest = Math.max(sourceBuffer.width, sourceBuffer.height);
 
-      const { width, height } = getExportDimensions(sourceBuffer.width, sourceBuffer.height, longest);
+      const { width, height } = getCroppedOutputSize(
+        sourceBuffer.width,
+        sourceBuffer.height,
+        crop.aspectRatio,
+        longest
+      );
       const output = renderEffectSync(sourceBuffer, crop, effect.presetId, resolved, width, height);
       const blob = await pixelBufferToBlob(output, format, quality);
 

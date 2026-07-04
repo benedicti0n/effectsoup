@@ -1,11 +1,21 @@
 # EffectSoup
 
-Browser-based, non-AI image transformation studio. Upload a photo, choose a retro-digital aesthetic, adjust one Intensity slider, and export. Built with the Cohere design system.
+> Beautiful image effects, made in your browser.
+
+EffectSoup is a free, browser-based image effects studio. Pick from 25+
+curated presets — pixel grids, halftones, ASCII art, glowing symbols,
+cinematic bloom, glitch, CRT, and graphic-print looks — then export to
+PNG, JPEG, or WebP. Every pixel is processed in a Web Worker on your
+device; no uploads, no AI, no signup required.
+
+Built with the Cohere design system and designed for instant
+interaction: crop, pan, and adjust the Intensity slider with live
+preview.
 
 ## Tech Stack
 
 - **Monorepo:** pnpm workspaces + Turborepo
-- **App:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS
+- **App:** Next.js 15 App Router (RSC), React 19, TypeScript, Tailwind CSS
 - **Image Engine:**
   - `@effectsoup/core` — pure TypeScript image-processing primitives
   - `@effectsoup/presets` — product preset definitions and pipelines
@@ -13,6 +23,8 @@ Browser-based, non-AI image transformation studio. Upload a photo, choose a retr
 - **Auth:** Better Auth (Google OAuth + email/password)
 - **Database:** Neon PostgreSQL + Drizzle ORM
 - **Cache/Rate Limits:** Upstash Redis
+- **SEO:** `app/robots.ts`, `app/sitemap.ts`, JSON-LD structured data,
+  OpenGraph + Twitter cards, per-page metadata, `manifest.webmanifest`
 - **Tests:** Vitest + Playwright
 
 ## Local Setup
@@ -23,7 +35,7 @@ Browser-based, non-AI image transformation studio. Upload a photo, choose a retr
    pnpm install
    ```
 
-2. Copy `.env.example` to `.env.local` and fill in required values.
+2. Copy `.env.example` to `.env.local` and fill in the required values.
 
 3. Build internal packages:
 
@@ -62,6 +74,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 SENTRY_DSN=
 NEXT_PUBLIC_POSTHOG_KEY=
 NEXT_PUBLIC_POSTHOG_HOST=
+BETTER_AUTH_TRUSTED_ORIGINS=
 ```
 
 ## Commands
@@ -86,4 +99,8 @@ pnpm format       # Format with Prettier
 
 ## Architecture Summary
 
-All image effects run in the user's browser. The backend handles auth only. See `architecture.md` for detailed diagrams and scaling notes.
+All image effects run in the user's browser. The backend handles auth
+only. See `architecture.md` for detailed diagrams and scaling notes.
+
+See `dream-glow.md` for an in-depth walk-through of the most cinematic
+preset — useful when feeding context to an LLM.

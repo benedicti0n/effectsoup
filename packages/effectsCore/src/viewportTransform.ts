@@ -1,7 +1,7 @@
 import type { CropConfig, PixelBuffer } from "./types.js";
 import { createPixelBuffer, pixelIndex } from "./buffer.js";
 
-function parseAspectRatio(ratio: CropConfig["aspectRatio"]): number | null {
+function parseAspectRatioInternal(ratio: CropConfig["aspectRatio"]): number | null {
   switch (ratio) {
     case "1:1":
       return 1;
@@ -14,6 +14,60 @@ function parseAspectRatio(ratio: CropConfig["aspectRatio"]): number | null {
     default:
       return null;
   }
+}
+
+/**
+ * Parse a CropConfig aspect-ratio to a numeric width/height value.
+ * Returns null for "original" (caller falls back to source dimensions).
+ */
+export function parseAspectRatio(
+  ratio: CropConfig["aspectRatio"]
+): number | null {
+  return parseAspectRatioInternal(ratio);
+}
+
+/**
+ * Compute output dimensions that match the cropped aspect ratio.
+ *
+ * - "original" returns source dimensions unchanged.
+ * - Otherwise returns { width, height } sized to the largest dimension,
+ *   preserving crop ratio with a longestEdge ceiling.
+ */
+export function getCroppedOutputSize(
+  sourceWidth: number,
+  sourceHeight: number,
+  aspectRatio: CropConfig["aspectRatio"],
+  longestEdge: number
+): { width: number; height: number } {
+  if (sourceWidth <= 0 || sourceHeight <= 0) {
+    throw new Error("Source dimensions must be positive");
+  }
+  if (!Number.isFinite(longestEdge) || longestEdge <= 0) {
+    throw new Error("longestEdge must be a positive number");
+  }
+  const ratio = parseAspectRatio(aspectRatio);
+  if (ratio === null) {
+    const longest = Math.max(sourceWidth, sourceHeight);
+    const scale = longest > longestEdge ? longestEdge / longest : 1;
+    return {
+      width: Math.max(1, Math.round(sourceWidth * scale)),
+      height: Math.max(1, Math.round(sourceHeight * scale))
+    };
+  }
+  // Fixed aspect ratio: pick height so the longest dimension equals
+  // longestEdge (or fewer pixels if source is smaller).
+  const sourceLongest = Math.max(sourceWidth, sourceHeight);
+  const scale = sourceLongest >= longestEdge ? longestEdge / sourceLongest : 1;
+  let width: number;
+  let height: number;
+  if (ratio >= 1) {
+    width = Math.max(1, Math.round(sourceLongest * scale));
+    height = Math.max(1, Math.round(width / ratio));
+  } else {
+    height = Math.max(1, Math.round(sourceLongest * scale));
+    width = Math.max(1, Math.round(height * ratio));
+  }
+  return { width, height };
 }
 
 function sampleBilinear(source: PixelBuffer, x: number, y: number): [number, number, number, number] {

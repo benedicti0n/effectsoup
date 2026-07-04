@@ -1,4 +1,5 @@
 import type { JSX } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { allPresets } from "@effectsoup/presets";
 import { SiteHeader } from "@/components/siteHeader";
@@ -8,6 +9,47 @@ import { HowItWorks } from "@/components/home/howItWorks";
 import { CreatorsDevelopers } from "@/components/home/creatorsDevelopers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  FaqJsonLd,
+  SoftwareApplicationJsonLd
+} from "@/components/seo/StructuredData";
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TAGLINE,
+  canonical
+} from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: `${SITE_NAME} — ${SITE_TAGLINE}`
+  },
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    url: canonical("/"),
+    type: "website",
+    siteName: SITE_NAME,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "EffectSoup — browser-based image effects studio"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    images: ["/og-image.png"]
+  }
+};
 
 function HeroEyebrow(): JSX.Element {
   return (
@@ -138,6 +180,36 @@ export default function HomePage(): JSX.Element {
         <HowItWorks />
       </main>
       <SiteFooter />
+      <SoftwareApplicationJsonLd />
+      <FaqJsonLd
+        faqs={[
+          {
+            question: "What is EffectSoup?",
+            answer:
+              "EffectSoup is a browser-based image effects studio. It runs entirely in your browser via Web Workers, so no image ever leaves your device. Pick from 25+ curated presets covering pixel grids, halftones, ASCII art, glow, glitch, CRT, and graphic-print looks, then export to PNG, JPEG, or WebP."
+          },
+          {
+            question: "Do I need to create an account to use EffectSoup?",
+            answer:
+              "No. The editor and mini-playground work without an account. Account creation is optional and only used to save your work to the cloud in future versions."
+          },
+          {
+            question: "Are my uploaded images sent to a server?",
+            answer:
+              "No. EffectSoup runs entirely client-side. Every pixel is processed in your browser using a Web Worker. The exported image is created with the standard Canvas toBlob API on your device."
+          },
+          {
+            question: "Which image formats does EffectSoup support?",
+            answer:
+              "EffectSoup accepts JPEG, PNG, and WebP as input, and exports to PNG, JPEG, and WebP. You can choose the longest edge (1080px, original resolution, or up to 4K) and JPEG quality."
+          },
+          {
+            question: "Is EffectSoup free?",
+            answer:
+              "Yes. Every effect is free. There are no subscriptions, watermarks, or hidden limits in the editor."
+          }
+        ]}
+      />
     </div>
   );
 }

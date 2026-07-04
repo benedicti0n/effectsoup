@@ -3,7 +3,7 @@
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PixelBuffer } from "@effectsoup/core";
-import { applyViewportTransform } from "@effectsoup/core";
+import { applyViewportTransform, getCroppedOutputSize } from "@effectsoup/core";
 import { getPresetById } from "@effectsoup/presets";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { EyeIcon } from "@hugeicons/core-free-icons";
@@ -12,21 +12,6 @@ import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
 import { useEffectsWorker } from "@/hooks/useEffectsWorker";
 import { useAdaptiveQuality } from "@/hooks/useAdaptiveQuality";
-
-function getPreviewSize(
-  sourceWidth: number,
-  sourceHeight: number,
-  isMobile: boolean,
-  qualityScale: number
-): { width: number; height: number } {
-  const maxLongest = (isMobile ? 960 : 1400) * qualityScale;
-  const longest = Math.max(sourceWidth, sourceHeight);
-  const scale = longest > maxLongest ? maxLongest / longest : 1;
-  return {
-    width: Math.max(1, Math.round(sourceWidth * scale)),
-    height: Math.max(1, Math.round(sourceHeight * scale))
-  };
-}
 
 async function loadSourceBuffer(
   source: { objectUrl: string; width: number; height: number },
@@ -145,11 +130,12 @@ export function CanvasPreview(): JSX.Element {
         if (!preset) return;
         const resolved = preset.intensityMapper(effect.intensity, effect.advancedOverrides);
 
-        const { width, height } = getPreviewSize(
+        const previewLongest = (window.innerWidth < 768 ? 960 : 1400) * qualityScale;
+        const { width, height } = getCroppedOutputSize(
           sourceBuffer.width,
           sourceBuffer.height,
-          window.innerWidth < 768,
-          qualityScale
+          crop.aspectRatio,
+          previewLongest
         );
 
         const startTime = performance.now();
@@ -217,11 +203,12 @@ export function CanvasPreview(): JSX.Element {
         );
         if (cancelled) return;
 
-        const { width, height } = getPreviewSize(
+        const previewLongest = (window.innerWidth < 768 ? 960 : 1400) * qualityScale;
+        const { width, height } = getCroppedOutputSize(
           sourceBuffer.width,
           sourceBuffer.height,
-          window.innerWidth < 768,
-          qualityScale
+          crop.aspectRatio,
+          previewLongest
         );
 
         const cropped = applyViewportTransform(sourceBuffer, crop, width, height);

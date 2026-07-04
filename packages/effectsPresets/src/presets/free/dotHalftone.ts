@@ -6,11 +6,7 @@ import {
   type RgbaColor
 } from "@effectsoup/core";
 import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../../types.js";
-import {
-  atmosphereAdvancedControls,
-  resolveOverride,
-  runAtWorkingResolution
-} from "../shared.js";
+import { resolveOverride, runAtWorkingResolution } from "../shared.js";
 
 const WORKING_LONGEST = 800;
 
@@ -21,30 +17,29 @@ export const dotHalftonePreset: EffectPreset = {
   category: "pixelDither",
   defaultIntensity: 5,
   advancedControlSchema: [
-    ...atmosphereAdvancedControls,
-    { id: "dotSize", name: "Dot Size", type: "range", min: 2, max: 32, step: 1, defaultValue: 5 },
-    { id: "dotSpacing", name: "Dot Spacing", type: "range", min: 2, max: 48, step: 1, defaultValue: 2 },
+    { id: "dotSize", name: "Dot Size", type: "range", min: 2, max: 32, step: 1, defaultValue: 6 },
+    { id: "dotSpacing", name: "Dot Spacing", type: "range", min: 2, max: 48, step: 1, defaultValue: 4 },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["monochrome", "source", "palette"], defaultValue: "source" },
     { id: "palette", name: "Palette", type: "select", options: ["cmyk", "warm", "cool", "mono"], defaultValue: "cmyk" },
-    { id: "saturationBoost", name: "Saturation", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 }
+    { id: "saturationBoost", name: "Saturation", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 },
+    { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 25 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    dotSize: resolveOverride(overrides, "dotSize", 5),
-    dotSpacing: resolveOverride(overrides, "dotSpacing", 2),
+    dotSize: resolveOverride(overrides, "dotSize", 6),
+    dotSpacing: resolveOverride(overrides, "dotSpacing", 4),
     colorMode: resolveOverride(overrides, "colorMode", "source"),
     palette: resolveOverride(overrides, "palette", "cmyk"),
     saturationBoost: resolveOverride(overrides, "saturationBoost", Math.round((intensity / 100) * 40)),
-    grainAmount: resolveOverride(overrides, "grainAmount", 10),
-    glowAmount: resolveOverride(overrides, "glowAmount", 0)
+    grainAmount: resolveOverride(overrides, "grainAmount", 25)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
-      const dotSize = (params.dotSize as number) ?? 12;
-      const dotSpacing = (params.dotSpacing as number) ?? 16;
+      const dotSize = (params.dotSize as number) ?? 6;
+      const dotSpacing = (params.dotSpacing as number) ?? 4;
       const colorMode = (params.colorMode as string) ?? "source";
       const paletteName = (params.palette as string) ?? "cmyk";
       const saturationBoost = ((params.saturationBoost as number) ?? 0) / 100;

@@ -20,7 +20,7 @@ export const blocksAsciiPreset: EffectPreset = {
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6),
     characterSet: resolveOverride(overrides, "characterSet", "blocks"),
-    baseOpacity: resolveOverride(overrides, "baseOpacity", 40),
+    baseOpacity: resolveOverride(overrides, "baseOpacity", 50),
     grainAmount: resolveOverride(overrides, "grainAmount", 15),
     glowAmount: resolveOverride(overrides, "glowAmount", 0)
   }),

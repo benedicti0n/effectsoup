@@ -16,20 +16,20 @@ export const luminousAsciiBloomPreset: EffectPreset = {
   category: "asciiSymbols",
   defaultIntensity: 1,
   advancedControlSchema: [
-    { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 5 },
-    { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 6 },
-    { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
+    { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 8 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
     { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 24 },
-    { id: "baseOpacity", name: "Base Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
+    { id: "baseOpacity", name: "Base Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 60 },
+    { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 6 },
+    { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 5 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    fontSize: resolveOverride(overrides, "fontSize", 6 + Math.round((intensity / 100) * 26)),
+    fontSize: resolveOverride(overrides, "fontSize", 8),
     density: resolveOverride(overrides, "density", 10),
     bloomRadius: resolveOverride(overrides, "bloomRadius", 24),
-    baseOpacity: resolveOverride(overrides, "baseOpacity", 40),
+    baseOpacity: resolveOverride(overrides, "baseOpacity", 60),
     glowAmount: resolveOverride(overrides, "glowAmount", 6),
     grainAmount: resolveOverride(overrides, "grainAmount", 5)
   }),
@@ -37,12 +37,12 @@ export const luminousAsciiBloomPreset: EffectPreset = {
     return (source: PixelBuffer) => {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
-      const fontSize = (params.fontSize as number) ?? 12;
+      const fontSize = (params.fontSize as number) ?? 8;
       const density = Math.max(2, Math.min(10, (params.density as number) ?? 10));
       const bloomRadius = (params.bloomRadius as number) ?? 12;
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
-      const baseOpacity = ((params.baseOpacity as number) ?? 20) / 100;
+      const baseOpacity = ((params.baseOpacity as number) ?? 60) / 100;
 
       const result = renderLuminousAsciiBloom(source, {
         fontSize,

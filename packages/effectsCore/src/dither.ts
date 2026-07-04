@@ -73,3 +73,53 @@ export function applyFloydSteinbergDither(
     }
   }
 }
+
+/**
+ * Apply Floyd–Steinberg error-diffusion dither to each color channel
+ * independently in-place. The result preserves color information while
+ * the per-channel error propagation produces a richly textured noise
+ * that maintains image hue and saturation.
+ *
+ * threshold: 0 to 255, applied to each channel.
+ * channels: optional list of channel indices (0=R, 1=G, 2=B, 3=A).
+ *   Default dithers R, G, B and leaves alpha untouched.
+ */
+export function applyFloydSteinbergColorDither(
+  buffer: PixelBuffer,
+  threshold: number = 128,
+  channels: readonly number[] = [0, 1, 2]
+): void {
+  const { data, width, height } = buffer;
+
+  // Per-channel error buffers for the FS propagation.
+  const errorBuffers = channels.map(
+    () => new Float32Array(width * height)
+  );
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = pixelIndex(buffer, x, y);
+      const errorIdx = y * width + x;
+      for (let c = 0; c < channels.length; c++) {
+        const channel = channels[c];
+        const oldValue = data[idx + channel] + errorBuffers[c][errorIdx];
+        const newValue = oldValue >= threshold ? 255 : 0;
+        const quantError = oldValue - newValue;
+        data[idx + channel] = clampByte(newValue);
+
+        if (x + 1 < width) {
+          errorBuffers[c][errorIdx + 1] += (quantError * 7) / 16;
+        }
+        if (y + 1 < height) {
+          if (x > 0) {
+            errorBuffers[c][errorIdx + width - 1] += (quantError * 3) / 16;
+          }
+          errorBuffers[c][errorIdx + width] += (quantError * 5) / 16;
+          if (x + 1 < width) {
+            errorBuffers[c][errorIdx + width + 1] += (quantError * 1) / 16;
+          }
+        }
+      }
+    }
+  }
+}

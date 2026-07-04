@@ -3,6 +3,7 @@ export * from "./types.js";
 import { pixelGridPreset } from "./presets/free/pixelGrid.js";
 import { errorDiffusionDitherPreset } from "./presets/free/errorDiffusionDither.js";
 import { orderedDitherPreset } from "./presets/free/orderedDither.js";
+import { colorDitherPreset } from "./presets/free/colorDither.js";
 import { classicAsciiPreset } from "./presets/free/classicAscii.js";
 import { blocksAsciiPreset } from "./presets/free/blocksAscii.js";
 import { minimalAsciiPreset } from "./presets/free/minimalAscii.js";
@@ -31,6 +32,7 @@ export const allPresets: EffectPreset[] = [
   pixelGridPreset,
   errorDiffusionDitherPreset,
   orderedDitherPreset,
+  colorDitherPreset,
   dotHalftonePreset,
   classicAsciiPreset,
   blocksAsciiPreset,

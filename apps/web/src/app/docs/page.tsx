@@ -1,9 +1,30 @@
 import type { JSX } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SITE_NAME, SITE_DESCRIPTION, canonical } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Docs & API Reference",
+  description:
+    "EffectSoup developer docs: API reference for @effectsoup/core, @effectsoup/presets, and @effectsoup/worker. Learn how to integrate the same image pipeline that powers the playground into your own apps.",
+  alternates: { canonical: "/docs" },
+  openGraph: {
+    title: `Docs & API Reference | ${SITE_NAME}`,
+    description: SITE_DESCRIPTION,
+    url: canonical("/docs"),
+    type: "website",
+    siteName: SITE_NAME
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Docs & API Reference | ${SITE_NAME}`,
+    description: SITE_DESCRIPTION
+  }
+};
 
 function CodeBlock({ code }: { code: string }): JSX.Element {
   return (

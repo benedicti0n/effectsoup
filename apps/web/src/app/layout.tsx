@@ -1,11 +1,109 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_LOCALE,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_TYPE,
+  canonical,
+  getSiteOrigin
+} from "@/lib/seo";
+
+const ogImage = "/og-image.png";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" }
+  ],
+  colorScheme: "light",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover"
+};
 
 export const metadata: Metadata = {
-  title: "EffectSoup — Beautiful image effects, made in the browser.",
-  description:
-    "Transform any image with pixel grids, halftones, ASCII art, glowing symbols, cinematic bloom, and graphic print effects — directly in your browser."
+  metadataBase: new URL(getSiteOrigin()),
+  title: {
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s | ${SITE_NAME}`
+  },
+  applicationName: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  authors: [{ name: "benedicti0n", url: "https://github.com/benedicti0n" }],
+  creator: "benedicti0n",
+  publisher: SITE_NAME,
+  category: "Photo & Video",
+  classification: "Image Editor",
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+    url: false
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1
+    }
+  },
+  alternates: {
+    canonical: "/",
+    languages: { "en-US": "/", "en": "/" }
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+      { url: "/icon.svg", type: "image/svg+xml" }
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.ico"
+  },
+  manifest: "/manifest.webmanifest",
+  openGraph: {
+    type: SITE_TYPE,
+    locale: SITE_LOCALE,
+    url: canonical("/"),
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: "EffectSoup — browser-based image effects studio",
+        type: "image/png"
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@benedicti0n",
+    creator: "@benedicti0n",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    images: [ogImage]
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: SITE_NAME
+  },
+  other: {
+    "application-category": "DesignApplication",
+    "operating-system": "Web Browser"
+  }
 };
 
 export default function RootLayout({
@@ -14,7 +112,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr">
+      <head>
+        <meta name="theme-color" content="#0a0a0a" />
+        <link rel="canonical" href={canonical("/")} />
+        <link rel="manifest" href="/manifest.webmanifest" />
+      </head>
       <body className="min-h-screen bg-canvas font-body text-ink-primary antialiased">
         <ToastProvider>{children}</ToastProvider>
       </body>

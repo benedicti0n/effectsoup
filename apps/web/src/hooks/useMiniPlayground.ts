@@ -16,6 +16,23 @@ const PREVIEW_LONGEST = 720;
 const FREE_EXPORT_LONGEST = 1080;
 const UPLOADED_IMAGE_ID = -1;
 
+// Presets exposed on the home mini playground. Curated subset of the
+// full registry — the goal is to give visitors a quick taste of the
+// effect vocabulary without showing every variant.
+export const MINI_PLAYGROUND_PRESETS: readonly string[] = [
+  "pixelGrid",
+  "orderedDither",
+  "colorDither",
+  "classicAscii",
+  "cyberAscii",
+  "symbolGlow",
+  "cubicGlass",
+  "duotone",
+  "dreamGlow",
+  "ledMatrix",
+  "noirGrain"
+];
+
 const defaultCrop: CropConfig = {
   aspectRatio: "original",
   zoom: 1,
@@ -61,7 +78,7 @@ export function useMiniPlayground(): MiniPlaygroundState {
   }, []);
 
   const preset = getPresetById(presetId);
-  const presets = allPresets;
+  const presets = allPresets.filter((p) => MINI_PLAYGROUND_PRESETS.includes(p.id));
 
   // Load the demo image (or skip when an upload owns the source).
   useEffect(() => {

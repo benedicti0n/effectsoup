@@ -3,8 +3,8 @@ import { allPresets, getPresetById, migratePresetId, getPresetIds } from "./inde
 import { createPixelBuffer } from "@effectsoup/core";
 
 describe("presets", () => {
-  it("has 25 presets total", () => {
-    expect(allPresets.length).toBe(25);
+  it("has 26 presets total", () => {
+    expect(allPresets.length).toBe(26);
   });
 
   it("every preset resolves valid defaults", () => {
@@ -65,16 +65,16 @@ describe("presets", () => {
       expect(resolved.gridOpacity).toBe(50);
     });
 
-    it("Dot Halftone defaults to 5% intensity, source color, CMYK palette, dot size 5, dot spacing 2, grain 10", () => {
+    it("Dot Halftone defaults to 5% intensity, source color, CMYK palette, dot size 6, dot spacing 4, grain 25, no glow", () => {
       const preset = allPresets.find((p) => p.id === "dotHalftone");
       expect(preset?.defaultIntensity).toBe(5);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(5);
       expect(resolved.colorMode).toBe("source");
       expect(resolved.palette).toBe("cmyk");
-      expect(resolved.dotSize).toBe(5);
-      expect(resolved.dotSpacing).toBe(2);
-      expect(resolved.grainAmount).toBe(10);
+      expect(resolved.dotSize).toBe(6);
+      expect(resolved.dotSpacing).toBe(4);
+      expect(resolved.grainAmount).toBe(25);
     });
 
     it("Error Diffusion defaults to 60% intensity", () => {
@@ -102,14 +102,14 @@ describe("presets", () => {
       expect(resolved.colorMode).toBe("originalColors");
     });
 
-    it("Blocks ASCII defaults to 1% intensity, blocks character set, font size 6, base opacity 40, grain 15 and glow 0", () => {
+    it("Blocks ASCII defaults to 1% intensity, blocks character set, font size 6, base opacity 50, grain 15 and glow 0", () => {
       const preset = allPresets.find((p) => p.id === "blocksAscii");
       expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.characterSet).toBe("blocks");
       expect(resolved.colorMode).toBe("originalColors");
       expect(resolved.fontSize).toBe(6);
-      expect(resolved.baseOpacity).toBe(40);
+      expect(resolved.baseOpacity).toBe(50);
       expect(resolved.grainAmount).toBe(15);
       expect(resolved.glowAmount).toBe(0);
     });
@@ -316,16 +316,47 @@ describe("presets", () => {
       expect(schema.find((c) => c.id === "palette")).toBeDefined();
     });
 
-    it("Luminous ASCII Bloom defaults to 1% intensity, density 10, bloom radius 24, base opacity 40, grain 5 and glow 6", () => {
+    it("Luminous ASCII Bloom defaults to 1% intensity, font size 8, density 10, bloom radius 24, base opacity 60, grain 5, glow 6", () => {
       const preset = allPresets.find((p) => p.id === "luminousAsciiBloom");
       expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(1);
+      expect(resolved.fontSize).toBe(8);
       expect(resolved.density).toBe(10);
       expect(resolved.bloomRadius).toBe(24);
-      expect(resolved.baseOpacity).toBe(40);
+      expect(resolved.baseOpacity).toBe(60);
       expect(resolved.grainAmount).toBe(5);
       expect(resolved.glowAmount).toBe(6);
+    });
+
+    it("Color Dither produces a same-sized output at intensity 50", () => {
+      const preset = allPresets.find((p) => p.id === "colorDither");
+      expect(preset).toBeDefined();
+      const source = createPixelBuffer(40, 40, [200, 100, 50, 255]);
+      const resolved = preset!.intensityMapper(50, {});
+      const pipeline = preset!.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+      expect(output.width).toBe(source.width);
+      expect(output.height).toBe(source.height);
+      // Dither must change at least one pixel byte.
+      let changed = 0;
+      for (let i = 0; i < output.data.length; i++) {
+        if (output.data[i] !== source.data[i]) changed++;
+      }
+      expect(changed).toBeGreaterThan(0);
+    });
+
+    it("Color Dither at intensity 0 is an exact source clone", () => {
+      const preset = allPresets.find((p) => p.id === "colorDither")!;
+      const source = createPixelBuffer(20, 20, [80, 160, 240, 255]);
+      for (let i = 0; i < source.data.length; i += 8) {
+        source.data[i] = 200;
+      }
+      const original = new Uint8ClampedArray(source.data);
+      const resolved = preset.intensityMapper(0, {});
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+      expect(Array.from(output.data)).toEqual(Array.from(original));
     });
 
     it("Duotone defaults to black shadow", () => {
