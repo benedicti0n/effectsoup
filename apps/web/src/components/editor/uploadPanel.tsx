@@ -25,27 +25,32 @@ export function UploadPanel(): JSX.Element {
       }
 
       const objectUrl = URL.createObjectURL(file);
-      const image = new Image();
-      image.src = objectUrl;
-      await new Promise<void>((resolve, reject) => {
-        image.onload = () => resolve();
-        image.onerror = () => reject(new Error("Failed to load image"));
-      });
+      try {
+        const image = new Image();
+        image.src = objectUrl;
+        await new Promise<void>((resolve, reject) => {
+          image.onload = () => resolve();
+          image.onerror = () => reject(new Error("Failed to load image"));
+        });
 
-      const megapixels = (image.width * image.height) / 1_000_000;
-      if (megapixels > 25) {
-        alert("Image is too large. Maximum decoded size is 25 megapixels.");
+        const megapixels = (image.width * image.height) / 1_000_000;
+        if (megapixels > 25) {
+          alert("Image is too large. Maximum decoded size is 25 megapixels.");
+          URL.revokeObjectURL(objectUrl);
+          return;
+        }
+
+        setSource({
+          localId: crypto.randomUUID(),
+          fileName: file.name,
+          width: image.width,
+          height: image.height,
+          objectUrl
+        });
+      } catch (error) {
         URL.revokeObjectURL(objectUrl);
-        return;
+        throw error;
       }
-
-      setSource({
-        localId: crypto.randomUUID(),
-        fileName: file.name,
-        width: image.width,
-        height: image.height,
-        objectUrl
-      });
     },
     [setSource]
   );

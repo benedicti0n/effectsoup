@@ -1,15 +1,20 @@
-import type { EffectPreset, ResolvedPresetParameters } from "../../types.js";
+import type { AdvancedControlDefinition, EffectPreset, ResolvedPresetParameters } from "../../types.js";
 import { classicAsciiPreset } from "./classicAscii.js";
 import { resolveOverride } from "../shared.js";
+
+const schema: AdvancedControlDefinition[] = classicAsciiPreset.advancedControlSchema.map((control) =>
+  control.id === "characterSet"
+    ? { ...control, defaultValue: "blocks" }
+    : control
+);
 
 export const blocksAsciiPreset: EffectPreset = {
   id: "blocksAscii",
   name: "Blocks ASCII",
   description: "ASCII image built from block-shade glyphs.",
   category: "asciiSymbols",
-  access: "free",
   defaultIntensity: 1,
-  advancedControlSchema: classicAsciiPreset.advancedControlSchema,
+  advancedControlSchema: schema,
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     ...classicAsciiPreset.intensityMapper(intensity, overrides),
     advancedOverrides: overrides,

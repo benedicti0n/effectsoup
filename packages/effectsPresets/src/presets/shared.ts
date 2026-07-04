@@ -1,6 +1,9 @@
 import {
   applyGlow,
   applyGrain,
+  clonePixelBuffer,
+  resizeBilinear,
+  resizeNearestNeighbor,
   type PixelBuffer,
   type RgbaColor
 } from "@effectsoup/core";
@@ -28,9 +31,18 @@ export function resolveOverride<T extends number | string | boolean>(
 }
 
 export function hexToRgba(hex: string): RgbaColor {
-  const clean = hex.replace("#", "");
+  const fallback: RgbaColor = [0, 0, 0, 255];
+  if (typeof hex !== "string") return fallback;
+  const clean = hex.trim().replace(/^#/, "");
+  if (clean.length !== 6 && clean.length !== 8) return fallback;
+  if (!/^[0-9a-fA-F]+$/.test(clean)) return fallback;
   const bigint = parseInt(clean, 16);
-  return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255, 255];
+  if (Number.isNaN(bigint)) return fallback;
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  const a = clean.length === 8 ? (bigint >> 24) & 255 : 255;
+  return [r, g, b, a];
 }
 
 export function applyAtmosphereAdjustments(
@@ -40,7 +52,7 @@ export function applyAtmosphereAdjustments(
   const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
   const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
 
-  const result = buffer;
+  const result = clonePixelBuffer(buffer);
   if (glowAmount > 0) {
     applyGlow(result, {
       radius: Math.max(1, Math.round(glowAmount * 8)),
@@ -68,3 +80,26 @@ export const ATMOSPHERE_TINT_PRESETS: Record<string, string> = {
   mint: "#7CFFC4",
   custom: "#ff5c9a"
 };
+
+/**
+ * Run a per-pixel effect at a manageable working size, then upscale back to
+ * the source dimensions with nearest-neighbor. Keeps dithering/halftone/bitmap
+ * visually consistent at any input resolution and avoids O(W*H) cost on huge
+ * images, which would otherwise produce cluttered noise on every pixel.
+ */
+export function runAtWorkingResolution(
+  source: PixelBuffer,
+  maxLongest: number,
+  apply: (small: PixelBuffer) => PixelBuffer
+): PixelBuffer {
+  const longest = Math.max(source.width, source.height);
+  if (longest <= maxLongest) {
+    return apply(source);
+  }
+  const scale = maxLongest / longest;
+  const smallW = Math.max(1, Math.round(source.width * scale));
+  const smallH = Math.max(1, Math.round(source.height * scale));
+  const small = resizeBilinear(source, smallW, smallH);
+  const processed = apply(small);
+  return resizeNearestNeighbor(processed, source.width, source.height);
+}

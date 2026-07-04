@@ -1,4 +1,5 @@
 import type { JSX } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export function CreatorsDevelopers(): JSX.Element {
@@ -19,7 +20,7 @@ export function CreatorsDevelopers(): JSX.Element {
               without learning a complex tool.
             </p>
             <Button variant="outline" className="border-on-dark/30 text-on-dark hover:bg-on-dark/10" asChild>
-              <a href="/playground">Try the playground</a>
+              <Link href="/playground">Try the playground</Link>
             </Button>
           </div>
 
@@ -39,7 +40,7 @@ export function CreatorsDevelopers(): JSX.Element {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="outline" className="border-on-dark/30 text-on-dark hover:bg-on-dark/10" asChild>
-                <a href="/docs">Read the docs</a>
+                <Link href="/docs">Read the docs</Link>
               </Button>
             </div>
           </div>

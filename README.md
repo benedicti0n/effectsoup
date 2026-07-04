@@ -12,7 +12,6 @@ Browser-based, non-AI image transformation studio. Upload a photo, choose a retr
   - `@effectsoup/worker` — Web Worker communication layer
 - **Auth:** Better Auth (Google OAuth + email/password)
 - **Database:** Neon PostgreSQL + Drizzle ORM
-- **Payments:** Dodo Payments
 - **Cache/Rate Limits:** Upstash Redis
 - **Tests:** Vitest + Playwright
 
@@ -78,20 +77,13 @@ pnpm loadtest     # Run k6 backend load test (requires k6 and dev server)
 pnpm format       # Format with Prettier
 ```
 
-## Database Migrations
-
-```bash
-pnpm --filter web db:generate
-pnpm --filter web db:migrate
-```
-
 ## Key Routes
 
 - `/` — Marketing homepage with interactive mini-playground
 - `/playground` — Full image editor workspace
 - `/docs` — Documentation shell
-- `/account` — User account and saved projects
+- `/account` — User account
 
 ## Architecture Summary
 
-All image effects run in the user's browser. The backend handles auth and project metadata. See `architecture.md` for detailed diagrams and scaling notes.
+All image effects run in the user's browser. The backend handles auth only. See `architecture.md` for detailed diagrams and scaling notes.

@@ -19,7 +19,6 @@ export const classicAsciiPreset: EffectPreset = {
   name: "Classic ASCII",
   description: "ASCII image from a dense luminance-to-glyph mapping.",
   category: "asciiSymbols",
-  access: "free",
   defaultIntensity: 1,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,

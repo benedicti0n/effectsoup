@@ -77,7 +77,7 @@ export function SignInDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
-      <div className="w-full max-w-md rounded-sm border border-hairline bg-surface-soft p-6 shadow-sm md:p-8 bg-white">
+      <div className="w-full max-w-md rounded-sm border border-hairline bg-canvas p-6 shadow-sm md:p-8">
         <div className="mb-6 flex items-center justify-between border-b border-hairline pb-3">
           <h2 className="font-mono text-2xl font-bold text-ink">
             {mode === "signin" ? "Sign In" : "Create Account"}

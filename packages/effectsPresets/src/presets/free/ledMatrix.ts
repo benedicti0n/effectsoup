@@ -14,7 +14,6 @@ export const ledMatrixPreset: EffectPreset = {
   name: "LED Matrix",
   description: "Glowing LED dot matrix with color, white, or tinted dots.",
   category: "colorGlow",
-  access: "free",
   defaultIntensity: 100,
   usesIntensity: false,
   advancedControlSchema: [
@@ -22,7 +21,7 @@ export const ledMatrixPreset: EffectPreset = {
     { id: "shape", name: "Shape", type: "select", options: shapeOptions, defaultValue: "circle" },
     { id: "colorMode", name: "Color Mode", type: "select", options: colorModeOptions, defaultValue: "source" },
     { id: "tintColor", name: "Tint Color", type: "color", defaultValue: "#00f0ff" },
-    { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 1 }
+    { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 100 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
@@ -31,7 +30,7 @@ export const ledMatrixPreset: EffectPreset = {
     shape: resolveOverride(overrides, "shape", "circle"),
     colorMode: resolveOverride(overrides, "colorMode", "source"),
     tintColor: resolveOverride(overrides, "tintColor", "#00f0ff"),
-    glowAmount: resolveOverride(overrides, "glowAmount", 1)
+    glowAmount: resolveOverride(overrides, "glowAmount", 100)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {

@@ -1,4 +1,5 @@
 import type { JSX } from "react";
+import { allPresets } from "@effectsoup/presets";
 
 const steps = [
   {
@@ -9,7 +10,7 @@ const steps = [
   {
     number: "02",
     title: "Pick a preset",
-    description: "Choose from 16 carefully tuned looks across print, ASCII, and atmosphere categories."
+    description: `Choose from ${allPresets.length} carefully tuned looks across print, ASCII, and atmosphere categories.`
   },
   {
     number: "03",

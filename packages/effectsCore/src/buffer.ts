@@ -50,9 +50,13 @@ export function fillPixelBuffer(buffer: PixelBuffer, color: RgbaColor): void {
 
 /**
  * Helper to clamp a number to the 0-255 range.
+ * Returns 0 for NaN/Infinity values.
  */
 export function clampByte(value: number): number {
-  return Math.max(0, Math.min(255, Math.round(value)));
+  if (!Number.isFinite(value)) return 0;
+  if (value <= 0) return 0;
+  if (value >= 255) return 255;
+  return Math.round(value);
 }
 
 /**

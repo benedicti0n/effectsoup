@@ -111,8 +111,21 @@ export const useEditorStore = create<EditorState>((set) => ({
   snapshotHistory: () =>
     set((state) => {
       const entry = createSnapshot(state);
+      const lastEntry = state.history[state.historyIndex];
+      if (
+        lastEntry &&
+        lastEntry.crop === entry.crop &&
+        lastEntry.effect === entry.effect &&
+        lastEntry.output === entry.output
+      ) {
+        return state;
+      }
+      const MAX_HISTORY = 50;
       const history = state.history.slice(0, state.historyIndex + 1);
       history.push(entry);
+      if (history.length > MAX_HISTORY) {
+        history.shift();
+      }
       return { history, historyIndex: history.length - 1 };
     }),
 

@@ -20,15 +20,14 @@ export const vhsBloomPreset: EffectPreset = {
   name: "VHS Bloom",
   description: "Blurry compressed nostalgic digital effect.",
   category: "retroSignal",
-  access: "premium",
   defaultIntensity: 1,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
     { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 16, step: 1, defaultValue: 1 },
     { id: "chromatic", name: "Chromatic", type: "range", min: 0, max: 20, step: 1, defaultValue: 5 },
     { id: "noise", name: "Noise", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 },
-    { id: "tintPreset", name: "Tint Preset", type: "select", options: ["warmPink", "coolCyan", "amberCrt", "mint", "custom"], defaultValue: "custom" },
-    { id: "tintColor", name: "Custom Tint", type: "color", defaultValue: "#000000" },
+    { id: "tintPreset", name: "Tint Preset", type: "select", options: ["warmPink", "coolCyan", "amberCrt", "mint", "custom"], defaultValue: "warmPink" },
+    { id: "tintColor", name: "Custom Tint", type: "color", defaultValue: "#ff5c9a" },
     { id: "tintAmount", name: "Tint Amount", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
@@ -38,8 +37,8 @@ export const vhsBloomPreset: EffectPreset = {
     chromatic: resolveOverride(overrides, "chromatic", 5),
     noise: resolveOverride(overrides, "noise", 20),
     glowAmount: resolveOverride(overrides, "glowAmount", 100),
-    tintPreset: resolveOverride(overrides, "tintPreset", "custom"),
-    tintColor: resolveOverride(overrides, "tintColor", "#000000"),
+    tintPreset: resolveOverride(overrides, "tintPreset", "warmPink"),
+    tintColor: resolveOverride(overrides, "tintColor", "#ff5c9a"),
     tintAmount: resolveOverride(overrides, "tintAmount", 20),
     grainAmount: resolveOverride(overrides, "grainAmount", 0)
   }),

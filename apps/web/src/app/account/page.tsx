@@ -1,46 +1,35 @@
 "use client";
 
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/authClient";
-import { listProjects, type ProjectSummary, deleteProject } from "@/lib/projectClient";
 import { SignInDialog } from "@/components/auth/signInDialog";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
+import { useToast } from "@/components/ui/toast";
 
 export default function AccountPage(): JSX.Element {
   const { data: session, isPending } = authClient.useSession();
   const [showSignIn, setShowSignIn] = useState(false);
-  const [projects, setProjects] = useState<ProjectSummary[]>([]);
-  const [projectsLoading, setProjectsLoading] = useState(false);
-
-  useEffect(() => {
-    if (!session) return;
-    setProjectsLoading(true);
-    listProjects()
-      .then(setProjects)
-      .catch(() => setProjects([]))
-      .finally(() => setProjectsLoading(false));
-  }, [session]);
+  const [signingOut, setSigningOut] = useState(false);
+  const router = useRouter();
+  const { showToast } = useToast();
 
   const signOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          window.location.reload();
-        }
-      }
-    });
-  };
-
-  const handleDelete = async (projectId: string) => {
+    if (signingOut) return;
+    setSigningOut(true);
     try {
-      await deleteProject(projectId);
-      setProjects((prev) => prev.filter((p) => p.id !== projectId));
-    } catch {
-      alert("Failed to delete project");
+      await authClient.signOut();
+      showToast("Signed out", "success");
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to sign out";
+      showToast(message, "error");
+      setSigningOut(false);
     }
   };
 
@@ -64,49 +53,19 @@ export default function AccountPage(): JSX.Element {
                   <span className="font-medium text-ink">{session.user.email}</span>
                 </p>
                 <button
-                  onClick={signOut}
-                  className="inline-flex h-9 items-center gap-1 rounded-sm border border-hairline bg-canvas px-5 font-mono text-sm text-ink hover:bg-surface-card"
+                  onClick={() => void signOut()}
+                  disabled={signingOut}
+                  className="inline-flex h-9 items-center gap-1 rounded-sm border border-hairline bg-canvas px-5 font-mono text-sm text-ink hover:bg-surface-card disabled:opacity-60"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4" />
-                  Sign Out
+                  {signingOut ? "Signing out…" : "Sign Out"}
                 </button>
-              </div>
-
-              <div>
-                <h2 className="mb-4 font-mono text-base font-bold text-ink">Cloud Projects</h2>
-                {projectsLoading ? (
-                  <p className="font-mono text-base text-mute">Loading projects…</p>
-                ) : projects.length === 0 ? (
-                  <p className="font-mono text-base text-mute">No saved projects yet.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {projects.map((project) => (
-                      <div
-                        key={project.id}
-                        className="flex items-center justify-between rounded-sm border border-hairline bg-canvas p-4"
-                      >
-                        <div>
-                          <p className="font-mono text-base font-medium text-ink">{project.title}</p>
-                          <p className="font-mono text-xs text-mute">
-                            {project.aspectRatio} · {new Date(project.updatedAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleDelete(project.id)}
-                          className="font-mono text-xs text-danger hover:text-danger-hover"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           ) : (
             <div className="space-y-4">
               <p className="font-mono text-base text-body">
-                Sign in to save projects and access them across devices.
+                Sign in to access your account.
               </p>
               <button
                 onClick={() => setShowSignIn(true)}

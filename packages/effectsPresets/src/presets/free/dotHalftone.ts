@@ -8,15 +8,17 @@ import {
 import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../../types.js";
 import {
   atmosphereAdvancedControls,
-  resolveOverride
+  resolveOverride,
+  runAtWorkingResolution
 } from "../shared.js";
+
+const WORKING_LONGEST = 800;
 
 export const dotHalftonePreset: EffectPreset = {
   id: "dotHalftone",
   name: "Dot Halftone",
   description: "Colored dot halftone inspired by newsprint and Risograph screens.",
   category: "pixelDither",
-  access: "free",
   defaultIntensity: 5,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
@@ -75,16 +77,18 @@ export const dotHalftonePreset: EffectPreset = {
         ]
       };
 
-      const result = renderHalftoneData(source, {
-        dotSpacing,
-        maxDotSize: dotSize,
-        inkColor: [0, 0, 0, 255],
-        backgroundColor: [255, 255, 255, 255],
-        shape: "circle",
-        colorMode: colorMode as "monochrome" | "source" | "palette",
-        palette: palettes[paletteName] ?? palettes.cmyk,
-        saturationBoost
-      });
+      const result = runAtWorkingResolution(source, WORKING_LONGEST, (small) =>
+        renderHalftoneData(small, {
+          dotSpacing,
+          maxDotSize: dotSize,
+          inkColor: [0, 0, 0, 255],
+          backgroundColor: [255, 255, 255, 255],
+          shape: "circle",
+          colorMode: colorMode as "monochrome" | "source" | "palette",
+          palette: palettes[paletteName] ?? palettes.cmyk,
+          saturationBoost
+        })
+      );
 
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);

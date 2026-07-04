@@ -20,12 +20,12 @@ export function MiniPlayground(): JSX.Element {
   const {
     canvasRef,
     fileInputRef,
-    selectedDemo,
     presetId,
     intensity,
     isRendering,
     error,
     presets,
+    selectedDemo,
     onFileChange,
     handleDownload,
     setPresetId,

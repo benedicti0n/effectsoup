@@ -14,6 +14,7 @@ import {
 
 const PREVIEW_LONGEST = 720;
 const FREE_EXPORT_LONGEST = 1080;
+const UPLOADED_IMAGE_ID = -1;
 
 const defaultCrop: CropConfig = {
   aspectRatio: "original",
@@ -27,13 +28,13 @@ export type MiniPlaygroundState = {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   source: PixelBuffer | null;
   sourceName: string;
-  selectedDemo: number;
   presetId: string;
   intensity: number;
   isRendering: boolean;
   error: string | null;
-  presets: ReturnType<typeof allPresets.filter>;
+  presets: typeof allPresets;
   preset: ReturnType<typeof getPresetById>;
+  selectedDemo: number;
   handleUpload: (file: File) => Promise<void>;
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDownload: () => Promise<void>;
@@ -47,7 +48,7 @@ export function useMiniPlayground(): MiniPlaygroundState {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [source, setSource] = useState<PixelBuffer | null>(null);
   const [sourceName, setSourceName] = useState<string>("demo");
-  const [selectedDemo, setSelectedDemo] = useState(1);
+  const [selectedDemo, setSelectedDemoState] = useState(1);
   const [presetId, setPresetId] = useState("pixelGrid");
   const [intensity, setIntensity] = useState(50);
   const [isRendering, setIsRendering] = useState(false);
@@ -55,13 +56,19 @@ export function useMiniPlayground(): MiniPlaygroundState {
   const { render: renderInWorker } = useEffectsWorker();
   const { showToast } = useToast();
 
-  const preset = getPresetById(presetId);
-  const presets = allPresets.filter((p) => p.access === "free").slice(0, 6);
+  const setSelectedDemo = useCallback((value: number) => {
+    setSelectedDemoState(value);
+  }, []);
 
-  // Load default demo image on mount / when demo changes.
+  const preset = getPresetById(presetId);
+  const presets = allPresets;
+
+  // Load the demo image (or skip when an upload owns the source).
   useEffect(() => {
     let cancelled = false;
     setError(null);
+    if (selectedDemo === UPLOADED_IMAGE_ID) return;
+    if (selectedDemo < 1) return;
     loadImageSource(`/assets/showcase/img${selectedDemo}.png`)
       .then((buffer) => {
         if (!cancelled) {
@@ -153,7 +160,7 @@ export function useMiniPlayground(): MiniPlaygroundState {
       URL.revokeObjectURL(url);
       setSource(buffer);
       setSourceName(file.name.replace(/\.[^/.]+$/, ""));
-      setSelectedDemo(0);
+      setSelectedDemoState(UPLOADED_IMAGE_ID);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");

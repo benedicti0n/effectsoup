@@ -22,7 +22,6 @@ export const cyberAsciiPreset: EffectPreset = {
   name: "Cyber ASCII",
   description: "Colored terminal-like character image with a technical glyph set and neon glow.",
   category: "asciiSymbols",
-  access: "premium",
   defaultIntensity: 15,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,

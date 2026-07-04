@@ -3,10 +3,19 @@ import { clampByte } from "./buffer.js";
 
 /**
  * Simple deterministic linear congruential generator for seeded noise.
+ * Hashes the input seed so different integer, fractional, NaN, ±Infinity
+ * and zero-coercing values produce different streams.
  */
 export function createSeededRandom(seed: number): () => number {
-  let state = seed >>> 0;
-  if (state === 0) state = 12345;
+  let h = 2166136261 >>> 0;
+  const bytes = new Float64Array([seed]);
+  const u32 = new Uint32Array(bytes.buffer);
+  for (let i = 0; i < u32.length; i++) {
+    h ^= u32[i];
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  if (h === 0) h = 0x9e3779b9;
+  let state = h;
   return () => {
     state = (state * 1664525 + 1013904223) >>> 0;
     return state / 4294967296;

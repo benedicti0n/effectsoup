@@ -6,7 +6,6 @@ import {
 } from "@effectsoup/core";
 import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../../types.js";
 import {
-  atmosphereAdvancedControls,
   resolveOverride
 } from "../shared.js";
 
@@ -15,10 +14,10 @@ export const luminousAsciiBloomPreset: EffectPreset = {
   name: "Luminous ASCII Bloom",
   description: "ASCII characters that glow from bright areas with source-colored light.",
   category: "asciiSymbols",
-  access: "premium",
   defaultIntensity: 1,
   advancedControlSchema: [
-    ...atmosphereAdvancedControls,
+    { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 5 },
+    { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 6 },
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 12 },
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 10 },
     { id: "bloomRadius", name: "Bloom Radius", type: "range", min: 2, max: 24, step: 1, defaultValue: 24 },

@@ -4,14 +4,15 @@ import {
   type PixelBuffer
 } from "@effectsoup/core";
 import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../../types.js";
-import { resolveOverride } from "../shared.js";
+import { resolveOverride, runAtWorkingResolution } from "../shared.js";
+
+const WORKING_LONGEST = 800;
 
 export const bitmapPreset: EffectPreset = {
   id: "bitmap",
   name: "Bitmap",
   description: "Heavy pixelation with palette reduction for a retro 8-bit look.",
   category: "pixelDither",
-  access: "premium",
   defaultIntensity: 100,
   usesIntensity: false,
   advancedControlSchema: [
@@ -34,11 +35,13 @@ export const bitmapPreset: EffectPreset = {
       const colorLevels = (params.colorLevels as number) ?? 32;
       const ditherThreshold = (params.ditherThreshold as number) ?? 200;
 
-      return applyBitmap(source, {
-        pixelSize,
-        colorLevels,
-        ditherThreshold: ditherThreshold > 0 ? ditherThreshold : undefined
-      });
+      return runAtWorkingResolution(source, WORKING_LONGEST, (small) =>
+        applyBitmap(small, {
+          pixelSize,
+          colorLevels,
+          ditherThreshold: ditherThreshold > 0 ? ditherThreshold : undefined
+        })
+      );
     };
   }
 };

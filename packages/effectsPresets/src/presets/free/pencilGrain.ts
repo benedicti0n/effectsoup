@@ -11,7 +11,6 @@ export const pencilGrainPreset: EffectPreset = {
   name: "Pencil Grain",
   description: "Graphite sketch on textured paper with film grain.",
   category: "printPaper",
-  access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [
     { id: "paperColor", name: "Paper Color", type: "color", defaultValue: "#f5f2eb" },

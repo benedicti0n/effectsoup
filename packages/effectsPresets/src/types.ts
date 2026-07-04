@@ -8,8 +8,6 @@ export type PresetCategory =
   | "colorGlow"
   | "retroSignal";
 
-export type PresetAccess = "free" | "premium";
-
 export type AdvancedControlType =
   | "range"
   | "select"
@@ -49,7 +47,6 @@ export type EffectPreset = {
   name: string;
   description: string;
   category: PresetCategory;
-  access: PresetAccess;
   defaultIntensity: number;
   /** Whether the main Intensity slider is shown for this preset. Defaults to true. */
   usesIntensity?: boolean;

@@ -9,16 +9,23 @@ export async function loadImageSource(src: string): Promise<PixelBuffer> {
     image.onerror = () => reject(new Error("Failed to load image"));
   });
 
+  const MAX_DIM = 8192;
+  const width = Math.min(image.naturalWidth || image.width, MAX_DIM);
+  const height = Math.min(image.naturalHeight || image.height, MAX_DIM);
+  if (width <= 0 || height <= 0) {
+    throw new Error("Image has no visible dimensions");
+  }
+
   const canvas = document.createElement("canvas");
-  canvas.width = image.width;
-  canvas.height = image.height;
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Could not get canvas context");
-  ctx.drawImage(image, 0, 0);
-  const imageData = ctx.getImageData(0, 0, image.width, image.height);
+  ctx.drawImage(image, 0, 0, width, height);
+  const imageData = ctx.getImageData(0, 0, width, height);
   return {
-    width: image.width,
-    height: image.height,
+    width,
+    height,
     data: imageData.data
   };
 }
@@ -41,11 +48,17 @@ export function getExportDimensions(
   sourceHeight: number,
   requestedLongest: number
 ): { width: number; height: number } {
+  if (sourceWidth <= 0 || sourceHeight <= 0) {
+    throw new Error("Source dimensions must be positive");
+  }
+  if (!Number.isFinite(requestedLongest) || requestedLongest <= 0) {
+    throw new Error("requestedLongest must be a positive number");
+  }
   const longest = Math.max(sourceWidth, sourceHeight);
-  const scale = requestedLongest / longest;
+  const scale = longest >= requestedLongest ? requestedLongest / longest : 1;
   return {
-    width: Math.round(sourceWidth * scale),
-    height: Math.round(sourceHeight * scale)
+    width: Math.max(1, Math.round(sourceWidth * scale)),
+    height: Math.max(1, Math.round(sourceHeight * scale))
   };
 }
 

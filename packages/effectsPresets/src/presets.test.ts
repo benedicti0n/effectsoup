@@ -1,21 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { allPresets, freePresets, premiumPresets, getPresetById, migratePresetId } from "./index.js";
+import { allPresets, getPresetById, migratePresetId, getPresetIds } from "./index.js";
 import { createPixelBuffer } from "@effectsoup/core";
 
 describe("presets", () => {
   it("has 25 presets total", () => {
     expect(allPresets.length).toBe(25);
-  });
-
-  it("has 14 free and 11 premium source presets", () => {
-    expect(freePresets.length).toBe(14);
-    expect(premiumPresets.length).toBe(11);
-  });
-
-  it("every public preset is free", () => {
-    for (const preset of allPresets) {
-      expect(preset.access).toBe("free");
-    }
   });
 
   it("every preset resolves valid defaults", () => {
@@ -53,6 +42,18 @@ describe("presets", () => {
     expect(preset).toBeDefined();
     const resolved = preset!.intensityMapper(50, { contrast: 42 });
     expect(resolved.contrast).toBe(42);
+  });
+
+  it("preset ids are unique", () => {
+    const ids = getPresetIds();
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("every advancedControlSchema has a unique id within its preset", () => {
+    for (const preset of allPresets) {
+      const ids = preset.advancedControlSchema.map((c) => c.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
   });
 
   describe("default configurations", () => {
@@ -158,6 +159,34 @@ describe("presets", () => {
       expect(resolved.paperColor).toBe("#000000");
     });
 
+    it("LED Matrix defaults to glow 100", () => {
+      const preset = allPresets.find((p) => p.id === "ledMatrix");
+      expect(preset).toBeDefined();
+      expect(preset!.usesIntensity).toBe(false);
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.glowAmount).toBe(100);
+    });
+
+    it("Manga Scanlines defaults to 50% intensity with line spacing 5, width 2, angle 0, threshold 95", () => {
+      const preset = allPresets.find((p) => p.id === "mangaScanlines");
+      expect(preset).toBeDefined();
+      expect(preset!.category).toBe("printPaper");
+      expect(preset!.defaultIntensity).toBe(50);
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.lineSpacing).toBe(5);
+      expect(resolved.lineWidth).toBe(2);
+      expect(resolved.angle).toBe(0);
+      expect(resolved.threshold).toBe(95);
+    });
+
+    it("Dream Glow defaults to a glowy look (glow >= 50, blur >= 8)", () => {
+      const preset = allPresets.find((p) => p.id === "dreamGlow");
+      expect(preset).toBeDefined();
+      const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
+      expect(resolved.glowAmount).toBeGreaterThanOrEqual(50);
+      expect(resolved.blurAmount).toBeGreaterThanOrEqual(8);
+    });
+
     it("Luminous ASCII Bloom defaults to 1% intensity, density 10, bloom radius 24, base opacity 40, grain 5 and glow 6", () => {
       const preset = allPresets.find((p) => p.id === "luminousAsciiBloom");
       expect(preset?.defaultIntensity).toBe(1);
@@ -219,7 +248,6 @@ describe("presets", () => {
       const preset = allPresets.find((p) => p.id === "cubicGlass");
       expect(preset).toBeDefined();
       expect(preset!.category).toBe("distortionGlass");
-      expect(preset!.access).toBe("free");
       expect(preset!.defaultIntensity).toBe(40);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.tileSize).toBeGreaterThanOrEqual(4);

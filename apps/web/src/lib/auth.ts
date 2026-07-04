@@ -19,8 +19,29 @@ export const auth = betterAuth({
   }),
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
+  trustedOrigins: [env.BETTER_AUTH_URL],
   socialProviders,
   emailAndPassword: {
-    enabled: true
+    enabled: true,
+    minPasswordLength: 12,
+    maxPasswordLength: 128,
+    requireEmailVerification: false,
+    autoSignIn: true
+  },
+  advanced: {
+    useSecureCookies: env.BETTER_AUTH_URL.startsWith("https://"),
+    defaultCookieAttributes: {
+      sameSite: "lax",
+      secure: env.BETTER_AUTH_URL.startsWith("https://"),
+      httpOnly: true
+    }
+  },
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 30
+  },
+  emailNormalization: {
+    email: (email: string) => email.toLowerCase().trim()
   }
 });

@@ -12,7 +12,6 @@ const badgeVariants = cva(
         default: "bg-ink-primary text-on-primary",
         outline: "border border-hairline text-ink",
         coral: "bg-coral/10 text-coral border border-coral/20",
-        premium: "bg-accent text-on-primary",
         muted: "bg-soft-stone text-ink"
       }
     },

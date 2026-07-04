@@ -12,7 +12,6 @@ export const symbolGlowPreset: EffectPreset = {
   name: "Symbol Glow",
   description: "Luminous ASCII symbols over a soft blurred image.",
   category: "asciiSymbols",
-  access: "premium",
   defaultIntensity: 100,
   usesIntensity: false,
   advancedControlSchema: [

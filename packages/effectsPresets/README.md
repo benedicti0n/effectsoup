@@ -52,9 +52,10 @@ const output = pipeline(source, params);
 ## API
 
 - `allPresets` — every preset
-- `freePresets` / `premiumPresets` — preset groups
 - `getPresetById(id)` — look up a preset by ID
 - `migratePresetId(id)` — map legacy preset IDs to current ones
+- `getPresetIds()` — list every preset id
+- `hasPresetId(id)` — check whether a preset (or migrated variant) exists
 
 ## Repository
 

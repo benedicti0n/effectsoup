@@ -13,15 +13,20 @@ import {
 } from "../shared.js";
 import { classicAsciiPreset } from "./classicAscii.js";
 
+const DEFAULT_MINIMAL_CHARSET = "#";
+
 export const minimalAsciiPreset: EffectPreset = {
   id: "minimalAscii",
   name: "Minimal ASCII",
   description: "Sparse ASCII image using just a few high-contrast glyphs.",
   category: "asciiSymbols",
-  access: "free",
   defaultIntensity: 1,
   advancedControlSchema: [
-    ...classicAsciiPreset.advancedControlSchema,
+    ...classicAsciiPreset.advancedControlSchema.map((control) =>
+      control.id === "characterSet"
+        ? { ...control, defaultValue: "minimal" }
+        : control
+    ),
     { id: "density", name: "Density", type: "range", min: 2, max: 10, step: 1, defaultValue: 2 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
@@ -40,6 +45,8 @@ export const minimalAsciiPreset: EffectPreset = {
 
       const fontSize = (params.fontSize as number) ?? 6;
       const colorMode = (params.colorMode as string) ?? "originalColors";
+      const characterSet = (params.characterSet as string) ?? "minimal";
+      const customCharset = (params.customCharset as string) ?? "";
       const tintColor = hexToRgba((params.tintColor as string) ?? "#ffffff");
       const backgroundColor = hexToRgba((params.backgroundColor as string) ?? "#000000");
       const baseOpacity = ((params.baseOpacity as number) ?? 40) / 100;
@@ -50,15 +57,20 @@ export const minimalAsciiPreset: EffectPreset = {
         colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
       const renderInkColor = colorMode === "tint" ? tintColor : inkColor;
 
+      const charset =
+        characterSet === "custom" && customCharset.trim().length > 0
+          ? customCharset
+          : DEFAULT_MINIMAL_CHARSET;
+
       // Build the background layer: solid color or a dimmed copy of the source.
       const { width, height } = source;
       let backgroundLayer: PixelBuffer;
       if (baseOpacity > 0) {
         backgroundLayer = clonePixelBuffer(source);
         for (let i = 0; i < backgroundLayer.data.length; i += 4) {
-          backgroundLayer.data[i] = Math.round(backgroundLayer.data[i] * baseOpacity);
-          backgroundLayer.data[i + 1] = Math.round(backgroundLayer.data[i + 1] * baseOpacity);
-          backgroundLayer.data[i + 2] = Math.round(backgroundLayer.data[i + 2] * baseOpacity);
+          backgroundLayer.data[i] = Math.min(255, Math.round(backgroundLayer.data[i] * baseOpacity));
+          backgroundLayer.data[i + 1] = Math.min(255, Math.round(backgroundLayer.data[i + 1] * baseOpacity));
+          backgroundLayer.data[i + 2] = Math.min(255, Math.round(backgroundLayer.data[i + 2] * baseOpacity));
         }
       } else {
         backgroundLayer = createPixelBuffer(width, height, backgroundColor);
@@ -85,7 +97,7 @@ export const minimalAsciiPreset: EffectPreset = {
         fontSize,
         inkColor: renderInkColor,
         backgroundColor: [0, 0, 0, 0],
-        charset: "#",
+        charset,
         colorMode: renderColorMode,
         densityMap: weightMap,
         minGlyphLuminance: 0.25,
@@ -98,8 +110,9 @@ export const minimalAsciiPreset: EffectPreset = {
         if (alpha > 0) {
           for (let c = 0; c < 3; c++) {
             // glyphLayer RGB is already premultiplied by alpha from renderAscii.
-            result.data[i + c] = Math.round(
-              glyphLayer.data[i + c] + backgroundLayer.data[i + c] * (1 - alpha)
+            result.data[i + c] = Math.min(
+              255,
+              Math.round(glyphLayer.data[i + c] + backgroundLayer.data[i + c] * (1 - alpha))
             );
           }
         }

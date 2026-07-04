@@ -11,15 +11,17 @@ import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../
 import {
   adjustmentControls,
   atmosphereAdvancedControls,
-  resolveOverride
+  resolveOverride,
+  runAtWorkingResolution
 } from "../shared.js";
+
+const WORKING_LONGEST = 800;
 
 export const errorDiffusionDitherPreset: EffectPreset = {
   id: "errorDiffusionDither",
   name: "Error Diffusion",
   description: "Organic monochrome dithering with diffused pixel texture.",
   category: "pixelDither",
-  access: "free",
   defaultIntensity: 60,
   advancedControlSchema: [
     ...adjustmentControls,
@@ -42,7 +44,6 @@ export const errorDiffusionDitherPreset: EffectPreset = {
     return (source: PixelBuffer) => {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
-      const result = clonePixelBuffer(source);
       const saturation = ((params.saturation as number) ?? 0) / 100;
       const contrast = ((params.contrast as number) ?? 0) / 100;
       const brightness = (params.brightness as number) ?? 0;
@@ -50,25 +51,30 @@ export const errorDiffusionDitherPreset: EffectPreset = {
       const invert = (params.invert as boolean) ?? false;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
 
-      if (saturation !== 0) {
-        adjustSaturation(result, saturation);
-      }
-      toGrayscale(result);
-      if (brightness !== 0 || contrast !== 0) {
-        adjustBrightnessContrast(result, brightness, contrast);
-      }
-      applyFloydSteinbergDither(result, threshold);
-      if (invert) {
-        for (let i = 0; i < result.data.length; i += 4) {
-          result.data[i] = 255 - result.data[i];
-          result.data[i + 1] = 255 - result.data[i + 1];
-          result.data[i + 2] = 255 - result.data[i + 2];
+      const processed = runAtWorkingResolution(source, WORKING_LONGEST, (small) => {
+        const result = clonePixelBuffer(small);
+        if (saturation !== 0) {
+          adjustSaturation(result, saturation);
         }
-      }
+        toGrayscale(result);
+        if (brightness !== 0 || contrast !== 0) {
+          adjustBrightnessContrast(result, brightness, contrast);
+        }
+        applyFloydSteinbergDither(result, threshold);
+        if (invert) {
+          for (let i = 0; i < result.data.length; i += 4) {
+            result.data[i] = 255 - result.data[i];
+            result.data[i + 1] = 255 - result.data[i + 1];
+            result.data[i + 2] = 255 - result.data[i + 2];
+          }
+        }
+        return result;
+      });
+
       if (grainAmount > 0) {
-        applyGrain(result, grainAmount);
+        applyGrain(processed, grainAmount);
       }
-      return result;
+      return processed;
     };
   }
 };

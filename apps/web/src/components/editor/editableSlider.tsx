@@ -72,15 +72,17 @@ export function EditableSlider({
   const commitValue = useCallback(
     (raw: string) => {
       const parsed = parseInput(raw, unit);
+      let changed = false;
       if (parsed !== null) {
         const clamped = clamp(parsed, min, max);
         const snapped = snapToStep(clamped, step);
         if (snapped !== value) {
           onChange(snapped);
+          changed = true;
         }
       }
       setIsEditing(false);
-      onCommit?.();
+      if (changed) onCommit?.();
     },
     [max, min, onChange, onCommit, step, unit, value]
   );
@@ -107,12 +109,26 @@ export function EditableSlider({
     commitValue(draft);
   }, [commitValue, draft]);
 
+  const dragStartValueRef = useRef<number | null>(null);
+
+  const handleSliderPointerDown = useCallback(() => {
+    dragStartValueRef.current = value;
+  }, [value]);
+
   const handleSliderChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange(Number(event.target.value));
     },
     [onChange]
   );
+
+  const handleSliderCommit = useCallback(() => {
+    const start = dragStartValueRef.current;
+    dragStartValueRef.current = null;
+    if (start !== null && start !== value) {
+      onCommit?.();
+    }
+  }, [onCommit, value]);
 
   return (
     <div className="space-y-1.5">
@@ -156,8 +172,10 @@ export function EditableSlider({
         value={value}
         disabled={disabled}
         onChange={handleSliderChange}
-        onMouseUp={onCommit}
-        onTouchEnd={onCommit}
+        onPointerDown={handleSliderPointerDown}
+        onMouseUp={handleSliderCommit}
+        onTouchEnd={handleSliderCommit}
+        onKeyUp={handleSliderCommit}
         aria-labelledby={labelId}
         className="w-full cursor-pointer appearance-none bg-transparent focus-visible:outline-none [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-hairline [&::-webkit-slider-thumb]:-mt-1.5 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-ink-primary [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-hairline [&::-moz-range-thumb]:-mt-1.5 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-ink-primary disabled:opacity-50"
       />

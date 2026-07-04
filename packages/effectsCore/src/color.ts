@@ -92,7 +92,11 @@ export function applyDuotone(
 }
 
 /**
- * Reduce the color palette to a fixed number of colors using simple uniform quantization.
+ * Reduce the color palette to a fixed number of colors using uniform per-channel quantization.
+ * The result is an approximation with exactly `levels³` output colors where
+ * `levels ≈ round(cbrt(colorCount))`. The actual produced palette size may differ
+ * slightly from `colorCount` because channels are quantized independently.
+ *
  * For MVP this is fast and deterministic; a k-means variant can be swapped later.
  */
 export function reducePalette(buffer: PixelBuffer, colorCount: number): void {
@@ -100,7 +104,7 @@ export function reducePalette(buffer: PixelBuffer, colorCount: number): void {
     throw new Error("colorCount must be between 2 and 256");
   }
   const { data } = buffer;
-  const levels = Math.max(2, Math.round(Math.cbrt(colorCount)));
+  const levels = Math.max(2, Math.min(256, Math.round(Math.cbrt(colorCount))));
   const step = 255 / (levels - 1);
   for (let i = 0; i < data.length; i += 4) {
     for (let c = 0; c < 3; c++) {
@@ -127,6 +131,7 @@ export function applyTint(buffer: PixelBuffer, tint: RgbaColor, amount: number):
 
 /**
  * Compute the average color of a buffer.
+ * Returns [0,0,0,0] for an empty buffer to avoid NaN.
  */
 export function averageColor(buffer: PixelBuffer): RgbaColor {
   const { data } = buffer;
@@ -141,5 +146,6 @@ export function averageColor(buffer: PixelBuffer): RgbaColor {
     b += data[i + 2];
     a += data[i + 3];
   }
+  if (count === 0) return [0, 0, 0, 0];
   return [r / count, g / count, b / count, a / count];
 }

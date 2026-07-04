@@ -36,7 +36,7 @@
     "lint": "eslint src --ext .ts",
     "test": "echo \"No tests\"",
     "clean": "rm -rf dist",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run clean && pnpm run build"
   },
   "dependencies": {
     "@effectsoup/core": "workspace:*",

@@ -68,11 +68,21 @@ export function useEffectsWorker() {
     versionRef.current += 1;
     const version = versionRef.current;
 
-    // Cancel any pending jobs older than this one.
-    for (const [pendingVersion] of pendingRef.current) {
+    // Reject any pending jobs older than this one so callers don't wait forever.
+    const superseded: Array<{ ver: number; reject: (error: string) => void }> = [];
+    for (const [pendingVersion, pending] of pendingRef.current) {
       if (pendingVersion < version) {
-        worker.postMessage({ type: "cancel", renderVersion: pendingVersion } satisfies WorkerRequestMessage);
+        superseded.push({ ver: pendingVersion, reject: pending.reject });
       }
+    }
+    for (const { ver, reject: rejectPending } of superseded) {
+      pendingRef.current.delete(ver);
+      try {
+        worker.postMessage({ type: "cancel", renderVersion: ver } satisfies WorkerRequestMessage);
+      } catch {
+        /* worker gone */
+      }
+      rejectPending("superseded");
     }
 
     return new Promise((resolve, reject) => {
@@ -96,7 +106,7 @@ export function useEffectsWorker() {
       };
 
       try {
-        worker.postMessage(message, [sourceForWorker.data.buffer]);
+        worker.postMessage(message);
       } catch (error) {
         pendingRef.current.delete(version);
         const messageText = error instanceof Error ? error.message : String(error);

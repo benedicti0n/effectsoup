@@ -11,7 +11,6 @@ export const crtGlitchPreset: EffectPreset = {
   name: "CRT Glitch",
   description: "Sliced horizontal shifts, RGB separation, and analog scanlines.",
   category: "retroSignal",
-  access: "free",
   defaultIntensity: 40,
   advancedControlSchema: [
     { id: "sliceHeight", name: "Slice Height", type: "range", min: 2, max: 24, step: 1, defaultValue: 6 },

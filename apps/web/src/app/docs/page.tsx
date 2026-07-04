@@ -209,7 +209,7 @@ export default function DocsPage(): JSX.Element {
             <PackageCard
               name="@effectsoup/presets"
               description="Product presets that bundle core primitives into tunable pipelines. Each preset exposes an Intensity slider and optional advanced controls."
-              exports="allPresets, freePresets, premiumPresets, getPresetById, migratePresetId, EffectPreset, ResolvedPresetParameters"
+              exports="allPresets, getPresetById, migratePresetId, EffectPreset, ResolvedPresetParameters"
             >
               <p className="mb-3 text-sm leading-relaxed text-body-muted">
                 Run a preset by resolving its parameters and building a

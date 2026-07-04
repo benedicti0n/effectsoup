@@ -29,34 +29,40 @@ export function blendPixelBuffers(
     for (let c = 0; c < 3; c++) {
       const av = a[i + c];
       const bv = b[i + c];
-      let blended = av;
+      let result = av;
 
       if (mode === "normal") {
-        blended = av + (bv - av) * amount;
-      } else if (mode === "multiply") {
-        blended = (av * bv) / 255;
-      } else if (mode === "screen") {
-        blended = 255 - ((255 - av) * (255 - bv)) / 255;
-      } else if (mode === "overlay") {
-        blended =
-          av < 128
-            ? (2 * av * bv) / 255
-            : 255 - (2 * (255 - av) * (255 - bv)) / 255;
-      } else if (mode === "soft") {
-        const bvNorm = bv / 255;
-        const avNorm = av / 255;
-        const soft =
-          bv < 128
-            ? avNorm - (1 - 2 * bvNorm) * avNorm * (1 - avNorm)
-            : avNorm +
-              (2 * bvNorm - 1) *
-                (Math.sqrt(avNorm) - avNorm);
-        blended = soft * 255;
-      } else if (mode === "lighten") {
-        blended = Math.max(av, bv);
+        result = av + (bv - av) * amount;
+      } else {
+        let blended: number;
+        if (mode === "multiply") {
+          blended = (av * bv) / 255;
+        } else if (mode === "screen") {
+          blended = 255 - ((255 - av) * (255 - bv)) / 255;
+        } else if (mode === "overlay") {
+          blended =
+            av < 128
+              ? (2 * av * bv) / 255
+              : 255 - (2 * (255 - av) * (255 - bv)) / 255;
+        } else if (mode === "soft") {
+          const bvNorm = bv / 255;
+          const avNorm = av / 255;
+          const soft =
+            bv < 128
+              ? avNorm - (1 - 2 * bvNorm) * avNorm * (1 - avNorm)
+              : avNorm +
+                (2 * bvNorm - 1) *
+                  (Math.sqrt(avNorm) - avNorm);
+          blended = soft * 255;
+        } else if (mode === "lighten") {
+          blended = Math.max(av, bv);
+        } else {
+          blended = av;
+        }
+        result = av + (blended - av) * amount;
       }
 
-      out[i + c] = clampByte(blended);
+      out[i + c] = clampByte(result);
     }
     out[i + 3] = Math.max(a[i + 3], b[i + 3]);
   }
@@ -103,12 +109,12 @@ export function applyBoxBlur(buffer: PixelBuffer, radius: number): void {
   // Vertical pass.
   for (let x = 0; x < width; x++) {
     // Build prefix sums for this column (3 channels) from temp.
-    const pc = new Uint32Array(height + 1);
+    const pr = new Uint32Array(height + 1);
     const pg = new Uint32Array(height + 1);
     const pb = new Uint32Array(height + 1);
     for (let y = 0; y < height; y++) {
       const idx = (y * width + x) * 4;
-      pc[y + 1] = pc[y] + temp[idx];
+      pr[y + 1] = pr[y] + temp[idx];
       pg[y + 1] = pg[y] + temp[idx + 1];
       pb[y + 1] = pb[y] + temp[idx + 2];
     }
@@ -118,7 +124,7 @@ export function applyBoxBlur(buffer: PixelBuffer, radius: number): void {
       const hi = Math.min(height - 1, y + radius);
       const count = hi - lo + 1;
       const idx = (y * width + x) * 4;
-      data[idx] = (pc[hi + 1] - pc[lo]) / count;
+      data[idx] = (pr[hi + 1] - pr[lo]) / count;
       data[idx + 1] = (pg[hi + 1] - pg[lo]) / count;
       data[idx + 2] = (pb[hi + 1] - pb[lo]) / count;
     }

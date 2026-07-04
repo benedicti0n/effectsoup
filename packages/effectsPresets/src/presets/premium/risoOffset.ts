@@ -19,7 +19,6 @@ export const risoOffsetPreset: EffectPreset = {
   name: "Riso Offset",
   description: "Imperfect risograph-inspired print effect.",
   category: "printPaper",
-  access: "premium",
   defaultIntensity: 70,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,

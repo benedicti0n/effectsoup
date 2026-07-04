@@ -10,7 +10,6 @@ export const invertedGlowPreset: EffectPreset = {
   name: "Inverted Glow",
   description: "Inverted colors with a blue-cyan grade and stacked glow bloom.",
   category: "colorGlow",
-  access: "premium",
   defaultIntensity: 100,
   usesIntensity: true,
   advancedControlSchema: [],

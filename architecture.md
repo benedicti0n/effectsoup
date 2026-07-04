@@ -62,14 +62,11 @@ type EffectPreset = {
   name: string;
   description: string;
   category: "printGrid" | "asciiSymbols" | "atmosphereGlow" | "glassFrost" | "printLab" | "signalLab" | "lightLab";
-  access: "free" | "premium";
   defaultIntensity: number;
   intensityMapper: IntensityMapper;
   advancedControlSchema: AdvancedControlDefinition[];
   createPipeline: (resolvedParameters: ResolvedPresetParameters) => EffectPipeline;
 };
-
-All public presets are overridden to `access: "free"` at runtime.
 ```
 
 ### `packages/effectsWorker`
