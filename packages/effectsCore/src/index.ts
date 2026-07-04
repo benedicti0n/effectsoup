@@ -22,3 +22,4 @@ export * from "./manga.js";
 export * from "./waveSlice.js";
 export * from "./pencilGrain.js";
 export * from "./invertedGlow.js";
+export * from "./highlights.js";
