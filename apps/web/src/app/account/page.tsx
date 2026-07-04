@@ -12,7 +12,10 @@ import { SiteFooter } from "@/components/siteFooter";
 import { useToast } from "@/components/ui/toast";
 
 export default function AccountPage(): JSX.Element {
-  const { data: session, isPending } = authClient.useSession();
+  const sessionQuery = authClient.useSession();
+  const session = sessionQuery.data;
+  const isPending = sessionQuery.isPending;
+  const refetchSession = sessionQuery.refetch;
   const [showSignIn, setShowSignIn] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const router = useRouter();
@@ -22,15 +25,32 @@ export default function AccountPage(): JSX.Element {
     if (signingOut) return;
     setSigningOut(true);
     try {
+      // Fire the signout request. Better Auth's response handler schedules a
+      // signal-flipped refetch via setTimeout(10ms); we don't rely on that
+      // racing our navigation, and call refetch explicitly below.
       await authClient.signOut();
-      showToast("Signed out", "success");
-      router.push("/");
-      router.refresh();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to sign out";
-      showToast(message, "error");
-      setSigningOut(false);
+      console.error("signOut request failed:", err);
+      // Even if the network call failed the cookie may already be gone; fall
+      // through and let the explicit refetch reflect whatever state the
+      // server actually has.
     }
+
+    // Force the local session atom to clear before we navigate. Without this,
+    // the /account page re-renders with the cached session and shows
+    // "Signed in as ..." for the moment it takes Better Auth's deferred
+    // refetch to land.
+    try {
+      await refetchSession();
+    } catch (err) {
+      console.error("session refetch after signOut failed:", err);
+    }
+
+    setSigningOut(false);
+    showToast("Signed out", "success");
+    // `replace` so back-button doesn't return to a cached /account render.
+    router.replace("/");
+    router.refresh();
   };
 
   return (
