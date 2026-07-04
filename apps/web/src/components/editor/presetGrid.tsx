@@ -13,6 +13,7 @@ const categoryOrder: PresetCategory[] = [
   "printPaper",
   "distortionGlass",
   "colorGlow",
+  "atmosphereGlow",
   "retroSignal"
 ];
 
@@ -22,6 +23,7 @@ const categoryLabels: Record<PresetCategory, string> = {
   printPaper: "Print & Paper",
   distortionGlass: "Distortion & Glass",
   colorGlow: "Color & Glow",
+  atmosphereGlow: "Atmosphere & Glow",
   retroSignal: "Retro Signal"
 };
 
@@ -48,6 +50,7 @@ export function PresetGrid(): JSX.Element {
       printPaper: [],
       distortionGlass: [],
       colorGlow: [],
+      atmosphereGlow: [],
       retroSignal: []
     };
     filtered.forEach((preset) => {

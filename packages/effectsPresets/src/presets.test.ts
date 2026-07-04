@@ -187,12 +187,22 @@ describe("presets", () => {
       expect(resolved.blurAmount).toBeGreaterThanOrEqual(8);
     });
 
-    it("Dream Glow master intensity scales every effect strength", () => {
+    it("Dream Glow intensity scales blur / glow / grain together", () => {
       const preset = allPresets.find((p) => p.id === "dreamGlow")!;
       const at50 = preset.intensityMapper(50, {});
       const at100 = preset.intensityMapper(100, {});
-      expect(at100.masterStrength).toBeGreaterThan(at50.masterStrength);
-      expect(at50.masterStrength).toBeGreaterThan(0);
+      // glowAmount default is intensity itself (so it must equal 50 and 100).
+      expect(at50.glowAmount).toBe(50);
+      expect(at100.glowAmount).toBe(100);
+      // blurAmount default is 2 + round(intensity/100*14)
+      expect(at50.blurAmount).toBe(9);
+      expect(at100.blurAmount).toBe(16);
+      // grainAmount default scales with intensity (0 .. 20).
+      expect(at50.grainAmount).toBe(10);
+      expect(at100.grainAmount).toBe(20);
+      // Blur and grain scale up with intensity.
+      expect(at100.blurAmount).toBeGreaterThan(at50.blurAmount);
+      expect(at100.grainAmount).toBeGreaterThan(at50.grainAmount);
     });
 
     it("Dream Glow at intensity 0 returns an exact source clone", () => {
@@ -212,102 +222,68 @@ describe("presets", () => {
       expect(Array.from(output.data)).toEqual(Array.from(original));
     });
 
-    it("Dream Glow bloom is selective — does not paint dark regions", () => {
-      // A 32x32 image with a clear half-and-half split: top half bright
-      // (240), bottom half dark (20). Samples the lower portion of the
-      // dark half (rows 22..30) so blur bleed from the bright/bloom zone
-      // doesn't dominate.
-      const source = createPixelBuffer(32, 32, [20, 20, 20, 255]);
-      for (let y = 0; y < 16; y++) {
-        for (let x = 0; x < 32; x++) {
-          const idx = (y * 32 + x) * 4;
-          source.data[idx] = 240;
-          source.data[idx + 1] = 240;
-          source.data[idx + 2] = 240;
-        }
+    it("Dream Glow full-frame pipeline brightens bright areas", () => {
+      // Full-frame blur + screen + soft duotone. Bright pixels become
+      // brighter; the bloom is global.
+      const source = createPixelBuffer(8, 8);
+      // Set one pixel to white, rest to mid-gray.
+      for (let i = 0; i < source.data.length; i += 4) {
+        source.data[i] = 200;
+        source.data[i + 1] = 200;
+        source.data[i + 2] = 200;
       }
+      source.data[0] = 255;
+      source.data[1] = 255;
+      source.data[2] = 255;
+
       const preset = allPresets.find((p) => p.id === "dreamGlow")!;
       const resolved = preset.intensityMapper(preset.defaultIntensity, {});
       const pipeline = preset.createPipeline(resolved);
       const output = pipeline(source, resolved);
 
-      let darkR = 0;
-      let darkG = 0;
-      let darkB = 0;
-      let count = 0;
-      for (let y = 22; y < 31; y++) {
-        for (let x = 0; x < 32; x++) {
-          const i = (y * 32 + x) * 4;
-          darkR += output.data[i];
-          darkG += output.data[i + 1];
-          darkB += output.data[i + 2];
-          count++;
+      // The originally-white pixel should remain bright.
+      expect(output.data[0]).toBeGreaterThanOrEqual(240);
+      // The mid-gray pixels should not drop below source gray.
+      let okCount = 0;
+      for (let i = 4; i < output.data.length; i += 4) {
+        if (
+          output.data[i] >= 195 &&
+          output.data[i + 1] >= 195 &&
+          output.data[i + 2] >= 195
+        ) {
+          okCount++;
         }
       }
-      const avgR = darkR / count;
-      const avgG = darkG / count;
-      const avgB = darkB / count;
-      const lum = (0.2126 * avgR + 0.7152 * avgG + 0.0722 * avgB) / 255;
-      // Average luminance stays dark — bloom didn't bleach dark regions.
-      expect(lum).toBeLessThan(0.4);
-      // Shadow channel tilts toward blue (indigo shadow color).
-      expect(avgB).toBeGreaterThan(avgG);
+      expect(okCount).toBeGreaterThan(0);
     });
 
-    it("Dream Glow split-tone pulls dark toward indigo and bright toward warm", () => {
-      // 32x32 image split top/bottom; sample the brightest row of the
-      // bright side and the deepest row of the dark side — far from each
-      // other — to verify split-tone direction independently.
-      const source = createPixelBuffer(32, 32, [30, 30, 30, 255]);
-      for (let y = 0; y < 16; y++) {
-        for (let x = 0; x < 32; x++) {
-          const idx = (y * 32 + x) * 4;
-          source.data[idx] = 250;
-          source.data[idx + 1] = 250;
-          source.data[idx + 2] = 250;
-        }
-      }
+    it("Dream Glow palette selection switches tint components", () => {
       const preset = allPresets.find((p) => p.id === "dreamGlow")!;
-      const resolved = preset.intensityMapper(60, {});
-      const pipeline = preset.createPipeline(resolved);
-      const output = pipeline(source, resolved);
-
-      // Sample the brightest row (the original bright row, untouched by
-      // the dark side).
-      let brightR = 0, brightG = 0, brightB = 0, bCount = 0;
-      for (let x = 0; x < 32; x++) {
-        const i = x * 4;
-        brightR += output.data[i];
-        brightG += output.data[i + 1];
-        brightB += output.data[i + 2];
-        bCount++;
-      }
-      const avgBrightR = brightR / bCount;
-      const avgBrightG = brightG / bCount;
-      const avgBrightB = brightB / bCount;
-      // Bright row pull toward warm peach — R leads, G drops below 250.
-      expect(avgBrightR).toBeGreaterThanOrEqual(avgBrightB);
-      expect(avgBrightG).toBeLessThan(255);
-
-      // Sample deep in the dark side (rows 28..31).
-      let darkR = 0, darkB = 0, dCount = 0;
-      for (let y = 28; y < 32; y++) {
-        for (let x = 0; x < 32; x++) {
-          const i = (y * 32 + x) * 4;
-          darkR += output.data[i];
-          darkB += output.data[i + 2];
-          dCount++;
-        }
-      }
-      const avgDarkR = darkR / dCount;
-      const avgDarkB = darkB / dCount;
-      // Dark row gets indigo tilt — B leads.
-      expect(avgDarkB).toBeGreaterThanOrEqual(avgDarkR);
+      const source = createPixelBuffer(8, 8, [200, 200, 200, 255]);
+      const outGolden = preset.createPipeline(
+        preset.intensityMapper(50, {})
+      )(source, preset.intensityMapper(50, {}));
+      const outRose = preset.createPipeline(
+        preset.intensityMapper(50, { palette: "roseBloom" })
+      )(source, preset.intensityMapper(50, { palette: "roseBloom" }));
+      const outCool = preset.createPipeline(
+        preset.intensityMapper(50, { palette: "coolHaze" })
+      )(source, preset.intensityMapper(50, { palette: "coolHaze" }));
+      // Different palettes must produce different outputs.
+      expect(
+        Array.from(outGolden.data.slice(0, 8))
+      ).not.toEqual(Array.from(outRose.data.slice(0, 8)));
+      expect(
+        Array.from(outGolden.data.slice(0, 8))
+      ).not.toEqual(Array.from(outCool.data.slice(0, 8)));
+      expect(
+        Array.from(outRose.data.slice(0, 8))
+      ).not.toEqual(Array.from(outCool.data.slice(0, 8)));
     });
 
     it("Dream Glow palettes expose glow/shadow/highlight", () => {
       // The palette is exported as a constant — guard against accidental
-      // shape changes that would break the split-tone/bloom pairing.
+      // shape changes that would break the duotone pairings.
       const preset = allPresets.find((p) => p.id === "dreamGlow")!;
       const schema = preset.advancedControlSchema;
       expect(schema.find((c) => c.id === "blurAmount")).toBeDefined();
@@ -338,12 +314,34 @@ describe("presets", () => {
       const output = pipeline(source, resolved);
       expect(output.width).toBe(source.width);
       expect(output.height).toBe(source.height);
-      // Dither must change at least one pixel byte.
+      // Ordered dither must change at least one pixel byte.
       let changed = 0;
       for (let i = 0; i < output.data.length; i++) {
         if (output.data[i] !== source.data[i]) changed++;
       }
       expect(changed).toBeGreaterThan(0);
+    });
+
+    it("Color Dither preserves color (per-channel) rather than collapsing to gray", () => {
+      // An image whose channels differ significantly should not collapse
+      // to grayscale after dithering — that's the difference vs the
+      // applyOrderedDither mono path.
+      const source = createPixelBuffer(16, 16, [200, 60, 30, 255]);
+      const preset = allPresets.find((p) => p.id === "colorDither")!;
+      const resolved = preset.intensityMapper(50, {});
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+
+      let unequalRGB = 0;
+      for (let i = 0; i < output.data.length; i += 4) {
+        const r = output.data[i];
+        const g = output.data[i + 1];
+        const b = output.data[i + 2];
+        if (r !== g || g !== b) unequalRGB++;
+      }
+      // The bulk of dithered pixels should still have at least one
+      // channel diverging from the others.
+      expect(unequalRGB).toBeGreaterThan(0);
     });
 
     it("Color Dither at intensity 0 is an exact source clone", () => {

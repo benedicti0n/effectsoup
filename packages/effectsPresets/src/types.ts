@@ -6,6 +6,7 @@ export type PresetCategory =
   | "printPaper"
   | "distortionGlass"
   | "colorGlow"
+  | "atmosphereGlow"
   | "retroSignal";
 
 export type AdvancedControlType =
