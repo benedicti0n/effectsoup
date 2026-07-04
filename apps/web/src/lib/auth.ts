@@ -12,6 +12,47 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
   };
 }
 
+/**
+ * Normalize an origin string. Strips paths, default ports, and trailing
+ * whitespace. Returns null for empty/invalid input so a bad config value
+ * silently drops instead of poisoning the allowlist.
+ */
+function normalizeOrigin(input: string): string | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  try {
+    const url = new URL(trimmed);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    const port = url.port;
+    const isDefaultHttp = url.protocol === "http:" && (port === "" || port === "80");
+    const isDefaultHttps = url.protocol === "https:" && (port === "" || port === "443");
+    const host = isDefaultHttp || isDefaultHttps ? url.hostname : url.host;
+    return `${url.protocol}//${host}`;
+  } catch {
+    return null;
+  }
+}
+
+function collectTrustedOrigins(): string[] {
+  const set = new Set<string>();
+  const add = (value: string | undefined) => {
+    const origin = normalizeOrigin(value ?? "");
+    if (origin) set.add(origin);
+  };
+  add(env.BETTER_AUTH_URL);
+  add(env.NEXT_PUBLIC_APP_URL);
+  if (env.BETTER_AUTH_TRUSTED_ORIGINS) {
+    for (const part of env.BETTER_AUTH_TRUSTED_ORIGINS.split(",")) {
+      add(part);
+    }
+  }
+  // Local development fallbacks so the allowlist works on any dev port
+  // without extra config.
+  add("http://localhost:3000");
+  add("http://127.0.0.1:3000");
+  return Array.from(set);
+}
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -19,7 +60,7 @@ export const auth = betterAuth({
   }),
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: [env.BETTER_AUTH_URL],
+  trustedOrigins: collectTrustedOrigins(),
   socialProviders,
   emailAndPassword: {
     enabled: true,
