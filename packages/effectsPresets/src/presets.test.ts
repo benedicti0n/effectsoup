@@ -32,8 +32,8 @@ function avgLuminance(buf: PixelBuffer): number {
 }
 
 describe("presets", () => {
-  it("has 26 presets total", () => {
-    expect(allPresets.length).toBe(26);
+  it("has 27 presets total", () => {
+    expect(allPresets.length).toBe(27);
   });
 
   it("every preset resolves valid defaults", () => {
@@ -106,20 +106,20 @@ describe("presets", () => {
       expect(resolved.grainAmount).toBe(25);
     });
 
-    it("Error Diffusion defaults to 60% intensity and cellSize 4", () => {
+    it("Error Diffusion defaults to 60% intensity and cellSize 2", () => {
       const preset = allPresets.find((p) => p.id === "errorDiffusionDither");
       expect(preset?.defaultIntensity).toBe(60);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(60);
-      expect(resolved.cellSize).toBe(4);
+      expect(resolved.cellSize).toBe(2);
     });
 
-    it("Ordered Dither defaults to 60% intensity and cellSize 4", () => {
+    it("Ordered Dither defaults to 60% intensity and cellSize 2", () => {
       const preset = allPresets.find((p) => p.id === "orderedDither");
       expect(preset?.defaultIntensity).toBe(60);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(60);
-      expect(resolved.cellSize).toBe(4);
+      expect(resolved.cellSize).toBe(2);
     });
 
     it("Classic ASCII defaults to 1% intensity, font size 6, base opacity 40, custom charset defaulting to standard, Original Colors", () => {
@@ -624,10 +624,32 @@ describe("presets", () => {
       expect(Array.from(output.data)).toEqual(Array.from(original));
     });
 
-    it("Color Dither defaults to cellSize 8", () => {
+    it("Color Dither defaults to cellSize 2", () => {
       const preset = allPresets.find((p) => p.id === "colorDither")!;
       const resolved = preset.intensityMapper(50, {});
-      expect(resolved.cellSize).toBe(8);
+      expect(resolved.cellSize).toBe(2);
+    });
+
+    it("Colored Cell Dither defaults to cellSize 2 and produces coloured output", () => {
+      const preset = allPresets.find((p) => p.id === "coloredCellDither")!;
+      expect(preset.defaultIntensity).toBe(60);
+      const resolved = preset.intensityMapper(50, {});
+      expect(resolved.cellSize).toBe(2);
+      // Pipeline produces output at source size.
+      const source = createPixelBuffer(24, 24, [80, 140, 200, 255]);
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+      expect(output.width).toBe(source.width);
+      expect(output.height).toBe(source.height);
+      // Output is coloured (not monochrome).
+      let hasColor = false;
+      for (let i = 0; i < output.data.length; i += 4) {
+        const r = output.data[i];
+        const g = output.data[i + 1];
+        const b = output.data[i + 2];
+        if (r !== g || g !== b) { hasColor = true; break; }
+      }
+      expect(hasColor).toBe(true);
     });
 
     it("Color Dither larger cellSize produces visibly larger output blocks", () => {

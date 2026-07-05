@@ -10,20 +10,18 @@ import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../
 import { resolveOverride } from "../shared.js";
 
 /**
- * Color Dither — cell-based ordered (Bayer 4×4) per-channel dithering.
- *
- * The source is partitioned into a cell grid (`cellSize` × `cellSize`).
- * Each cell's average color is computed; a 4×4 Bayer threshold pattern
- * determines which cells are filled (colored / grayscale) vs left black.
- * The result is scaled back up with nearest-neighbour, producing a clean
- * pixel-print texture that preserves source color relationships and
- * major shapes.
+ * Colored Cell Dither — cell-based ordered (Bayer 4×4) dither where
+ * both active and inactive cells display the source colour (active
+ * cells at full brightness, inactive cells dimmed to ~35 %).
+ * The result preserves every pixel's hue while the Bayer pattern
+ * controls the brightness gradient — like a colour halftone made of
+ * solid squares.
  */
-export const colorDitherPreset: EffectPreset = {
-  id: "colorDither",
-  name: "Color Dither",
+export const coloredCellDitherPreset: EffectPreset = {
+  id: "coloredCellDither",
+  name: "Colored Cell Dither",
   description:
-    "Cell-based ordered Bayer dither. Coloured pixel-print texture with visible cell blocks, structured pattern, and source color preservation.",
+    "Cell-based ordered Bayer dither where every cell is coloured. Active cells show full source colour, inactive cells show a dimmed version — like a colour halftone of solid squares.",
   category: "pixelDither",
   defaultIntensity: 60,
   advancedControlSchema: [
@@ -33,8 +31,7 @@ export const colorDitherPreset: EffectPreset = {
     { id: "brightness", name: "Brightness", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
     { id: "contrast", name: "Contrast", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
     { id: "saturation", name: "Saturation", type: "range", min: -100, max: 100, step: 1, defaultValue: 0 },
-    { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 5 },
-    { id: "monochrome", name: "Monochrome", type: "boolean", defaultValue: false }
+    { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 5 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
@@ -45,8 +42,7 @@ export const colorDitherPreset: EffectPreset = {
     contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 30)),
     brightness: resolveOverride(overrides, "brightness", Math.round((intensity / 100) * -10)),
     saturation: resolveOverride(overrides, "saturation", 0),
-    grainAmount: resolveOverride(overrides, "grainAmount", 5),
-    monochrome: resolveOverride(overrides, "monochrome", false)
+    grainAmount: resolveOverride(overrides, "grainAmount", 5)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {
@@ -59,9 +55,7 @@ export const colorDitherPreset: EffectPreset = {
       const brightness = (params.brightness as number) ?? 0;
       const saturation = ((params.saturation as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
-      const monochrome = (params.monochrome as boolean) ?? false;
 
-      // Apply tonal adjustments to the source before dithering.
       const adjusted = clonePixelBuffer(source);
       if (saturation !== 0) {
         adjustSaturation(adjusted, saturation);
@@ -70,12 +64,12 @@ export const colorDitherPreset: EffectPreset = {
         adjustBrightnessContrast(adjusted, brightness, contrast);
       }
 
-      // Cell-based Bayer color dither.
       const dithered = applyOrderedColorDither(adjusted, {
         cellSize,
         threshold,
         invert,
-        monochrome
+        monochrome: false,
+        coloredInactive: true
       });
 
       if (grainAmount > 0) {

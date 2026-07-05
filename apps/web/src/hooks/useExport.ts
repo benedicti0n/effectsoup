@@ -50,7 +50,8 @@ export function useExport(onClose: () => void) {
         sourceBuffer.width,
         sourceBuffer.height,
         crop.aspectRatio,
-        longest
+        longest,
+        crop.zoom
       );
       const output = renderEffectSync(sourceBuffer, crop, effect.presetId, resolved, width, height);
       const blob = await pixelBufferToBlob(output, format, quality);

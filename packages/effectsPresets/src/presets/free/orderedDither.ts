@@ -27,14 +27,14 @@ export const orderedDitherPreset: EffectPreset = {
   advancedControlSchema: [
     ...adjustmentControls,
     ...atmosphereAdvancedControls,
-    { id: "cellSize", name: "Cell Size", type: "range", min: 1, max: 32, step: 1, defaultValue: 4 },
+    { id: "cellSize", name: "Cell Size", type: "range", min: 1, max: 32, step: 1, defaultValue: 2 },
     { id: "threshold", name: "Threshold", type: "range", min: 0, max: 255, step: 1, defaultValue: 128 },
     { id: "invert", name: "Invert", type: "boolean", defaultValue: false }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    cellSize: resolveOverride(overrides, "cellSize", 4),
+    cellSize: resolveOverride(overrides, "cellSize", 2),
     threshold: resolveOverride(overrides, "threshold", 100 + Math.round((intensity / 100) * 80)),
     invert: resolveOverride(overrides, "invert", false),
     contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 30)),
@@ -53,7 +53,7 @@ export const orderedDitherPreset: EffectPreset = {
       const threshold = (params.threshold as number) ?? 128;
       const invert = (params.invert as boolean) ?? false;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
-      const cellSize = (params.cellSize as number) ?? 4;
+      const cellSize = (params.cellSize as number) ?? 2;
 
       const processed = runAtWorkingResolution(source, WORKING_LONGEST, (small) => {
         let working = small;

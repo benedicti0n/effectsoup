@@ -138,4 +138,25 @@ describe("applyOrderedColorDither", () => {
       expect(output.data[i + 1]).toBe(output.data[i + 2]);
     }
   });
+
+  it("coloredInactive fills every cell with colour (no black cells)", () => {
+    // Uniform mid-brightness source so some cells are active and some inactive.
+    const source = createPixelBuffer(16, 16, [160, 100, 60, 255]);
+    const standard = applyOrderedColorDither(source, {
+      cellSize: 4, threshold: 128, invert: false, monochrome: false
+    });
+    const colored = applyOrderedColorDither(source, {
+      cellSize: 4, threshold: 128, invert: false, monochrome: false, coloredInactive: true
+    });
+
+    // Standard mode has some black cells (R=0 == G=0 == B=0).
+    let standardBlack = 0;
+    let coloredBlack = 0;
+    for (let i = 0; i < standard.data.length; i += 4) {
+      if (standard.data[i] === 0 && standard.data[i + 1] === 0 && standard.data[i + 2] === 0) standardBlack++;
+      if (colored.data[i] === 0 && colored.data[i + 1] === 0 && colored.data[i + 2] === 0) coloredBlack++;
+    }
+    expect(standardBlack).toBeGreaterThan(0);
+    expect(coloredBlack).toBe(0);
+  });
 });

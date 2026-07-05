@@ -4,6 +4,7 @@ import { pixelGridPreset } from "./presets/free/pixelGrid.js";
 import { errorDiffusionDitherPreset } from "./presets/free/errorDiffusionDither.js";
 import { orderedDitherPreset } from "./presets/free/orderedDither.js";
 import { colorDitherPreset } from "./presets/free/colorDither.js";
+import { coloredCellDitherPreset } from "./presets/free/coloredCellDither.js";
 import { classicAsciiPreset } from "./presets/free/classicAscii.js";
 import { blocksAsciiPreset } from "./presets/free/blocksAscii.js";
 import { denseAsciiPreset } from "./presets/free/denseAscii.js";
@@ -33,6 +34,7 @@ export const allPresets: EffectPreset[] = [
   errorDiffusionDitherPreset,
   orderedDitherPreset,
   colorDitherPreset,
+  coloredCellDitherPreset,
   dotHalftonePreset,
   classicAsciiPreset,
   blocksAsciiPreset,

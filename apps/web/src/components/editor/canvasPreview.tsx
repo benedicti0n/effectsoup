@@ -156,7 +156,8 @@ export function CanvasPreview(): JSX.Element {
           sourceBuffer.width,
           sourceBuffer.height,
           crop.aspectRatio,
-          previewLongest
+          previewLongest,
+          crop.zoom
         );
 
         const startTime = performance.now();
@@ -229,7 +230,8 @@ export function CanvasPreview(): JSX.Element {
           sourceBuffer.width,
           sourceBuffer.height,
           crop.aspectRatio,
-          previewLongest
+          previewLongest,
+          crop.zoom
         );
 
         const cropped = applyViewportTransform(sourceBuffer, crop, width, height);

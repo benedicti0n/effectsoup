@@ -32,14 +32,20 @@ export function parseAspectRatio(
  * Compute output dimensions that match the cropped aspect ratio.
  *
  * - "original" returns source dimensions unchanged.
- * - Otherwise returns { width, height } sized to the largest dimension,
- *   preserving crop ratio with a longestEdge ceiling.
+ * - "free" with zoom returns the zoomed crop-window dimensions so the
+ *   output reflects exactly what the user selected.
+ * - All other presets return { width, height } sized to the largest
+ *   dimension, preserving crop ratio with a longestEdge ceiling.
+ *
+ * The optional `zoom` parameter is used only for the "free" aspect
+ * ratio to compute the cropped-region size.
  */
 export function getCroppedOutputSize(
   sourceWidth: number,
   sourceHeight: number,
   aspectRatio: CropConfig["aspectRatio"],
-  longestEdge: number
+  longestEdge: number,
+  zoom?: number
 ): { width: number; height: number } {
   if (sourceWidth <= 0 || sourceHeight <= 0) {
     throw new Error("Source dimensions must be positive");
@@ -47,6 +53,19 @@ export function getCroppedOutputSize(
   if (!Number.isFinite(longestEdge) || longestEdge <= 0) {
     throw new Error("longestEdge must be a positive number");
   }
+
+  if (aspectRatio === "free") {
+    const z = Math.max(1, zoom ?? 1);
+    const cropW = sourceWidth / z;
+    const cropH = sourceHeight / z;
+    const longest = Math.max(cropW, cropH);
+    const scale = longest > longestEdge ? longestEdge / longest : 1;
+    return {
+      width: Math.max(1, Math.round(cropW * scale)),
+      height: Math.max(1, Math.round(cropH * scale))
+    };
+  }
+
   const ratio = parseAspectRatio(aspectRatio);
   if (ratio === null) {
     const longest = Math.max(sourceWidth, sourceHeight);
@@ -136,21 +155,28 @@ export function applyViewportTransform(
   const srcAspect = source.width / source.height;
   const targetAspect = parseAspectRatio(viewport.aspectRatio) ?? srcAspect;
 
-  // Compute the "cover" crop window in source coordinates.
+  // Compute the crop window in source coordinates.
   let cropW: number;
   let cropH: number;
-  if (srcAspect > targetAspect) {
-    cropH = source.height;
-    cropW = cropH * targetAspect;
-  } else {
-    cropW = source.width;
-    cropH = cropW / targetAspect;
-  }
-
-  // Apply zoom (reduce window size).
   const zoom = Math.max(1, viewport.zoom);
-  cropW /= zoom;
-  cropH /= zoom;
+
+  if (viewport.aspectRatio === "free") {
+    // "Free" starts from the full source and shrinks both dimensions
+    // equally by the zoom factor — no aspect-ratio constraint.
+    cropW = source.width / zoom;
+    cropH = source.height / zoom;
+  } else {
+    // Fixed aspect-ratio: "cover" crop model.
+    if (srcAspect > targetAspect) {
+      cropH = source.height;
+      cropW = cropH * targetAspect;
+    } else {
+      cropW = source.width;
+      cropH = cropW / targetAspect;
+    }
+    cropW /= zoom;
+    cropH /= zoom;
+  }
 
   // Clamp crop window to source bounds.
   cropW = Math.min(cropW, source.width);

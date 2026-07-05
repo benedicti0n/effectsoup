@@ -7,6 +7,8 @@ export type OrderedColorDitherOptions = {
   threshold: number;
   invert: boolean;
   monochrome: boolean;
+  /** When true, inactive cells show their averaged colour instead of black. */
+  coloredInactive?: boolean;
 };
 
 /**
@@ -148,7 +150,7 @@ export function applyOrderedColorDither(
   source: PixelBuffer,
   options: OrderedColorDitherOptions
 ): PixelBuffer {
-  const { cellSize, threshold, invert, monochrome } = options;
+  const { cellSize, threshold, invert, monochrome, coloredInactive } = options;
   const { width, height, data } = source;
 
   if (cellSize < 1) throw new Error("cellSize must be >= 1");
@@ -213,6 +215,17 @@ export function applyOrderedColorDither(
           grid.data[gridIdx] = clampByte(Math.round(avgR));
           grid.data[gridIdx + 1] = clampByte(Math.round(avgG));
           grid.data[gridIdx + 2] = clampByte(Math.round(avgB));
+        }
+      } else if (coloredInactive) {
+        if (monochrome) {
+          const gray = clampByte(Math.round(lum));
+          grid.data[gridIdx] = gray;
+          grid.data[gridIdx + 1] = gray;
+          grid.data[gridIdx + 2] = gray;
+        } else {
+          grid.data[gridIdx] = clampByte(Math.round(avgR * 0.35));
+          grid.data[gridIdx + 1] = clampByte(Math.round(avgG * 0.35));
+          grid.data[gridIdx + 2] = clampByte(Math.round(avgB * 0.35));
         }
       } else {
         grid.data[gridIdx] = 0;

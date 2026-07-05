@@ -21,7 +21,7 @@ describe("Phase 1 core effects", () => {
 
   it("applyBitmap pixelates and reduces colors", () => {
     const source = createPixelBuffer(40, 40, [100, 150, 200, 255]);
-    const output = applyBitmap(source, { pixelSize: 8, colorLevels: 4 });
+    const output = applyBitmap(source, { cellSize: 8, colorLevels: 4 });
     expect(output.width).toBe(source.width);
     expect(output.height).toBe(source.height);
   });
