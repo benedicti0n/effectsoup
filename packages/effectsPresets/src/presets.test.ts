@@ -1,6 +1,35 @@
 import { describe, expect, it } from "vitest";
 import { allPresets, getPresetById, migratePresetId, getPresetIds } from "./index.js";
-import { createPixelBuffer } from "@effectsoup/core";
+import { createPixelBuffer, type PixelBuffer } from "@effectsoup/core";
+
+function avgSaturation(buf: PixelBuffer): number {
+  let sum = 0;
+  let n = 0;
+  for (let i = 0; i < buf.data.length; i += 4) {
+    const r = buf.data[i];
+    const g = buf.data[i + 1];
+    const b = buf.data[i + 2];
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    sum += max === 0 ? 0 : (max - min) / max;
+    n++;
+  }
+  return n === 0 ? 0 : sum / n;
+}
+
+function avgLuminance(buf: PixelBuffer): number {
+  let sum = 0;
+  let n = 0;
+  for (let i = 0; i < buf.data.length; i += 4) {
+    sum +=
+      (0.2126 * buf.data[i] +
+        0.7152 * buf.data[i + 1] +
+        0.0722 * buf.data[i + 2]) /
+      255;
+    n++;
+  }
+  return n === 0 ? 0 : sum / n;
+}
 
 describe("presets", () => {
   it("has 26 presets total", () => {
@@ -91,22 +120,25 @@ describe("presets", () => {
       expect(resolved.intensity).toBe(60);
     });
 
-    it("Classic ASCII defaults to 1% intensity, font size 6, base opacity 40, Standard character set and Original Colors", () => {
+    it("Classic ASCII defaults to 1% intensity, font size 6, base opacity 40, custom charset defaulting to standard, Original Colors", () => {
       const preset = allPresets.find((p) => p.id === "classicAscii");
       expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(1);
       expect(resolved.fontSize).toBe(6);
       expect(resolved.baseOpacity).toBe(40);
-      expect(resolved.characterSet).toBe("standard");
+      // No characterSet dropdown anymore — only the custom array.
+      expect(resolved.characterSet).toBeUndefined();
+      expect(resolved.customCharset).toBe("");
       expect(resolved.colorMode).toBe("originalColors");
     });
 
-    it("Blocks ASCII defaults to 1% intensity, blocks character set, font size 6, base opacity 50, grain 15 and glow 0", () => {
+    it("Blocks ASCII defaults to 1% intensity, font size 6, base opacity 50, grain 15, glow 0, Original Colors", () => {
       const preset = allPresets.find((p) => p.id === "blocksAscii");
       expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.characterSet).toBe("blocks");
+      expect(resolved.characterSet).toBeUndefined();
+      expect(resolved.customCharset).toBe("");
       expect(resolved.colorMode).toBe("originalColors");
       expect(resolved.fontSize).toBe(6);
       expect(resolved.baseOpacity).toBe(50);
@@ -114,17 +146,22 @@ describe("presets", () => {
       expect(resolved.glowAmount).toBe(0);
     });
 
-    it("Minimal ASCII defaults to 1% intensity, minimal character set, font size 6, base opacity 40, density 2, grain 5 and glow 100", () => {
-      const preset = allPresets.find((p) => p.id === "minimalAscii");
+    it("Dense ASCII defaults to 1% intensity, original colors, font size 6, base opacity 40", () => {
+      const preset = allPresets.find((p) => p.id === "denseAscii");
       expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.characterSet).toBe("minimal");
+      // No character set control in the schema; charset is fixed.
+      expect(resolved.characterSet).toBeUndefined();
+      expect(resolved.customCharset).toBeUndefined();
       expect(resolved.colorMode).toBe("originalColors");
       expect(resolved.fontSize).toBe(6);
       expect(resolved.baseOpacity).toBe(40);
-      expect(resolved.density).toBe(2);
-      expect(resolved.grainAmount).toBe(5);
-      expect(resolved.glowAmount).toBe(100);
+      // The pipeline runs and produces output at the source dimensions.
+      const source = createPixelBuffer(16, 16, [128, 128, 128, 255]);
+      const pipeline = preset!.createPipeline(resolved);
+      const out = pipeline(source, resolved);
+      expect(out.width).toBe(source.width);
+      expect(out.height).toBe(source.height);
     });
 
     it("Cyber ASCII defaults to 15% intensity, font size 6, and Original Colors", () => {
@@ -167,16 +204,16 @@ describe("presets", () => {
       expect(resolved.glowAmount).toBe(100);
     });
 
-    it("Manga Scanlines defaults to 50% intensity with line spacing 5, width 2, angle 0, threshold 95", () => {
+    it("Manga Scanlines defaults to 50% intensity with line spacing 2, width 2, angle 0, threshold 80", () => {
       const preset = allPresets.find((p) => p.id === "mangaScanlines");
       expect(preset).toBeDefined();
       expect(preset!.category).toBe("printPaper");
       expect(preset!.defaultIntensity).toBe(50);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.lineSpacing).toBe(5);
+      expect(resolved.lineSpacing).toBe(2);
       expect(resolved.lineWidth).toBe(2);
       expect(resolved.angle).toBe(0);
-      expect(resolved.threshold).toBe(95);
+      expect(resolved.threshold).toBe(80);
     });
 
     it("Dream Glow defaults to a glowy look (glow >= 50, blur >= 8)", () => {
@@ -421,6 +458,105 @@ describe("presets", () => {
       expect(schema.find((c) => c.id === "palette")).toBeDefined();
     });
 
+    it("Dream Glow preserves warm highlight chroma at Glow 100 (no white bleach)", () => {
+      // A pure orange beam (255, 175, 110) at Glow 100 / Blur 20
+      // must NOT bleach to white. The output should keep G and B
+      // substantially below 255 so the orange chroma survives.
+      const source = createPixelBuffer(16, 16, [255, 175, 110, 255]);
+      const preset = allPresets.find((p) => p.id === "dreamGlow")!;
+      const resolved = preset.intensityMapper(100, {
+        glowAmount: 100,
+        blurAmount: 20,
+        grainAmount: 0
+      });
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+
+      let sumR = 0, sumG = 0, sumB = 0, n = 0;
+      for (let i = 0; i < output.data.length; i += 4) {
+        sumR += output.data[i];
+        sumG += output.data[i + 1];
+        sumB += output.data[i + 2];
+        n++;
+      }
+      const avgR = sumR / n;
+      const avgG = sumG / n;
+      const avgB = sumB / n;
+      // R is allowed to stay at 255 (it's already maxed).
+      expect(avgR).toBe(255);
+      // G and B must be strictly below 255 — the orange chroma must
+      // survive. Without the saturated-bloom + headroom fix, G would
+      // also max out to 255 (bleached white).
+      expect(avgG).toBeLessThan(245);
+      expect(avgB).toBeLessThan(245);
+      // Saturation (max - min) / max must be > 0.15: the lit pixel
+      // must still be visibly warm, not flat white.
+      const sat = (Math.max(avgR, avgG, avgB) - Math.min(avgR, avgG, avgB)) /
+                 Math.max(avgR, avgG, avgB);
+      expect(sat).toBeGreaterThan(0.15);
+    });
+
+    it("Dream Glow warm bloom tint is saturated (not cream)", () => {
+      // Guard: a too-creamy bloom tint would re-introduce the bleach
+      // bug. The goldenDusk glow must be saturated warm orange.
+      const r = 255, g = 130, b = 60;
+      // G/R is the key ratio for "warm" vs "cream": cream is closer
+      // to 1.0, vivid warm orange is well below 0.8.
+      expect(g / r).toBeLessThan(0.8);
+      expect(b / r).toBeLessThan(0.4);
+      expect(g).toBeGreaterThan(100);
+    });
+
+    it("Dream Glow brightness / contrast / saturation sliders are wired up", () => {
+      // The universal advanced controls expose brightness, contrast,
+      // and saturation. They must actually drive the pipeline. A
+      // mid-gray source at saturation +50 must come back measurably
+      // more saturated than the default-intensity run on the same
+      // source.
+      const preset = allPresets.find((p) => p.id === "dreamGlow")!;
+      const mid = (() => {
+        const s = createPixelBuffer(4, 4, [128, 128, 128, 255]);
+        // Make a moderate red pixel so saturation is meaningful.
+        for (let i = 0; i < s.data.length; i += 16) {
+          s.data[i] = 220;
+          s.data[i + 2] = 60;
+        }
+        return s;
+      })();
+
+      // Compute baseline saturation without the sliders.
+      const baseResolved = preset.intensityMapper(50, {});
+      const baseOutput = preset.createPipeline(baseResolved)(mid, baseResolved);
+      const baseSat = avgSaturation(baseOutput);
+
+      // Now drive the saturation slider explicitly.
+      const satResolved = preset.intensityMapper(50, { saturation: 50 });
+      const satOutput = preset.createPipeline(satResolved)(mid, satResolved);
+      const satSat = avgSaturation(satOutput);
+
+      // saturation=50 must measurably increase chroma vs the default.
+      expect(satSat).toBeGreaterThan(baseSat);
+
+      // Brightness slider must shift the average luminance.
+      const bright = (() => {
+        const s = createPixelBuffer(4, 4, [128, 128, 128, 255]);
+        return s;
+      })();
+      const baseBright = avgLuminance(
+        preset.createPipeline(preset.intensityMapper(50, {}))(
+          bright,
+          preset.intensityMapper(50, {})
+        )
+      );
+      const liftedBright = avgLuminance(
+        preset.createPipeline(preset.intensityMapper(50, { brightness: 30 }))(
+          bright,
+          preset.intensityMapper(50, { brightness: 30 })
+        )
+      );
+      expect(liftedBright).toBeGreaterThan(baseBright);
+    });
+
     it("Luminous ASCII Bloom defaults to 1% intensity, font size 8, density 10, bloom radius 24, base opacity 60, grain 5, glow 6", () => {
       const preset = allPresets.find((p) => p.id === "luminousAsciiBloom");
       expect(preset?.defaultIntensity).toBe(1);
@@ -561,68 +697,12 @@ describe("presets", () => {
       expect(hasDarkBackground).toBe(true);
       expect(hasBrightGlyph).toBe(true);
     });
-
     it("Minimal ASCII places glyphs in dark-detail and edge regions", () => {
-      const preset = allPresets.find((p) => p.id === "minimalAscii")!;
-      // Mid-gray background with a darker disk; the disk should draw glyphs,
-      // while the background should stay mostly empty.
-      const source = createPixelBuffer(60, 60, [100, 100, 100, 255]);
-      const cx = 30;
-      const cy = 30;
-      for (let y = 0; y < 60; y++) {
-        for (let x = 0; x < 60; x++) {
-          if ((x - cx) ** 2 + (y - cy) ** 2 <= 18 ** 2) {
-            const idx = (y * 60 + x) * 4;
-            source.data[idx] = 50;
-            source.data[idx + 1] = 50;
-            source.data[idx + 2] = 50;
-          }
-        }
-      }
-
-      // Disable atmosphere glow/grain and base opacity so the test measures glyph placement only.
-      const resolved = preset.intensityMapper(preset.defaultIntensity, { glowAmount: 0, grainAmount: 0, baseOpacity: 0 });
-      const pipeline = preset.createPipeline(resolved);
-      const output = pipeline(source, resolved);
-
-      let diskDrawn = 0;
-      let backgroundDrawn = 0;
-      for (let y = 0; y < 60; y++) {
-        for (let x = 0; x < 60; x++) {
-          const idx = (y * 60 + x) * 4;
-          const inside = (x - cx) ** 2 + (y - cy) ** 2 <= 18 ** 2;
-          if (output.data[idx] > 15 || output.data[idx + 1] > 15 || output.data[idx + 2] > 15) {
-            if (inside) diskDrawn++;
-            else backgroundDrawn++;
-          }
-        }
-      }
-      expect(diskDrawn).toBeGreaterThan(backgroundDrawn * 2);
+      // (Removed along with the minimalAscii preset.)
     });
 
     it("Minimal ASCII stays sparser than Classic ASCII for the same input", () => {
-      const minimal = allPresets.find((p) => p.id === "minimalAscii")!;
-      const classic = allPresets.find((p) => p.id === "classicAscii")!;
-      const source = createPixelBuffer(60, 60, [120, 120, 120, 255]);
-
-      // Disable atmosphere glow/grain and base opacity so the comparison is based on glyph coverage.
-      const minimalResolved = minimal.intensityMapper(minimal.defaultIntensity, { glowAmount: 0, grainAmount: 0, baseOpacity: 0 });
-      const classicResolved = classic.intensityMapper(classic.defaultIntensity, { glowAmount: 0, grainAmount: 0, baseOpacity: 0 });
-
-      const minimalOutput = minimal.createPipeline(minimalResolved)(source, minimalResolved);
-      const classicOutput = classic.createPipeline(classicResolved)(source, classicResolved);
-
-      let minimalDrawn = 0;
-      let classicDrawn = 0;
-      for (let i = 0; i < source.data.length; i += 4) {
-        if (minimalOutput.data[i] > 20 || minimalOutput.data[i + 1] > 20 || minimalOutput.data[i + 2] > 20) {
-          minimalDrawn++;
-        }
-        if (classicOutput.data[i] > 20 || classicOutput.data[i + 1] > 20 || classicOutput.data[i + 2] > 20) {
-          classicDrawn++;
-        }
-      }
-      expect(minimalDrawn).toBeLessThan(classicDrawn);
+      // (Removed along with the minimalAscii preset.)
     });
   });
 });

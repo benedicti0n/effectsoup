@@ -37,6 +37,7 @@ export type LuminousAsciiBloomOptions = {
   glowAmount: number;
   baseOpacity?: number;
   minGlyphLuminance?: number;
+  customCharset?: string;
 };
 
 export type AsciiWeightMapOptions = {

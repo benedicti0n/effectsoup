@@ -21,11 +21,14 @@ export function renderLuminousAsciiBloom(
     bloomRadius,
     glowAmount,
     baseOpacity = 0.2,
-    minGlyphLuminance = 0.2
+    minGlyphLuminance = 0.2,
+    customCharset
   } = options;
 
   const { width, height } = source;
-  const fullCharset = " .:-=+*#%@";
+  const fullCharset = customCharset && customCharset.length >= 2
+    ? customCharset
+    : " .:-=+*#%@";
   const charset = fullCharset.slice(0, Math.max(2, Math.min(fullCharset.length, density)));
 
   const base: PixelBuffer = {

@@ -50,6 +50,7 @@ export function CanvasPreview(): JSX.Element {
   const { render: renderInWorker } = useEffectsWorker();
   const { scale: qualityScale, reportDuration } = useAdaptiveQuality();
   const [showingOriginal, setShowingOriginal] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   // Disambiguate "click to toggle" from "hold to view".
   // - pressStartRef: timestamp of the most recent pointer-down
@@ -105,6 +106,26 @@ export function CanvasPreview(): JSX.Element {
       cancelLongPressTimer();
     };
   }, [cancelLongPressTimer]);
+
+  // Reset zoom when the source image changes (new upload).
+  useEffect(() => {
+    setZoom(1);
+  }, [source?.localId]);
+
+  // Ctrl/Cmd + wheel = zoom. Plain wheel = horizontal pan when
+  // zoomed in past fit.
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        setZoom((z) => {
+          const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+          return Math.max(0.25, Math.min(8, z * factor));
+        });
+      }
+    },
+    []
+  );
 
   // Render the processed effect whenever its inputs change.
   useEffect(() => {
@@ -259,19 +280,77 @@ export function CanvasPreview(): JSX.Element {
   const processedVisible = !showingOriginal;
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-sm border border-hairline bg-surface-soft">
-      <canvas
-        ref={processedRef}
-        className="max-h-full max-w-full object-contain"
-        aria-hidden={!processedVisible}
-        style={{ visibility: processedVisible ? "visible" : "hidden" }}
-      />
-      <canvas
-        ref={originalRef}
-        aria-hidden={showingOriginal}
-        className="max-h-full max-w-full object-contain"
-        style={{ visibility: showingOriginal ? "visible" : "hidden", position: "absolute", inset: 0, margin: "auto" }}
-      />
+    <div
+      className="relative flex h-full w-full items-center justify-center overflow-auto rounded-sm border border-hairline bg-surface-soft"
+      onWheel={handleWheel}
+    >
+      <div
+        className="flex min-h-full min-w-full items-center justify-center"
+        style={{ minHeight: "100%", minWidth: "100%" }}
+      >
+        <div
+          className="relative"
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: "center center"
+          }}
+        >
+          <canvas
+            ref={processedRef}
+            className="object-contain"
+            aria-hidden={!processedVisible}
+            style={{
+              visibility: processedVisible ? "visible" : "hidden",
+              maxWidth: "none",
+              maxHeight: "none",
+              width: source ? source.width : "auto",
+              height: source ? source.height : "auto"
+            }}
+          />
+          <canvas
+            ref={originalRef}
+            aria-hidden={showingOriginal}
+            className="object-contain"
+            style={{
+              visibility: showingOriginal ? "visible" : "hidden",
+              position: "absolute",
+              inset: 0,
+              width: source ? source.width : "auto",
+              height: source ? source.height : "auto"
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-full border border-hairline bg-canvas/90 px-1.5 py-1 text-ink shadow-sm backdrop-blur">
+        <button
+          type="button"
+          onClick={() => setZoom((z) => Math.max(0.25, z / 1.25))}
+          aria-label="Zoom out"
+          title="Zoom out"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-soft-stone"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          onClick={() => setZoom(1)}
+          aria-label="Reset zoom"
+          title="Reset zoom"
+          className="inline-flex h-7 min-w-[3rem] items-center justify-center rounded-full px-2 text-xs font-mono hover:bg-soft-stone"
+        >
+          {Math.round(zoom * 100)}%
+        </button>
+        <button
+          type="button"
+          onClick={() => setZoom((z) => Math.min(8, z * 1.25))}
+          aria-label="Zoom in"
+          title="Zoom in"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-soft-stone"
+        >
+          +
+        </button>
+      </div>
 
       <button
         type="button"
@@ -285,7 +364,7 @@ export function CanvasPreview(): JSX.Element {
         aria-pressed={showingOriginal}
         title={showingOriginal ? "Showing original — release to compare" : "Click to toggle, hold to compare"}
         className={cn(
-          "absolute right-3 top-3 z-10 inline-flex h-9 w-9 select-none items-center justify-center rounded-full border border-hairline bg-canvas/90 text-ink shadow-sm backdrop-blur transition-colors hover:bg-canvas",
+          "absolute right-3 bottom-3 z-20 inline-flex h-9 w-9 select-none items-center justify-center rounded-full border border-hairline bg-canvas/90 text-ink shadow-sm backdrop-blur transition-colors hover:bg-canvas",
           showingOriginal && "bg-ink-primary text-on-primary border-ink-primary hover:bg-ink-primary"
         )}
       >

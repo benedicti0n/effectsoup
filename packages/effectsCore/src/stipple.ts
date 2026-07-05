@@ -107,7 +107,19 @@ export function renderStipple(
       const y0 = row * spacing;
       const lum = cellAverageLuminance(source, x0, y0, spacing, spacing);
       const darkness = 1 - lum;
-      const dotCount = Math.round(darkness * density * maxDotsPerCell);
+
+      // Non-linear mapping so dark cells get noticeably more dots than
+      // the linear `darkness` would suggest. The square of darkness
+      // sharpens the gradient so the darkest areas feel much denser
+      // than midtones, with midtones staying airy.
+      const shaped = Math.pow(Math.max(0, darkness), 1.4);
+      // At least one dot in any cell whose darkness crosses 0.45 so
+      // the dark regions never look empty.
+      const minDark = darkness > 0.45 ? 1 : 0;
+      const dotCount = Math.max(
+        minDark,
+        Math.round(shaped * density * maxDotsPerCell)
+      );
 
       for (let i = 0; i < dotCount; i++) {
         const dx = rand() * spacing;

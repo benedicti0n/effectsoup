@@ -1,29 +1,31 @@
 import {
-  ASCII_CHARSET_PRESETS,
   clonePixelBuffer,
   createPixelBuffer,
-  normalizeCustomCharset,
   renderAscii,
   type PixelBuffer
 } from "@effectsoup/core";
 import type { EffectPipeline, EffectPreset, ResolvedPresetParameters } from "../../types.js";
-import {
-  atmosphereAdvancedControls,
-  applyAtmosphereAdjustments,
-  hexToRgba,
-  resolveOverride
-} from "../shared.js";
+import { atmosphereAdvancedControls, applyAtmosphereAdjustments, hexToRgba, resolveOverride } from "../shared.js";
 
-export const classicAsciiPreset: EffectPreset = {
-  id: "classicAscii",
-  name: "Classic ASCII",
-  description: "ASCII image from a dense luminance-to-glyph mapping. Customize the character array in the advanced controls.",
+/**
+ * Dense ASCII — high-resolution luminance-to-glyph mapping using a
+ * dense character set with 16+ symbols, no character-set option in
+ * advanced controls (the charset is fixed).
+ *
+ * For users who want control over the charset, see Classic ASCII which
+ * has character set and custom character set controls.
+ */
+const DENSE_CHARSET = " .:-=+*#%@01/|\\[]{}()";
+
+export const denseAsciiPreset: EffectPreset = {
+  id: "denseAscii",
+  name: "Dense ASCII",
+  description: "High-resolution ASCII image from a dense 22-symbol character set.",
   category: "asciiSymbols",
   defaultIntensity: 1,
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 6 },
-    { id: "customCharset", name: "Custom Character Array", type: "text", defaultValue: "" },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "monochrome", "tint"], defaultValue: "originalColors" },
     { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ffffff" },
     { id: "backgroundColor", name: "Background", type: "color", defaultValue: "#000000" },
@@ -34,7 +36,6 @@ export const classicAsciiPreset: EffectPreset = {
     intensity,
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6),
-    customCharset: resolveOverride(overrides, "customCharset", ""),
     colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
     tintColor: resolveOverride(overrides, "tintColor", "#ffffff"),
     backgroundColor: resolveOverride(overrides, "backgroundColor", "#000000"),
@@ -48,20 +49,11 @@ export const classicAsciiPreset: EffectPreset = {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
       const fontSize = (params.fontSize as number) ?? 6;
-      const customCharset = (params.customCharset as string) ?? "";
       const colorMode = (params.colorMode as string) ?? "originalColors";
       const tintColor = hexToRgba((params.tintColor as string) ?? "#ffffff");
       const backgroundColor = hexToRgba((params.backgroundColor as string) ?? "#000000");
       const baseOpacity = ((params.baseOpacity as number) ?? 40) / 100;
       const inkColor = hexToRgba((params.inkColor as string) ?? "#ffffff");
-
-      // If a custom character array is provided, use it. Otherwise fall
-      // back to the standard dense charset.
-      const fallback = ASCII_CHARSET_PRESETS.standard;
-      const charset =
-        customCharset.trim().length > 0
-          ? normalizeCustomCharset(customCharset, fallback)
-          : fallback;
 
       const renderColorMode: "monochrome" | "color" | "source" =
         colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
@@ -81,12 +73,12 @@ export const classicAsciiPreset: EffectPreset = {
         backgroundLayer = createPixelBuffer(width, height, backgroundColor);
       }
 
-      // Render glyphs from the original source so luminance mapping is not affected by base opacity.
+      // Render glyphs using the dense charset.
       const glyphLayer = renderAscii(source, {
         fontSize,
         inkColor: renderInkColor,
         backgroundColor: [0, 0, 0, 0],
-        charset,
+        charset: DENSE_CHARSET,
         colorMode: renderColorMode,
         backgroundMode: "transparent"
       });
@@ -96,7 +88,6 @@ export const classicAsciiPreset: EffectPreset = {
         const alpha = glyphLayer.data[i + 3] / 255;
         if (alpha > 0) {
           for (let c = 0; c < 3; c++) {
-            // glyphLayer RGB is already premultiplied by alpha from renderAscii.
             result.data[i + c] = Math.round(
               glyphLayer.data[i + c] + backgroundLayer.data[i + c] * (1 - alpha)
             );

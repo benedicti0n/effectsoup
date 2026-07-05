@@ -6,7 +6,7 @@ import { orderedDitherPreset } from "./presets/free/orderedDither.js";
 import { colorDitherPreset } from "./presets/free/colorDither.js";
 import { classicAsciiPreset } from "./presets/free/classicAscii.js";
 import { blocksAsciiPreset } from "./presets/free/blocksAscii.js";
-import { minimalAsciiPreset } from "./presets/free/minimalAscii.js";
+import { denseAsciiPreset } from "./presets/free/denseAscii.js";
 import { dotHalftonePreset } from "./presets/free/dotHalftone.js";
 import { duotonePreset } from "./presets/free/duotone.js";
 import { dreamGlowPreset } from "./presets/free/dreamGlow.js";
@@ -36,7 +36,7 @@ export const allPresets: EffectPreset[] = [
   dotHalftonePreset,
   classicAsciiPreset,
   blocksAsciiPreset,
-  minimalAsciiPreset,
+  denseAsciiPreset,
   stipplePrintPreset,
   pencilGrainPreset,
   duotonePreset,

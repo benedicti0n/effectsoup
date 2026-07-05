@@ -4,6 +4,54 @@ import { clampByte, createPixelBuffer } from "./buffer.js";
 export type BlendMode = "normal" | "multiply" | "screen" | "overlay" | "soft" | "lighten";
 
 /**
+ * Headroom-aware screen composite for selective bloom. Equivalent to
+ * `blendPixelBuffers(..., "screen", amount)`; the dedicated primitive
+ * exists so Dream Glow (and any other selective-bloom effect) can be
+ * read as "add bloom into the source's headroom" rather than
+ * "screen-blend a bloom layer over the source". They produce
+ * identical output bytes.
+ *
+ * Per-channel formula:
+ *
+ *   result_c = source_c + (255 - source_c) * bloom_c / 255 * amount
+ *
+ * Properties:
+ * - Source already at 255: zero contribution (highlight chroma
+ *   preserved).
+ * - Source at 0: full bloom contribution.
+ * - Source midtone: proportional lift.
+ *
+ * Use a SATURATED bloom tint (e.g. (255, 130, 60) for warm orange
+ * bloom) so the lift on already-bright pixels stays below 255 in
+ * the G and B channels — that's what keeps the warm chroma alive
+ * when the source is itself a warm orange highlight.
+ */
+export type HeadroomBloomOptions = {
+  amount: number;
+};
+
+export function applyHeadroomBloom(
+  source: PixelBuffer,
+  bloom: PixelBuffer,
+  options: HeadroomBloomOptions
+): PixelBuffer {
+  const { amount } = options;
+  const out = createPixelBuffer(source.width, source.height);
+  const sd = source.data;
+  const bd = bloom.data;
+  const od = out.data;
+  for (let i = 0; i < sd.length; i += 4) {
+    for (let c = 0; c < 3; c++) {
+      const headroom = 255 - sd[i + c];
+      const add = (headroom * bd[i + c] * amount) / 255;
+      od[i + c] = clampByte(sd[i + c] + add);
+    }
+    od[i + 3] = sd[i + 3];
+  }
+  return out;
+}
+
+/**
  * Blend two PixelBuffers of the same size into a new buffer.
  * amount controls the opacity of the top layer (0 to 1).
  */

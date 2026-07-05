@@ -170,31 +170,34 @@ together.
 | `brightness` | Brightness | 0 |
 | `contrast` | Contrast | 0 |
 | `saturation` | Saturation | 0 |
-| `grainAmount` | Grain | 0 (= `round(intensity/100 * 20)`) |
+| `grainAmount` | Grain | 0 (= `round(intensity/100 * 12)`) |
 | `glowAmount` | Glow | 0 (= `intensity`) |
-| `blurAmount` | Blur | 6 (= `2 + round(intensity/100 * 14)`) |
+| `blurAmount` | Blur | 6 (= `2 + round(intensity/100 * 18)`) |
 | `palette` | Palette | goldenDusk |
 
 `glowAmount` and `grainAmount` track `intensity` by default; the user
 can override either in the advanced panel. `Blur` stays user-driven.
 
-**Palettes (defined in `dreamGlow.ts`):**
+**Palettes (defined in `dreamGlow.ts`):** the bloom and highlight
+colors are intentionally **saturated** warm chroma rather than cream
+so the per-channel lift on already-bright warm pixels doesn't bleach
+to white.
 ```ts
 export const dreamGlowPalette = {
   goldenDusk: {
-    glow:      [255, 180,  80, 255],   // warm amber bloom color
-    shadow:    [ 60,  30,  40, 255],   // muted wine for shadows
-    highlight: [255, 220, 180, 255]   // warm cream for highlights
+    glow:      [255, 130,  60, 255],   // saturated warm orange bloom
+    shadow:    [ 30,  25,  80, 255],   // deep cinematic indigo
+    highlight: [255, 170, 100, 255]   // saturated peach (not cream)
   },
   roseBloom: {
-    glow:      [255, 165, 180, 255],
-    shadow:    [ 60,  25,  70, 255],
-    highlight: [255, 200, 210, 255]
+    glow:      [255, 130, 140, 255],
+    shadow:    [ 55,  25,  70, 255],
+    highlight: [255, 170, 170, 255]
   },
   coolHaze: {
-    glow:      [170, 200, 255, 255],
+    glow:      [140, 170, 240, 255],
     shadow:    [ 25,  30,  80, 255],
-    highlight: [205, 220, 255, 255]
+    highlight: [160, 200, 255, 255]
   }
 };
 ```
@@ -210,10 +213,22 @@ Each palette has three colors:
 
 ## 5. Pipeline overview (high level)
 
-The pipeline is **multi-band selective highlight bloom**. The source
-itself is never blurred; only luminance-keyed masks of it are. Three
-bands stack a real dream-like bloom on warm lit regions while dark
-shadows stay untouched.
+The pipeline is **multi-band selective highlight bloom + cinematic
+split-tone**. The source itself is never blurred; only luminance-masked
+copies of it are. Three bands stack a real dream-like bloom on warm
+lit regions while dark shadows stay untouched. The two key tuning
+choices that prevent the previous "pale white bleach":
+
+1. The bloom tint is **saturated** (e.g. `(255, 130, 60)` for
+   `goldenDusk`). When the headroom-additive composite lifts an
+   already-warm pixel, the per-channel contribution on R is zero
+   (R is already 255) and the contribution on G and B is small
+   because the headroom is small and the bloom G/B is below 255.
+   The result is a richer, more saturated orange highlight — not a
+   whiteout.
+2. The duotone amount is small (max 0.25 at glow=1) and the highlight
+   color is saturated peach, so the duotone reinforces warm chroma
+   rather than neutralizing it.
 
 ```
                                        ┌─────────────────────────────────┐
@@ -236,14 +251,18 @@ shadows stay untouched.
                         │ (mask byte multiplies glow color)   │
                         ▼                                             ▼
                                   ┌────────────────────────────────┐
-                                  │ screen-blend all 3 over source  │
-                                  │   @ 0.90 / 0.70 / 0.55          │
+                                  │ applyHeadroomBloom each band   │
+                                  │   @ 0.90 / 0.70 / 0.45         │
                                   │     of glowAmount               │
+                                  │  (per-channel:  result_c =      │
+                                  │   source_c + (255-source_c) *  │
+                                  │   bloom_c / 255 * amount)     │
                                   └──────────────┬──────────────────┘
                                                  ▼
                 ┌────────────────────────────────┴──────────────────────────┐
                 │  Duotone grade (clone first) + soft blend                 │
-                │   shadowColor, highlightColor at 0.16 + 0.20 * glowAmount│
+                │   shadowColor, highlightColor at 0.10 + 0.15 * glowAmount│
+                │   (saturated peach highlight, low amount)               │
                 └────────────────────────────┬─────────────────────────────┘
                                              ▼
                 ┌────────────────────────────────┴────────────────────────────┐
@@ -573,6 +592,58 @@ inputs the vertical pass still needs.
 Dream Glow calls it three times on the masked buffers (and once on
 the result for the diffusion step) — never on the source itself.
 
+### `applyHeadroomBloom` — `packages/effectsCore/src/blend.ts`
+
+```ts
+export type HeadroomBloomOptions = {
+  amount: number;
+};
+
+export function applyHeadroomBloom(
+  source: PixelBuffer,
+  bloom: PixelBuffer,
+  options: HeadroomBloomOptions
+): PixelBuffer;
+```
+
+Headroom-aware bloom composite. Per-channel formula:
+
+```
+result_c = source_c + (255 - source_c) * bloom_c / 255 * amount
+```
+
+This is mathematically equivalent to `blendPixelBuffers(..., "screen",
+amount)`; the dedicated primitive is exposed so Dream Glow (and any
+other selective-bloom effect) reads as "add bloom into the source's
+headroom" rather than the more generic "screen-blend a bloom layer
+over the source". Both produce identical output bytes.
+
+Why it matters for warm-light bloom: a saturated orange bloom
+(e.g. `(255, 130, 60)`) composited with a peach highlight source
+`(255, 175, 110)` at amount 1.0 lifts G from 175 to ~216 and B from
+110 to ~144. With a desaturated/cream bloom `(255, 175, 110)`, the
+same composite lifts G to ~230 and B to ~172 — flat. The
+**saturated tint + headroom additive** combination is what keeps
+warm highlights warm and luminous rather than bleached.
+
+Properties:
+- Source already at 255 in a channel: zero contribution in that
+  channel. Highlight chroma fully preserved.
+- Source at 0 in a channel: full contribution.
+- Source midtone: proportional lift.
+
+Dream Glow calls this three times — once per band, sequentially —
+with the result of each call feeding into the next. The call stack
+is:
+```
+result = applyHeadroomBloom(result, tightMask,  amount: glowAmount * 0.9);
+result = applyHeadroomBloom(result, mediumMask, amount: glowAmount * 0.7);
+result = applyHeadroomBloom(result, wideMask,   amount: glowAmount * 0.45);
+```
+Each subsequent call sees a result with reduced headroom, so the
+cumulative lift on any one channel cannot exceed 255. Returns a
+fresh PixelBuffer. O(W*H).
+
 ### `blendPixelBuffers` — same file
 
 ```ts
@@ -583,10 +654,12 @@ export function blendPixelBuffers(
 ```
 
 Returns a new buffer. `amount` is correctly applied to every mode.
-Dream Glow uses two modes:
-- `screen` to composite the three tinted bloom bands over the source
-  and to layer the diffusion soft copy back on top.
-- `soft` (Photoshop soft-light) to lift the duotone midtones.
+Dream Glow uses two modes here:
+- `screen` for the selective final diffusion: a lightly blurred
+  copy of the graded result, masked to lit areas, is screen-blended
+  back at `glowAmount * 0.2` to give the orange beam a soft
+  incandescent halo.
+- `soft` (Photoshop soft-light) for the duotone soft-blend step.
 
 ### `applyDuotone` — `packages/effectsCore/src/color.ts`
 
@@ -680,6 +753,8 @@ it("Dream Glow warm mid-bright pixels (orange-lit skin) bloom at Glow 100", …)
 it("Dream Glow protects near-black shadow pixels (no bloom leakage)", …);
 it("Dream Glow at Glow 100 is measurably stronger than at Glow 50", …);
 it("Dream Glow multi-band selective: warm pixels bloom, dark pixels don't", …);
+it("Dream Glow preserves warm highlight chroma at Glow 100 (no white bleach)", …);
+it("Dream Glow warm bloom tint is saturated (not cream)", …);
 it("Dream Glow palette selection switches tint components", …);
 it("Dream Glow palettes expose glow/shadow/highlight", …);
 ```

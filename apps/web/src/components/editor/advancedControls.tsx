@@ -28,7 +28,7 @@ function isControlVisible(
     return resolvedValues.colorMode === "monochrome";
   }
   if (control.id === "palette") {
-    return resolvedValues.colorMode === "palette";
+    return resolvedValues.colorMode === "palette" || resolvedValues.colorMode === undefined;
   }
   if (control.id === "glyphColor") {
     return resolvedValues.colorMode !== "palette";
@@ -83,7 +83,7 @@ export function AdvancedControls(): JSX.Element {
   return (
     <div className="space-y-4 rounded-sm border border-hairline bg-surface-soft p-4">
       <div className="flex items-center justify-between border-b border-hairline pb-2">
-        <h4 className="font-mono text-sm font-bold text-ink">Advanced</h4>
+        <h4 className="font-mono text-sm font-bold text-ink">Controls</h4>
         <button
           onClick={resetAdvancedOverrides}
           className="font-mono text-xs text-mute underline hover:text-ink"

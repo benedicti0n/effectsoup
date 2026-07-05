@@ -5,6 +5,7 @@ import {
   clampByte,
   clonePixelBuffer,
   createPixelBuffer,
+  normalizeCustomCharset,
   renderAscii,
   type PixelBuffer,
   type RgbaColor
@@ -30,6 +31,7 @@ export const cyberAsciiPreset: EffectPreset = {
     { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "tint", "monochrome"], defaultValue: "originalColors" },
     { id: "tintPreset", name: "Tint Preset", type: "select", options: ["terminalGreen", "electricCyan", "amberCrt", "violetCode"], defaultValue: "terminalGreen" },
     { id: "tintColor", name: "Tint", type: "color", defaultValue: "#00FF88" },
+    { id: "customCharset", name: "Custom Character Array", type: "text", defaultValue: "" },
     { id: "baseOpacity", name: "Base Opacity", type: "range", min: 0, max: 100, step: 1, defaultValue: 40 }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => {
@@ -43,6 +45,7 @@ export const cyberAsciiPreset: EffectPreset = {
       colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
       tintPreset,
       tintColor: resolveOverride(overrides, "tintColor", defaultTintColor),
+      customCharset: resolveOverride(overrides, "customCharset", ""),
       glowAmount: resolveOverride(overrides, "glowAmount", 40 + Math.round((intensity / 100) * 30)),
       grainAmount: resolveOverride(overrides, "grainAmount", Math.round((intensity / 100) * 20)),
       baseOpacity: resolveOverride(overrides, "baseOpacity", 40)
@@ -59,9 +62,17 @@ export const cyberAsciiPreset: EffectPreset = {
       const glowAmount = ((params.glowAmount as number) ?? 0) / 100;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
       const baseOpacity = ((params.baseOpacity as number) ?? 40) / 100;
-      // Technical glyph set with more symbols for detail.
-      const charset = " .:-=+*#%@01/\\|<>[]{}";
-      const trimmedCharset = charset.slice(0, Math.max(2, density + 12));
+      const customCharset = (params.customCharset as string) ?? "";
+      // Technical glyph set with more symbols for detail. If the user
+      // supplied a custom character array, use that (normalized to the
+      // first 2+ density+12 symbols so the rendered glyphs stay within
+      // the configured density).
+      const defaultCharset = " .:-=+*#%@01/\\|<>[]{}";
+      const trimmedCharset = (
+        customCharset.trim().length > 0
+          ? normalizeCustomCharset(customCharset, defaultCharset)
+          : defaultCharset
+      ).slice(0, Math.max(2, density + 12));
 
       const renderColorMode: "monochrome" | "color" | "source" =
         colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
