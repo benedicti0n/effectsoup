@@ -1,6 +1,7 @@
 import {
   clonePixelBuffer,
   createPixelBuffer,
+  normalizeCustomCharset,
   renderAscii,
   type PixelBuffer
 } from "@effectsoup/core";
@@ -26,6 +27,7 @@ export const denseAsciiPreset: EffectPreset = {
   advancedControlSchema: [
     ...atmosphereAdvancedControls,
     { id: "fontSize", name: "Font Size", type: "range", min: 6, max: 32, step: 1, defaultValue: 6 },
+    { id: "customCharset", name: "Custom Character Array", type: "text", defaultValue: "" },
     { id: "colorMode", name: "Color Mode", type: "select", options: ["originalColors", "monochrome", "tint"], defaultValue: "originalColors" },
     { id: "tintColor", name: "Tint", type: "color", defaultValue: "#ffffff" },
     { id: "backgroundColor", name: "Background", type: "color", defaultValue: "#000000" },
@@ -36,6 +38,7 @@ export const denseAsciiPreset: EffectPreset = {
     intensity,
     advancedOverrides: overrides,
     fontSize: resolveOverride(overrides, "fontSize", 6),
+    customCharset: resolveOverride(overrides, "customCharset", ""),
     colorMode: resolveOverride(overrides, "colorMode", "originalColors"),
     tintColor: resolveOverride(overrides, "tintColor", "#ffffff"),
     backgroundColor: resolveOverride(overrides, "backgroundColor", "#000000"),
@@ -49,11 +52,18 @@ export const denseAsciiPreset: EffectPreset = {
       if (params.intensity === 0) return clonePixelBuffer(source);
 
       const fontSize = (params.fontSize as number) ?? 6;
+      const customCharset = (params.customCharset as string) ?? "";
       const colorMode = (params.colorMode as string) ?? "originalColors";
       const tintColor = hexToRgba((params.tintColor as string) ?? "#ffffff");
       const backgroundColor = hexToRgba((params.backgroundColor as string) ?? "#000000");
       const baseOpacity = ((params.baseOpacity as number) ?? 40) / 100;
       const inkColor = hexToRgba((params.inkColor as string) ?? "#ffffff");
+
+      const fallback = DENSE_CHARSET;
+      const charset =
+        customCharset.trim().length > 0
+          ? normalizeCustomCharset(customCharset, fallback)
+          : fallback;
 
       const renderColorMode: "monochrome" | "color" | "source" =
         colorMode === "monochrome" ? "monochrome" : colorMode === "tint" ? "color" : "source";
@@ -73,12 +83,12 @@ export const denseAsciiPreset: EffectPreset = {
         backgroundLayer = createPixelBuffer(width, height, backgroundColor);
       }
 
-      // Render glyphs using the dense charset.
+      // Render glyphs using the resolved charset.
       const glyphLayer = renderAscii(source, {
         fontSize,
         inkColor: renderInkColor,
         backgroundColor: [0, 0, 0, 0],
-        charset: DENSE_CHARSET,
+        charset,
         colorMode: renderColorMode,
         backgroundMode: "transparent"
       });

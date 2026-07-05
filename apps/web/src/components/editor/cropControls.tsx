@@ -7,15 +7,28 @@ import { EditableSlider } from "./editableSlider";
 
 const ASPECT_RATIOS: Array<{ value: CropValue; label: string; ratio: number }> = [
   { value: "original", label: "Original", ratio: 4 / 3 },
+  { value: "free", label: "Free", ratio: 0 },
   { value: "1:1", label: "1:1", ratio: 1 },
   { value: "4:5", label: "4:5", ratio: 4 / 5 },
   { value: "9:16", label: "9:16", ratio: 9 / 16 },
   { value: "16:9", label: "16:9", ratio: 16 / 9 }
 ];
 
-type CropValue = "original" | "1:1" | "4:5" | "9:16" | "16:9";
+type CropValue = "original" | "free" | "1:1" | "4:5" | "9:16" | "16:9";
 
 function RatioFrame({ ratio, selected }: { ratio: number; selected: boolean }): JSX.Element {
+  if (ratio === 0) {
+    return (
+      <span
+        className={cn(
+          "flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border-2 text-[8px] font-bold",
+          selected ? "border-on-primary text-on-primary" : "border-ink-primary text-muted"
+        )}
+      >
+        ∞
+      </span>
+    );
+  }
   return (
     <span
       className={cn(
@@ -40,7 +53,7 @@ export function CropControls(): JSX.Element {
     <div className="space-y-4 rounded-sm border border-hairline bg-soft-stone/30 p-4">
       <h4 className="text-sm font-medium text-ink-primary">Crop</h4>
 
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-6 gap-1">
         {ASPECT_RATIOS.map(({ value, label, ratio }) => (
           <button
             key={value}

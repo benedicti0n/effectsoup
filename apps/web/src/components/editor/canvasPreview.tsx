@@ -281,13 +281,10 @@ export function CanvasPreview(): JSX.Element {
 
   return (
     <div
-      className="relative flex h-full w-full items-center justify-center overflow-auto rounded-sm border border-hairline bg-surface-soft"
+      className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-sm border border-hairline bg-surface-soft"
       onWheel={handleWheel}
     >
-      <div
-        className="flex min-h-full min-w-full items-center justify-center"
-        style={{ minHeight: "100%", minWidth: "100%" }}
-      >
+      <div className="flex items-center justify-center">
         <div
           className="relative"
           style={{
@@ -350,26 +347,25 @@ export function CanvasPreview(): JSX.Element {
         >
           +
         </button>
+        <button
+          type="button"
+          onPointerDown={handlePressStart}
+          onPointerUp={handlePressEnd}
+          onPointerLeave={handlePressCancel}
+          onPointerCancel={handlePressCancel}
+          onContextMenu={(e) => e.preventDefault()}
+          onClick={(e) => e.preventDefault()}
+          aria-label={showingOriginal ? "Show processed image" : "Show original image"}
+          aria-pressed={showingOriginal}
+          title={showingOriginal ? "Showing original — release to compare" : "Click to toggle, hold to compare"}
+          className={cn(
+            "ml-1 inline-flex h-7 w-7 select-none items-center justify-center rounded-full hover:bg-soft-stone",
+            showingOriginal && "text-on-primary"
+          )}
+        >
+          <HugeiconsIcon icon={EyeIcon} className="h-4 w-4" />
+        </button>
       </div>
-
-      <button
-        type="button"
-        onPointerDown={handlePressStart}
-        onPointerUp={handlePressEnd}
-        onPointerLeave={handlePressCancel}
-        onPointerCancel={handlePressCancel}
-        onContextMenu={(e) => e.preventDefault()}
-        onClick={(e) => e.preventDefault()}
-        aria-label={showingOriginal ? "Show processed image" : "Show original image"}
-        aria-pressed={showingOriginal}
-        title={showingOriginal ? "Showing original — release to compare" : "Click to toggle, hold to compare"}
-        className={cn(
-          "absolute right-3 bottom-3 z-20 inline-flex h-9 w-9 select-none items-center justify-center rounded-full border border-hairline bg-canvas/90 text-ink shadow-sm backdrop-blur transition-colors hover:bg-canvas",
-          showingOriginal && "bg-ink-primary text-on-primary border-ink-primary hover:bg-ink-primary"
-        )}
-      >
-        <HugeiconsIcon icon={EyeIcon} className="h-4 w-4" />
-      </button>
 
       {showingOriginal && (
         <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-sm border border-hairline bg-canvas/90 px-2.5 py-1 text-xs font-medium text-ink shadow-sm backdrop-blur">

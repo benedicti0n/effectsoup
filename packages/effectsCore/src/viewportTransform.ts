@@ -11,6 +11,8 @@ function parseAspectRatioInternal(ratio: CropConfig["aspectRatio"]): number | nu
       return 9 / 16;
     case "16:9":
       return 16 / 9;
+    case "free":
+      return null;
     default:
       return null;
   }

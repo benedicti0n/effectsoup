@@ -4,6 +4,7 @@ import {
   applyFloydSteinbergDither,
   applyGrain,
   clonePixelBuffer,
+  resizeNearestNeighbor,
   toGrayscale,
   type PixelBuffer
 } from "@effectsoup/core";
@@ -20,18 +21,20 @@ const WORKING_LONGEST = 800;
 export const errorDiffusionDitherPreset: EffectPreset = {
   id: "errorDiffusionDither",
   name: "Error Diffusion",
-  description: "Organic monochrome dithering with diffused pixel texture.",
+  description: "Organic monochrome dithering with diffused pixel texture. Cell Size controls the visible block size.",
   category: "pixelDither",
   defaultIntensity: 60,
   advancedControlSchema: [
     ...adjustmentControls,
     ...atmosphereAdvancedControls,
+    { id: "cellSize", name: "Cell Size", type: "range", min: 1, max: 32, step: 1, defaultValue: 4 },
     { id: "threshold", name: "Threshold", type: "range", min: 0, max: 255, step: 1, defaultValue: 128 },
     { id: "invert", name: "Invert", type: "boolean", defaultValue: false }
   ],
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
+    cellSize: resolveOverride(overrides, "cellSize", 4),
     threshold: resolveOverride(overrides, "threshold", 100 + Math.round((intensity / 100) * 80)),
     invert: resolveOverride(overrides, "invert", false),
     contrast: resolveOverride(overrides, "contrast", Math.round((intensity / 100) * 30)),
@@ -50,9 +53,19 @@ export const errorDiffusionDitherPreset: EffectPreset = {
       const threshold = (params.threshold as number) ?? 128;
       const invert = (params.invert as boolean) ?? false;
       const grainAmount = ((params.grainAmount as number) ?? 0) / 100;
+      const cellSize = (params.cellSize as number) ?? 4;
 
       const processed = runAtWorkingResolution(source, WORKING_LONGEST, (small) => {
-        const result = clonePixelBuffer(small);
+        let working = small;
+        let needsUpscale = false;
+        if (cellSize > 1) {
+          const gridW = Math.max(1, Math.round(small.width / cellSize));
+          const gridH = Math.max(1, Math.round(small.height / cellSize));
+          working = resizeNearestNeighbor(small, gridW, gridH);
+          needsUpscale = true;
+        }
+
+        const result = clonePixelBuffer(working);
         if (saturation !== 0) {
           adjustSaturation(result, saturation);
         }
@@ -67,6 +80,10 @@ export const errorDiffusionDitherPreset: EffectPreset = {
             result.data[i + 1] = 255 - result.data[i + 1];
             result.data[i + 2] = 255 - result.data[i + 2];
           }
+        }
+
+        if (needsUpscale) {
+          return resizeNearestNeighbor(result, small.width, small.height);
         }
         return result;
       });

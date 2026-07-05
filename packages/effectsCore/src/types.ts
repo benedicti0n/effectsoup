@@ -21,7 +21,7 @@ export type SupportedInputFormat = "image/jpeg" | "image/png" | "image/webp";
  * Crop configuration for non-destructive editing.
  */
 export type CropConfig = {
-  aspectRatio: "original" | "1:1" | "4:5" | "9:16" | "16:9";
+  aspectRatio: "original" | "free" | "1:1" | "4:5" | "9:16" | "16:9";
   zoom: number;
   offsetX: number;
   offsetY: number;

@@ -1,5 +1,13 @@
 import type { PixelBuffer } from "./types.js";
-import { clampByte, pixelIndex } from "./buffer.js";
+import { clampByte, createPixelBuffer, pixelIndex } from "./buffer.js";
+import { resizeNearestNeighbor } from "./resize.js";
+
+export type OrderedColorDitherOptions = {
+  cellSize: number;
+  threshold: number;
+  invert: boolean;
+  monochrome: boolean;
+};
 
 /**
  * 4x4 Bayer ordered dither matrix, normalized to 0-255 range.
@@ -122,4 +130,98 @@ export function applyFloydSteinbergColorDither(
       }
     }
   }
+}
+
+/**
+ * Cell-based ordered Bayer color dither.
+ *
+ * Downsamples the source into a cell grid (size = cellSize × cellSize),
+ * averages each cell's color, applies a 4x4 Bayer threshold to decide
+ * which cells are filled (colored / grayscale) vs empty (black), then
+ * scales back up with nearest-neighbor for a clean pixel-print texture.
+ *
+ * At cellSize=1 the grid equals the source resolution and the
+ * algorithm degrades gracefully to per-pixel Bayer dither, matching
+ * the behaviour of the old applyOrderedDitherColor.
+ */
+export function applyOrderedColorDither(
+  source: PixelBuffer,
+  options: OrderedColorDitherOptions
+): PixelBuffer {
+  const { cellSize, threshold, invert, monochrome } = options;
+  const { width, height, data } = source;
+
+  if (cellSize < 1) throw new Error("cellSize must be >= 1");
+
+  const gridW = Math.max(1, Math.ceil(width / cellSize));
+  const gridH = Math.max(1, Math.ceil(height / cellSize));
+
+  // 4×4 Bayer threshold map (values 0..15, used as 0..255 here).
+  const BAYER: number[][] = [
+    [0, 8, 2, 10],
+    [12, 4, 14, 6],
+    [3, 11, 1, 9],
+    [15, 7, 13, 5]
+  ];
+
+  const grid = createPixelBuffer(gridW, gridH);
+
+  for (let gy = 0; gy < gridH; gy++) {
+    const y0 = gy * cellSize;
+    const y1 = Math.min(height, y0 + cellSize);
+    for (let gx = 0; gx < gridW; gx++) {
+      const x0 = gx * cellSize;
+      const x1 = Math.min(width, x0 + cellSize);
+
+      // Average cell RGBA.
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let count = 0;
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          const idx = pixelIndex(source, x, y);
+          r += data[idx];
+          g += data[idx + 1];
+          b += data[idx + 2];
+          count++;
+        }
+      }
+
+      const avgR = count > 0 ? r / count : 0;
+      const avgG = count > 0 ? g / count : 0;
+      const avgB = count > 0 ? b / count : 0;
+
+      // Luminance (0..255) used as the threshold signal.
+      const lum = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
+
+      // Bayer threshold offset for this cell position.
+      const bayerVal = BAYER[gy % 4][gx % 4];
+      const offset = (bayerVal / 16) * 255;
+
+      const active = lum + offset >= threshold;
+      const isActive = invert ? !active : active;
+
+      const gridIdx = pixelIndex(grid, gx, gy);
+      if (isActive) {
+        if (monochrome) {
+          const gray = clampByte(Math.round(lum));
+          grid.data[gridIdx] = gray;
+          grid.data[gridIdx + 1] = gray;
+          grid.data[gridIdx + 2] = gray;
+        } else {
+          grid.data[gridIdx] = clampByte(Math.round(avgR));
+          grid.data[gridIdx + 1] = clampByte(Math.round(avgG));
+          grid.data[gridIdx + 2] = clampByte(Math.round(avgB));
+        }
+      } else {
+        grid.data[gridIdx] = 0;
+        grid.data[gridIdx + 1] = 0;
+        grid.data[gridIdx + 2] = 0;
+      }
+      grid.data[gridIdx + 3] = 255;
+    }
+  }
+
+  return resizeNearestNeighbor(grid, width, height);
 }

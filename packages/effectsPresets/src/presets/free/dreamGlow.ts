@@ -58,10 +58,10 @@ export const dreamGlowPalette = {
  */
 const universalAdvancedControls: AdvancedControlDefinition[] = [
   { id: "brightness", name: "Brightness", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
-  { id: "contrast", name: "Contrast", type: "range", min: -50, max: 50, step: 1, defaultValue: 0 },
-  { id: "saturation", name: "Saturation", type: "range", min: -100, max: 100, step: 1, defaultValue: 0 },
-  { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 },
-  { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 0 }
+  { id: "contrast", name: "Contrast", type: "range", min: -50, max: 50, step: 1, defaultValue: 5 },
+  { id: "saturation", name: "Saturation", type: "range", min: -100, max: 100, step: 1, defaultValue: 30 },
+  { id: "grainAmount", name: "Grain", type: "range", min: 0, max: 100, step: 1, defaultValue: 20 },
+  { id: "glowAmount", name: "Glow", type: "range", min: 0, max: 100, step: 1, defaultValue: 100 }
 ];
 
 /**
@@ -161,7 +161,7 @@ export const dreamGlowPreset: EffectPreset = {
   defaultIntensity: 50,
   advancedControlSchema: [
     ...universalAdvancedControls,
-    { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 20, step: 1, defaultValue: 6 },
+    { id: "blurAmount", name: "Blur", type: "range", min: 0, max: 20, step: 1, defaultValue: 20 },
     {
       id: "palette",
       name: "Palette",
@@ -173,21 +173,13 @@ export const dreamGlowPreset: EffectPreset = {
   intensityMapper: (intensity, overrides): ResolvedPresetParameters => ({
     intensity,
     advancedOverrides: overrides,
-    blurAmount: resolveOverride(
-      overrides,
-      "blurAmount",
-      2 + Math.round((intensity / 100) * 18)
-    ),
-    glowAmount: resolveOverride(overrides, "glowAmount", intensity),
-    grainAmount: resolveOverride(
-      overrides,
-      "grainAmount",
-      Math.round((intensity / 100) * 12)
-    ),
+    blurAmount: resolveOverride(overrides, "blurAmount", 20),
+    glowAmount: resolveOverride(overrides, "glowAmount", 100),
+    grainAmount: resolveOverride(overrides, "grainAmount", 20),
     palette: resolveOverride(overrides, "palette", "goldenDusk"),
     brightness: resolveOverride(overrides, "brightness", 0),
-    contrast: resolveOverride(overrides, "contrast", 0),
-    saturation: resolveOverride(overrides, "saturation", 0)
+    contrast: resolveOverride(overrides, "contrast", 5),
+    saturation: resolveOverride(overrides, "saturation", 30)
   }),
   createPipeline: (params): EffectPipeline => {
     return (source: PixelBuffer) => {

@@ -106,18 +106,20 @@ describe("presets", () => {
       expect(resolved.grainAmount).toBe(25);
     });
 
-    it("Error Diffusion defaults to 60% intensity", () => {
+    it("Error Diffusion defaults to 60% intensity and cellSize 4", () => {
       const preset = allPresets.find((p) => p.id === "errorDiffusionDither");
       expect(preset?.defaultIntensity).toBe(60);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(60);
+      expect(resolved.cellSize).toBe(4);
     });
 
-    it("Ordered Dither defaults to 60% intensity", () => {
+    it("Ordered Dither defaults to 60% intensity and cellSize 4", () => {
       const preset = allPresets.find((p) => p.id === "orderedDither");
       expect(preset?.defaultIntensity).toBe(60);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
       expect(resolved.intensity).toBe(60);
+      expect(resolved.cellSize).toBe(4);
     });
 
     it("Classic ASCII defaults to 1% intensity, font size 6, base opacity 40, custom charset defaulting to standard, Original Colors", () => {
@@ -150,9 +152,9 @@ describe("presets", () => {
       const preset = allPresets.find((p) => p.id === "denseAscii");
       expect(preset?.defaultIntensity).toBe(1);
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      // No character set control in the schema; charset is fixed.
+      // Dense ASCII has a customCharset control but no characterSet.
       expect(resolved.characterSet).toBeUndefined();
-      expect(resolved.customCharset).toBeUndefined();
+      expect(resolved.customCharset).toBe("");
       expect(resolved.colorMode).toBe("originalColors");
       expect(resolved.fontSize).toBe(6);
       expect(resolved.baseOpacity).toBe(40);
@@ -220,26 +222,26 @@ describe("presets", () => {
       const preset = allPresets.find((p) => p.id === "dreamGlow");
       expect(preset).toBeDefined();
       const resolved = preset!.intensityMapper(preset!.defaultIntensity, {});
-      expect(resolved.glowAmount).toBeGreaterThanOrEqual(50);
-      expect(resolved.blurAmount).toBeGreaterThanOrEqual(8);
+      expect(resolved.glowAmount).toBe(100);
+      expect(resolved.blurAmount).toBe(20);
     });
 
-    it("Dream Glow intensity scales blur / glow / grain together", () => {
+    it("Dream Glow has fixed defaults regardless of intensity", () => {
       const preset = allPresets.find((p) => p.id === "dreamGlow")!;
+      const at0 = preset.intensityMapper(0, {});
       const at50 = preset.intensityMapper(50, {});
       const at100 = preset.intensityMapper(100, {});
-      // glowAmount default is intensity itself (so it must equal 50 and 100).
-      expect(at50.glowAmount).toBe(50);
+      expect(at0.glowAmount).toBe(100);
+      expect(at50.glowAmount).toBe(100);
       expect(at100.glowAmount).toBe(100);
-      // blurAmount default is 2 + round(intensity/100*18)
-      expect(at50.blurAmount).toBe(11);
+      expect(at0.blurAmount).toBe(20);
+      expect(at50.blurAmount).toBe(20);
       expect(at100.blurAmount).toBe(20);
-      // grainAmount default scales with intensity (0 .. 12).
-      expect(at50.grainAmount).toBe(6);
-      expect(at100.grainAmount).toBe(12);
-      // Blur and grain scale up with intensity.
-      expect(at100.blurAmount).toBeGreaterThan(at50.blurAmount);
-      expect(at100.grainAmount).toBeGreaterThan(at50.grainAmount);
+      expect(at0.grainAmount).toBe(20);
+      expect(at50.grainAmount).toBe(20);
+      expect(at100.grainAmount).toBe(20);
+      expect(at50.contrast).toBe(5);
+      expect(at50.saturation).toBe(30);
     });
 
     it("Dream Glow at intensity 0 returns an exact source clone", () => {
@@ -620,6 +622,56 @@ describe("presets", () => {
       const pipeline = preset.createPipeline(resolved);
       const output = pipeline(source, resolved);
       expect(Array.from(output.data)).toEqual(Array.from(original));
+    });
+
+    it("Color Dither defaults to cellSize 8", () => {
+      const preset = allPresets.find((p) => p.id === "colorDither")!;
+      const resolved = preset.intensityMapper(50, {});
+      expect(resolved.cellSize).toBe(8);
+    });
+
+    it("Color Dither larger cellSize produces visibly larger output blocks", () => {
+      const preset = allPresets.find((p) => p.id === "colorDither")!;
+      const source = createPixelBuffer(64, 64);
+      for (let y = 0; y < 64; y++) {
+        for (let x = 0; x < 64; x++) {
+          const idx = (y * 64 + x) * 4;
+          if (x < 32) {
+            source.data[idx] = 180; source.data[idx + 1] = 80; source.data[idx + 2] = 80;
+          } else {
+            source.data[idx] = 80; source.data[idx + 1] = 80; source.data[idx + 2] = 180;
+          }
+          source.data[idx + 3] = 255;
+        }
+      }
+
+      const small = preset.createPipeline(
+        preset.intensityMapper(50, { cellSize: 4 })
+      )(source, preset.intensityMapper(50, { cellSize: 4 }));
+      const large = preset.createPipeline(
+        preset.intensityMapper(50, { cellSize: 8 })
+      )(source, preset.intensityMapper(50, { cellSize: 8 }));
+
+      const runs = (buf: Uint8ClampedArray): number => {
+        let count = 1;
+        for (let x = 4; x < buf.length; x += 4) {
+          if (buf[x] !== buf[x - 4]) count++;
+        }
+        return count;
+      };
+      expect(runs(large.data.subarray(0, 64 * 4))).toBeLessThan(
+        runs(small.data.subarray(0, 64 * 4))
+      );
+    });
+
+    it("Color Dither is deterministic", () => {
+      const preset = allPresets.find((p) => p.id === "colorDither")!;
+      const source = createPixelBuffer(24, 24, [80, 140, 200, 255]);
+      const resolved = preset.intensityMapper(50, {});
+      const pipeline = preset.createPipeline(resolved);
+      const a = pipeline(source, resolved);
+      const b = pipeline(source, resolved);
+      expect(a.data).toEqual(b.data);
     });
 
     it("Duotone defaults to black shadow", () => {

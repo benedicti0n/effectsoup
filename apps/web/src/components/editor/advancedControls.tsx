@@ -16,7 +16,7 @@ function isControlVisible(
   resolvedValues: Record<string, number | string | boolean>
 ): boolean {
   if (control.id === "customCharset") {
-    return resolvedValues.characterSet === "custom";
+    return resolvedValues.characterSet === "custom" || resolvedValues.characterSet === undefined;
   }
   if (control.id === "customSymbols") {
     return resolvedValues.symbolSet === "custom";
