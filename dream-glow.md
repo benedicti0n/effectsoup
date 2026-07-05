@@ -200,7 +200,9 @@ export const dreamGlowPalette = {
 ```
 
 Each palette has three colors:
-- **`glow`** — color painted onto the final halo glow pass.
+- **`glow`** — color that the masked bloom layers are tinted with. Where
+  the mask is 0 (dark areas) the contribution is exactly 0; where the
+  mask is 255 (full bright) the contribution is the full glow color.
 - **`shadow`** — color pulled into dark luminance regions by the duotone.
 - **`highlight`** — color pulled into bright luminance regions by the duotone.
 
@@ -208,35 +210,62 @@ Each palette has three colors:
 
 ## 5. Pipeline overview (high level)
 
-The pipeline uses a single full-frame blurred copy of the source, then
-layers duotone and tinted glow on top of the screen blend:
+The pipeline is **multi-band selective highlight bloom**. The source
+itself is never blurred; only luminance-keyed masks of it are. Three
+bands stack a real dream-like bloom on warm lit regions while dark
+shadows stay untouched.
 
 ```
-                ┌──────────────────────────────┐
-source ─────────►│ BoxBlur (radius = blurAmount) │
-                └────────────┬─────────────────┘
-                             │ screen-blend @ 0.4 * glowAmount
-                             ▼
-                ┌──────────────────────────────┐
-                │  Duotone grade (clone first) │
-                │  mapped via luminance to     │
-                │  palette.shadow..highlight   │
-                └────────────┬─────────────────┘
-                             │ soft-blend @ 0.2 + 0.25 * glowAmount
-                             ▼
-                ┌──────────────────────────────┐
-                │  Tinted halo glow            │
-                │  radius = blurAmount * 0.75  │
-                │  amount = 0.25 * glowAmount  │
-                │  color = palette.glow        │
-                └────────────┬─────────────────┘
-                             │ (if grainAmount > 0) applyGrain in-place
-                             ▼
-                          output
+                                       ┌─────────────────────────────────┐
+                                       │ extractHighlightMask            │
+                                       │   tight:  thresh 0.70, knee 0.15│
+                                       │   medium: thresh 0.45, knee 0.30│
+                                       │   wide:   thresh 0.25, knee 0.35│
+                                       │  → mask byte per pixel (R=G=B)  │
+                                       └──────────┬──────────────────────┘
+                                                  │ clone × 3
+                                                  ▼
+                          ┌──────────────────────┴──────────────────────┐
+                          ▼                                             ▼
+              ┌─────────────────────┐                       ┌─────────────────────┐
+              │ tightMask           │                       │ wideMask            │
+              │ applyBoxBlur r=     │                       │ applyBoxBlur r=     │
+              │   blurAmount*0.15   │                       │   blurAmount*0.90   │
+              └─────────┬───────────┘                       └─────────┬───────────┘
+                        │ tint each mask with palette.glow    │
+                        │ (mask byte multiplies glow color)   │
+                        ▼                                             ▼
+                                  ┌────────────────────────────────┐
+                                  │ screen-blend all 3 over source  │
+                                  │   @ 0.90 / 0.70 / 0.55          │
+                                  │     of glowAmount               │
+                                  └──────────────┬──────────────────┘
+                                                 ▼
+                ┌────────────────────────────────┴──────────────────────────┐
+                │  Duotone grade (clone first) + soft blend                 │
+                │   shadowColor, highlightColor at 0.16 + 0.20 * glowAmount│
+                └────────────────────────────┬─────────────────────────────┘
+                                             ▼
+                ┌────────────────────────────────┴────────────────────────────┐
+                │  Selective final diffusion in lit areas                  │
+                │   blur(graded, blurAmount * 0.25)                         │
+                │   mask with medium-band threshold (lit only)              │
+                │   screen-blend back @ 0.20 * glowAmount                   │
+                └────────────────────────────┬─────────────────────────────┘
+                                             │ (if grainAmount > 0) applyGrain
+                                             ▼
+                                          output
 ```
+
+Intensity scaling (intensityMapper):
+- `blurAmount = 2 + round(intensity/100 * 18)` → 11 at intensity 50, 20 at 100
+- `glowAmount = intensity` → 50 at intensity 50, 100 at 100
+- `grainAmount = round(intensity/100 * 12)` → 6 at intensity 50, 12 at 100
+- The Glow slider can override `glowAmount` directly; the Grain slider can override `grainAmount`. `blurAmount` is user-driven via the Blur slider.
 
 The pipeline is pure-function-of-source (no global state) and runs for
-both the on-screen preview and the export.
+both the on-screen preview and the export. At intensity 0 the source is
+returned as an exact clone (no bloom, no duotone, no grain).
 
 ---
 
@@ -248,10 +277,10 @@ both the on-screen preview and the export.
 import {
   applyBoxBlur,
   applyDuotone,
-  applyGlow,
   applyGrain,
   blendPixelBuffers,
   clonePixelBuffer,
+  extractHighlightMask,
   type PixelBuffer,
   type RgbaColor
 } from "@effectsoup/core";
@@ -271,19 +300,19 @@ import { resolveOverride } from "../shared.js";
  */
 export const dreamGlowPalette = {
   goldenDusk: {
-    glow: [255, 180, 80, 255] as RgbaColor,
-    shadow: [60, 30, 40, 255] as RgbaColor,
-    highlight: [255, 220, 180, 255] as RgbaColor
+    glow: [255, 175, 110, 255] as RgbaColor,
+    shadow: [30, 25, 80, 255] as RgbaColor,
+    highlight: [255, 200, 160, 255] as RgbaColor
   },
   roseBloom: {
-    glow: [255, 140, 180, 255] as RgbaColor,
-    shadow: [60, 20, 40, 255] as RgbaColor,
-    highlight: [255, 210, 220, 255] as RgbaColor
+    glow: [255, 165, 180, 255] as RgbaColor,
+    shadow: [55, 25, 70, 255] as RgbaColor,
+    highlight: [255, 200, 210, 255] as RgbaColor
   },
   coolHaze: {
-    glow: [120, 180, 255, 255] as RgbaColor,
-    shadow: [20, 30, 60, 255] as RgbaColor,
-    highlight: [200, 230, 255, 255] as RgbaColor
+    glow: [170, 200, 255, 255] as RgbaColor,
+    shadow: [25, 30, 80, 255] as RgbaColor,
+    highlight: [205, 220, 255, 255] as RgbaColor
   }
 };
 
@@ -300,23 +329,57 @@ const universalAdvancedControls: AdvancedControlDefinition[] = [
 ];
 
 /**
+ * Luminance thresholds + knee widths for the three bloom bands.
+ * Tight   -> highlights only (eye specular, lashes).
+ * Medium  -> warm mid-brights (skin, broad orange regions).
+ * Wide    -> atmospheric spread from large lit regions.
+ */
+const BAND_THRESHOLDS = {
+  tight: 0.7,
+  tightKnee: 0.15,
+  medium: 0.45,
+  mediumKnee: 0.3,
+  wide: 0.25,
+  wideKnee: 0.35
+} as const;
+
+function tintMaskWithGlow(buf: PixelBuffer, glow: RgbaColor): void {
+  const data = buf.data;
+  const gr = glow[0];
+  const gg = glow[1];
+  const gb = glow[2];
+  for (let i = 0; i < data.length; i += 4) {
+    const m = data[i] / 255;
+    data[i] = m * gr;
+    data[i + 1] = m * gg;
+    data[i + 2] = m * gb;
+  }
+}
+
+/**
  * Dream Glow.
  *
- * Pipeline (intensity scales blur, glow, and grain together):
- *   1. Full-image BoxBlur of the source at `blurAmount`.
- *   2. Screen-blend that blurry copy over the source at 0.4 * glowAmount.
- *   3. Duotone-grade the bloomed result (clone first) toward shadow and
- *      highlight colors, then soft-blend back at 0.2 + 0.25 * glowAmount.
- *   4. If glowAmount > 0, an additional tinted glow pass at
- *      `blurAmount * 0.75` radius tinted toward palette.glow.
- *   5. Apply grain in-place if grainAmount > 0.
+ * Multi-band selective highlight bloom. Source is never blurred.
+ * Intensity scales blur radius, glow strength, and grain together;
+ * the Glow slider controls only the bloom energy.
+ *
+ *   1. Extract three luminance masks (tight / medium / wide).
+ *   2. Blur each mask at a radius proportional to `blurAmount`.
+ *   3. Tint each blurred mask with palette.glow. Mask byte 0 -> 0,
+ *      255 -> full glow color; dark areas contribute nothing.
+ *   4. Screen-blend the three bands at 0.90 / 0.70 / 0.55 of glowAmount.
+ *   5. Duotone grade + soft blend (shadow -> highlight).
+ *   6. Selective final diffusion in lit areas (soft copy of result
+ *      masked to medium-band threshold, screen-blended back).
+ *   7. Apply grain in-place.
  *
  * At intensity 0 the source is returned as an exact clone.
  */
 export const dreamGlowPreset: EffectPreset = {
   id: "dreamGlow",
   name: "Dream Glow",
-  description: "Soft, hazy, nostalgic image treatment with palette presets.",
+  description:
+    "Multi-band selective highlight bloom. Tight halo on eye highlights, warm bloom on skin, atmospheric spread from large lit regions; deep cinematic indigo shadows.",
   category: "atmosphereGlow",
   defaultIntensity: 50,
   advancedControlSchema: [
@@ -336,13 +399,13 @@ export const dreamGlowPreset: EffectPreset = {
     blurAmount: resolveOverride(
       overrides,
       "blurAmount",
-      2 + Math.round((intensity / 100) * 14)
+      2 + Math.round((intensity / 100) * 18)
     ),
     glowAmount: resolveOverride(overrides, "glowAmount", intensity),
     grainAmount: resolveOverride(
       overrides,
       "grainAmount",
-      Math.round((intensity / 100) * 20)
+      Math.round((intensity / 100) * 12)
     ),
     palette: resolveOverride(overrides, "palette", "goldenDusk")
   }),
@@ -358,28 +421,77 @@ export const dreamGlowPreset: EffectPreset = {
       const palette =
         dreamGlowPalette[paletteName] ?? dreamGlowPalette.goldenDusk;
 
-      const blur = clonePixelBuffer(source);
-      applyBoxBlur(blur, blurAmount);
-      let result = blendPixelBuffers(source, blur, "screen", glowAmount * 0.4);
+      let result: PixelBuffer = source;
 
-      // Soft color-grade using duotone to keep tonal range intact.
-      const graded = clonePixelBuffer(result);
-      applyDuotone(graded, palette.shadow, palette.highlight);
-      result = blendPixelBuffers(result, graded, "soft", 0.2 + glowAmount * 0.25);
-
-      // Tinted glow on highlights.
       if (glowAmount > 0) {
-        applyGlow(result, {
-          radius: Math.max(1, Math.round(blurAmount * 0.75)),
-          amount: glowAmount * 0.25,
-          mode: "soft",
-          color: palette.glow
+        // 1+2. Three luminance-keyed highlight masks, each blurred.
+        const tightMask = extractHighlightMask(source, {
+          threshold: BAND_THRESHOLDS.tight,
+          knee: BAND_THRESHOLDS.tightKnee,
+          intensity: 1
         });
+        const mediumMask = extractHighlightMask(source, {
+          threshold: BAND_THRESHOLDS.medium,
+          knee: BAND_THRESHOLDS.mediumKnee,
+          intensity: 1
+        });
+        const wideMask = extractHighlightMask(source, {
+          threshold: BAND_THRESHOLDS.wide,
+          knee: BAND_THRESHOLDS.wideKnee,
+          intensity: 1
+        });
+
+        const tightRadius = Math.max(1, Math.round(blurAmount * 0.15));
+        const mediumRadius = Math.max(2, Math.round(blurAmount * 0.45));
+        const wideRadius = Math.max(4, Math.round(blurAmount * 0.9));
+        applyBoxBlur(tightMask, tightRadius);
+        applyBoxBlur(mediumMask, mediumRadius);
+        applyBoxBlur(wideMask, wideRadius);
+
+        // 3. Tint each blurred mask with palette.glow.
+        tintMaskWithGlow(tightMask, palette.glow);
+        tintMaskWithGlow(mediumMask, palette.glow);
+        tintMaskWithGlow(wideMask, palette.glow);
+
+        // 4. Screen-blend the three bands over the source.
+        result = blendPixelBuffers(result, tightMask, "screen", glowAmount * 0.9);
+        result = blendPixelBuffers(result, mediumMask, "screen", glowAmount * 0.7);
+        result = blendPixelBuffers(result, wideMask, "screen", glowAmount * 0.55);
       }
 
+      // 5. Duotone grade (clone first) + soft blend.
+      const graded = clonePixelBuffer(result);
+      applyDuotone(graded, palette.shadow, palette.highlight);
+      result = blendPixelBuffers(result, graded, "soft", 0.16 + glowAmount * 0.2);
+
+      // 6. Selective final diffusion in lit areas. A lightly blurred
+      //    copy of the graded result is masked to lit regions (medium
+      //    threshold) and screen-blended back, giving the orange beam a
+      //    soft incandescent halo without globally softening the image.
+      if (glowAmount > 0) {
+        const soft = clonePixelBuffer(result);
+        applyBoxBlur(soft, Math.max(1, Math.round(blurAmount * 0.25)));
+        const diffusionMask = extractHighlightMask(source, {
+          threshold: BAND_THRESHOLDS.medium,
+          knee: BAND_THRESHOLDS.mediumKnee,
+          intensity: 1
+        });
+        const dm = diffusionMask.data;
+        const sd = soft.data;
+        for (let i = 0; i < sd.length; i += 4) {
+          const m = dm[i] / 255;
+          sd[i] *= m;
+          sd[i + 1] *= m;
+          sd[i + 2] *= m;
+        }
+        result = blendPixelBuffers(result, soft, "screen", glowAmount * 0.2);
+      }
+
+      // 7. Restrained film grain.
       if (grainAmount > 0) {
         applyGrain(result, grainAmount);
       }
+
       return result;
     };
   }
@@ -414,6 +526,39 @@ Given a source image and parameters:
 
 ## 7. The primitives the pipeline depends on
 
+### `extractHighlightMask` — `packages/effectsCore/src/highlights.ts`
+
+```ts
+export type HighlightMaskOptions = {
+  threshold?: number; // 0..1, default 0.55
+  knee?: number;      // 0..1, default 0.2
+  intensity?: number; // 0..n, default 1
+  floor?: number;     // 0..1, default 0
+};
+
+export function extractHighlightMask(
+  source: PixelBuffer,
+  options: HighlightMaskOptions = {}
+): PixelBuffer;
+```
+
+Builds a same-sized buffer where each pixel's R=G=B byte holds a
+luminance-thresholded mask value (0..255) and A=255. Per pixel:
+
+```
+lum   = Rec.709 luminance of source          ∈ [0, 1]
+mask  = smoothstep(threshold − knee/2, threshold + knee/2, lum)
+mask  = max(mask, floor)
+mask *= intensity
+```
+
+Dark and midtone pixels produce 0 (or `floor`); bright pixels
+approach 1. The whole pass is O(width*height).
+
+Dream Glow calls this three times with progressively softer thresholds
+(tight 0.70 / medium 0.45 / wide 0.25) so warm mid-brights
+participate in the medium and wide bands.
+
 ### `applyBoxBlur` — `packages/effectsCore/src/blend.ts`
 
 ```ts
@@ -425,8 +570,8 @@ work, independent of `radius`. Mutates the buffer in place, writing
 first to a temp buffer during the horizontal pass to avoid clobbering
 inputs the vertical pass still needs.
 
-Dream Glow calls it once on a clone of the source at the user's
-`blurAmount`.
+Dream Glow calls it three times on the masked buffers (and once on
+the result for the diffusion step) — never on the source itself.
 
 ### `blendPixelBuffers` — same file
 
@@ -439,7 +584,8 @@ export function blendPixelBuffers(
 
 Returns a new buffer. `amount` is correctly applied to every mode.
 Dream Glow uses two modes:
-- `screen` to composite the blurred source over the original.
+- `screen` to composite the three tinted bloom bands over the source
+  and to layer the diffusion soft copy back on top.
 - `soft` (Photoshop soft-light) to lift the duotone midtones.
 
 ### `applyDuotone` — `packages/effectsCore/src/color.ts`
@@ -456,25 +602,6 @@ Rec.601 luminance, then linearly interpolate between `shadow` and
 `highlight` colors per pixel. Mutates in place. Dream Glow runs this
 on a clone of the bloomed result so the gradient aligns with the
 bloomed values.
-
-### `applyGlow` — `packages/effectsCore/src/glow.ts`
-
-```ts
-export type GlowOptions = {
-  radius: number;
-  amount: number;
-  mode?: "screen" | "add" | "soft";
-  color?: RgbaColor;
-};
-
-export function applyGlow(buffer: PixelBuffer, options: GlowOptions): void;
-```
-
-Self-contained glow primitive: clone, blur, optionally tint (60/40 mix
-toward `color`), then blend back into the original. Mutates in place.
-
-Dream Glow calls it once with `mode: "soft"` and `color: palette.glow`,
-producing the final colored halo on top of everything else.
 
 ### `applyGrain` — `packages/effectsCore/src/noise.ts`
 
@@ -511,9 +638,6 @@ else the preset-default.
 
 ---
 
----
-
-
 ## 8. How a parameter change flows end-to-end
 
 User moves the **Glow** slider in the editor.
@@ -528,11 +652,11 @@ User moves the **Glow** slider in the editor.
    { intensity: 50, advancedOverrides: { glowAmount: 72, ... },
      blurAmount: 12, glowAmount: 72, grainAmount: 10, palette: "goldenDusk" }
    ```
-4. Posts the job to the worker (or runs `renderEffectSync`).
+ 4. Posts the job to the worker (or runs `renderEffectSync`).
 5. Worker calls `preset.createPipeline(resolved)(croppedBuffer, resolved)`.
 6. `createPipeline` returned a closure that captured `params.intensity = 50`
-   etc. The closure runs stages 1–8 above using the new `glowAmount: 72`
-   inside it.
+   etc. The closure runs the multi-band bloom, duotone, and diffusion
+   steps above using the new `glowAmount: 72` inside it.
 7. Output `PixelBuffer` is drawn to the on-screen canvas via
    `ctx.putImageData(new ImageData(...), 0, 0)`.
 
@@ -545,15 +669,27 @@ runs unchanged.
 ## 9. Tests
 
 `packages/effectsPresets/src/presets.test.ts` includes Dream Glow–specific
-tests covering the pipeline's guarantees:
+tests covering the multi-band pipeline's guarantees:
 
 ```ts
 it("Dream Glow defaults to a glowy look (glow >= 50, blur >= 8)", …);
 it("Dream Glow intensity scales blur / glow / grain together", …);
 it("Dream Glow at intensity 0 returns an exact source clone", …);
-it("Dream Glow full-frame pipeline brightens bright areas", …);
+it("Dream Glow at Glow 0 still returns the source unchanged", …);
+it("Dream Glow warm mid-bright pixels (orange-lit skin) bloom at Glow 100", …);
+it("Dream Glow protects near-black shadow pixels (no bloom leakage)", …);
+it("Dream Glow at Glow 100 is measurably stronger than at Glow 50", …);
+it("Dream Glow multi-band selective: warm pixels bloom, dark pixels don't", …);
 it("Dream Glow palette selection switches tint components", …);
 it("Dream Glow palettes expose glow/shadow/highlight", …);
+```
+
+`packages/effectsCore/src/highlights.test.ts` covers the new selective
+bloom primitive directly:
+
+```ts
+it("extractHighlightMask: warm mid-bright orange contributes to the medium-band mask", …);
+it("extractHighlightMask: deep shadow contributes zero to the wide-band mask", …);
 ```
 
 Plus cross-cutting presets tests that exercise every preset including
@@ -590,7 +726,9 @@ packages/effectsCore/src/
   blend.ts                   applyBoxBlur, blendPixelBuffers (and BlendMode)
   color.ts                   applyDuotone, adjustBrightnessContrast, etc.
   glow.ts                    applyGlow (and applyBloom)
+  highlights.ts              ★ extractHighlightMask, applySplitTone
   noise.ts                   applyGrain, applyNoise, createSeededRandom
+  highlights.test.ts         ★ vitest suite for the two new primitives
   types.ts                   PixelBuffer, RgbaColor, CropConfig, OutputOptions
   index.ts                   barrel re-export
 

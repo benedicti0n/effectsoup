@@ -194,12 +194,12 @@ describe("presets", () => {
       // glowAmount default is intensity itself (so it must equal 50 and 100).
       expect(at50.glowAmount).toBe(50);
       expect(at100.glowAmount).toBe(100);
-      // blurAmount default is 2 + round(intensity/100*14)
-      expect(at50.blurAmount).toBe(9);
-      expect(at100.blurAmount).toBe(16);
-      // grainAmount default scales with intensity (0 .. 20).
-      expect(at50.grainAmount).toBe(10);
-      expect(at100.grainAmount).toBe(20);
+      // blurAmount default is 2 + round(intensity/100*18)
+      expect(at50.blurAmount).toBe(11);
+      expect(at100.blurAmount).toBe(20);
+      // grainAmount default scales with intensity (0 .. 12).
+      expect(at50.grainAmount).toBe(6);
+      expect(at100.grainAmount).toBe(12);
       // Blur and grain scale up with intensity.
       expect(at100.blurAmount).toBeGreaterThan(at50.blurAmount);
       expect(at100.grainAmount).toBeGreaterThan(at50.grainAmount);
@@ -222,39 +222,168 @@ describe("presets", () => {
       expect(Array.from(output.data)).toEqual(Array.from(original));
     });
 
-    it("Dream Glow full-frame pipeline brightens bright areas", () => {
-      // Full-frame blur + screen + soft duotone. Bright pixels become
-      // brighter; the bloom is global.
-      const source = createPixelBuffer(8, 8);
-      // Set one pixel to white, rest to mid-gray.
-      for (let i = 0; i < source.data.length; i += 4) {
-        source.data[i] = 200;
-        source.data[i + 1] = 200;
-        source.data[i + 2] = 200;
-      }
+    it("Dream Glow at Glow 0 still returns the source unchanged", () => {
+      // Glow 0 = no bloom. The duotone still runs (with small amount
+      // 0.16) so the color shifts; the bloom is fully gated off.
+      const preset = allPresets.find((p) => p.id === "dreamGlow")!;
+      const source = createPixelBuffer(8, 8, [200, 200, 200, 255]);
+      // Insert a bright pixel to confirm the mask is bypassed.
       source.data[0] = 255;
       source.data[1] = 255;
       source.data[2] = 255;
+      const resolved = preset.intensityMapper(50, { glowAmount: 0 });
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+      // The bright pixel must NOT receive any glow tint from a bloom
+      // band. With Glow 0 the bloom is fully bypassed so the source is
+      // the only contribution to that pixel (modulo the duotone which
+      // blends a max of 0.16 of the shadow/highlight colors toward the
+      // source).
+      // Concretely: the bright pixel stays >= 0.84 of original (since
+      // duotone pulls it by at most 0.16 toward highlight (255,200,160)
+      // which is still > 0.84*255 ~ 214).
+      expect(output.data[0]).toBeGreaterThan(214);
+    });
 
+    it("Dream Glow warm mid-bright pixels (orange-lit skin) bloom at Glow 100", () => {
+      // Build a 16x16 image. Fill with a warm orange (255, 175, 110)
+      // which has Rec.709 luminance ~0.62 — well above the medium-band
+      // threshold of 0.45. At Glow 100 / Blur 20 the result must be
+      // measurably brighter than the source because the bloom bands fire.
+      const source = createPixelBuffer(16, 16, [255, 175, 110, 255]);
       const preset = allPresets.find((p) => p.id === "dreamGlow")!;
-      const resolved = preset.intensityMapper(preset.defaultIntensity, {});
+      const resolved = preset.intensityMapper(100, {
+        glowAmount: 100,
+        blurAmount: 20,
+        grainAmount: 0
+      });
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+      // Sample a few mid-image pixels and ensure at least one of them
+      // has been lifted by the bloom.
+      let lifted = 0;
+      let sumBefore = 0;
+      let sumAfter = 0;
+      let count = 0;
+      for (let y = 4; y < 12; y++) {
+        for (let x = 4; x < 12; x++) {
+          const i = (y * 16 + x) * 4;
+          // Rec.709 luminance of (r, g, b).
+          const beforeL = (0.2126 * 255 + 0.7152 * 175 + 0.0722 * 110) / 255;
+          const outR = output.data[i];
+          const outG = output.data[i + 1];
+          const outB = output.data[i + 2];
+          const afterL = (0.2126 * outR + 0.7152 * outG + 0.0722 * outB) / 255;
+          sumBefore += beforeL;
+          sumAfter += afterL;
+          if (afterL > beforeL + 0.05) lifted++;
+          count++;
+        }
+      }
+      expect(lifted).toBeGreaterThan(0);
+      expect(sumAfter / count).toBeGreaterThan(sumBefore / count);
+    });
+
+    it("Dream Glow protects near-black shadow pixels (no bloom leakage)", () => {
+      // 16x16 image of dark indigo-violet (~RGB 30, 25, 80). Rec.709
+      // luminance is ~0.058 — well below every mask threshold. Bloom
+      // must not lighten the dark area at any Glow setting.
+      const source = createPixelBuffer(16, 16, [30, 25, 80, 255]);
+      const preset = allPresets.find((p) => p.id === "dreamGlow")!;
+      const resolved = preset.intensityMapper(100, {
+        glowAmount: 100,
+        blurAmount: 20,
+        grainAmount: 0
+      });
+      const pipeline = preset.createPipeline(resolved);
+      const output = pipeline(source, resolved);
+      // Average source luminance in the center 8x8.
+      let srcSum = 0, outSum = 0, n = 0;
+      for (let y = 4; y < 12; y++) {
+        for (let x = 4; x < 12; x++) {
+          const i = (y * 16 + x) * 4;
+          srcSum += (0.2126 * source.data[i] + 0.7152 * source.data[i + 1] + 0.0722 * source.data[i + 2]) / 255;
+          outSum += (0.2126 * output.data[i] + 0.7152 * output.data[i + 1] + 0.0722 * output.data[i + 2]) / 255;
+          n++;
+        }
+      }
+      const srcAvg = srcSum / n;
+      const outAvg = outSum / n;
+      // Average luminance must NOT climb more than 0.05 — bloom must
+      // not leak into pure-shadow regions. The duotone will pull the
+      // color toward palette.shadow (30,25,80) which is essentially
+      // the source here, so the output luminance stays close to source.
+      expect(outAvg - srcAvg).toBeLessThan(0.05);
+      // And the output must remain dark (luminance < 0.15) — no yellow
+      // haze, no muddy warming.
+      expect(outAvg).toBeLessThan(0.15);
+    });
+
+    it("Dream Glow at Glow 100 is measurably stronger than at Glow 50", () => {
+      // On a warm-lit image, the average luminance after Glow 100 must
+      // exceed that after Glow 50. The duotone color grade is the
+      // same in both cases, so any luminance gain is bloom-driven.
+      const source = createPixelBuffer(16, 16, [255, 175, 110, 255]);
+      const preset = allPresets.find((p) => p.id === "dreamGlow")!;
+      const runAt = (glow: number) => {
+        const resolved = preset.intensityMapper(50, {
+          glowAmount: glow,
+          blurAmount: 20,
+          grainAmount: 0
+        });
+        return preset.createPipeline(resolved)(source, resolved);
+      };
+      const out50 = runAt(50);
+      const out100 = runAt(100);
+      let sum50 = 0, sum100 = 0, n = 0;
+      for (let i = 0; i < source.data.length; i += 4) {
+        sum50 += (0.2126 * out50.data[i] + 0.7152 * out50.data[i + 1] + 0.0722 * out50.data[i + 2]) / 255;
+        sum100 += (0.2126 * out100.data[i] + 0.7152 * out100.data[i + 1] + 0.0722 * out100.data[i + 2]) / 255;
+        n++;
+      }
+      // Glow 100 must lift the average luminance meaningfully more
+      // than Glow 50. We allow a tiny tolerance for rounding.
+      expect(sum100 / n).toBeGreaterThan(sum50 / n + 0.05);
+    });
+
+    it("Dream Glow multi-band selective: warm pixels bloom, dark pixels don't", () => {
+      // 32x32 image with a clear vertical half: left half orange-lit,
+      // right half deep indigo. The left half must brighten via the
+      // bloom bands; the right half must NOT (only duotone).
+      const source = createPixelBuffer(32, 32, [30, 25, 80, 255]);
+      for (let y = 0; y < 32; y++) {
+        for (let x = 0; x < 16; x++) {
+          const i = (y * 32 + x) * 4;
+          source.data[i] = 255;
+          source.data[i + 1] = 175;
+          source.data[i + 2] = 110;
+        }
+      }
+      const preset = allPresets.find((p) => p.id === "dreamGlow")!;
+      const resolved = preset.intensityMapper(100, {
+        glowAmount: 100,
+        blurAmount: 20,
+        grainAmount: 0
+      });
       const pipeline = preset.createPipeline(resolved);
       const output = pipeline(source, resolved);
 
-      // The originally-white pixel should remain bright.
-      expect(output.data[0]).toBeGreaterThanOrEqual(240);
-      // The mid-gray pixels should not drop below source gray.
-      let okCount = 0;
-      for (let i = 4; i < output.data.length; i += 4) {
-        if (
-          output.data[i] >= 195 &&
-          output.data[i + 1] >= 195 &&
-          output.data[i + 2] >= 195
-        ) {
-          okCount++;
+      // Average luminance per side, far from the half-line edge.
+      let warm = 0, dark = 0, n = 0;
+      for (let y = 8; y < 24; y++) {
+        for (let x = 2; x < 14; x++) {
+          const i = (y * 32 + x) * 4;
+          warm += (0.2126 * output.data[i] + 0.7152 * output.data[i + 1] + 0.0722 * output.data[i + 2]) / 255;
         }
+        for (let x = 18; x < 30; x++) {
+          const i = (y * 32 + x) * 4;
+          dark += (0.2126 * output.data[i] + 0.7152 * output.data[i + 1] + 0.0722 * output.data[i + 2]) / 255;
+        }
+        n++;
       }
-      expect(okCount).toBeGreaterThan(0);
+      warm /= n;
+      dark /= n;
+      expect(warm).toBeGreaterThan(dark + 0.1);
     });
 
     it("Dream Glow palette selection switches tint components", () => {

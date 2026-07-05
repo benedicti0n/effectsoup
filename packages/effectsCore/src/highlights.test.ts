@@ -52,6 +52,36 @@ describe("extractHighlightMask", () => {
       expect(mask.data[i]).toBe(255);
     }
   });
+
+  it("warm mid-bright orange contributes to the medium-band mask", () => {
+    // RGB (255, 175, 110) — Rec.709 luminance ~0.62. Must cross the
+    // medium-band threshold of 0.45 with knee 0.30 (range 0.30..0.60)
+    // and produce a non-zero mask.
+    const source = createPixelBuffer(1, 1, [255, 175, 110, 255]);
+    const mask = extractHighlightMask(source, {
+      threshold: 0.45,
+      knee: 0.3,
+      intensity: 1
+    });
+    // lum=0.62 is past edge1=0.60 -> smoothstep returns 1.
+    expect(mask.data[0]).toBe(255);
+    expect(mask.data[1]).toBe(255);
+    expect(mask.data[2]).toBe(255);
+  });
+
+  it("deep shadow contributes zero to the wide-band mask", () => {
+    // RGB (5, 5, 5) — Rec.709 luminance ~0.021. Below every band
+    // threshold, so the mask must be exactly 0.
+    const source = createPixelBuffer(1, 1, [5, 5, 5, 255]);
+    const mask = extractHighlightMask(source, {
+      threshold: 0.25,
+      knee: 0.35,
+      intensity: 1
+    });
+    expect(mask.data[0]).toBe(0);
+    expect(mask.data[1]).toBe(0);
+    expect(mask.data[2]).toBe(0);
+  });
 });
 
 describe("applySplitTone", () => {
