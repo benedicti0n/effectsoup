@@ -47,7 +47,7 @@ export function DocsSidebar({
                     className={cn(
                       "block rounded-sm px-3 py-1.5 text-sm transition-colors",
                       isActive
-                        ? "bg-accent-muted font-medium text-accent"
+                        ? "bg-soft-stone font-medium text-ink-primary"
                         : "text-body-muted hover:bg-soft-stone hover:text-ink"
                     )}
                   >
@@ -121,7 +121,7 @@ export function DocsMobileNav({
                         className={cn(
                           "block rounded-sm px-3 py-2 text-sm",
                           pathname === `/${page.slug}`
-                            ? "bg-accent-muted font-medium text-accent"
+                            ? "bg-soft-stone font-medium text-ink-primary"
                             : "text-body-muted hover:bg-soft-stone hover:text-ink"
                         )}
                       >

@@ -17,7 +17,7 @@ export function DocsPageShell({
     <div className="flex gap-12">
       <article
         id="docs-content"
-        className="min-w-0 flex-1 max-w-[720px] prose-headings:font-display prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-ink-primary prose-h2:mt-10 prose-h2:mb-3 prose-h2:text-xl prose-h3:mt-8 prose-h3:mb-2 prose-h3:text-lg prose-p:text-body-muted prose-p:leading-relaxed prose-p:text-sm prose-a:text-accent prose-a:underline prose-strong:text-ink prose-ul:text-body-muted prose-ul:text-sm prose-ol:text-body-muted prose-ol:text-sm"
+        className="min-w-0 flex-1 max-w-[720px] prose-headings:font-display prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-ink-primary prose-h2:mt-12 prose-h2:mb-4 prose-h2:text-2xl prose-h2:tracking-tight prose-h3:mt-10 prose-h3:mb-3 prose-h3:text-xl prose-h3:tracking-tight prose-h4:mt-8 prose-h4:mb-2 prose-h4:text-lg prose-p:text-body-muted prose-p:leading-relaxed prose-p:text-base prose-a:text-action-blue prose-a:underline prose-a:transition-colors hover:prose-a:text-action-blue/80 prose-strong:text-ink prose-ul:text-body-muted prose-ul:text-base prose-ol:text-body-muted prose-ol:text-base prose-li:my-1"
       >
         <DocsBreadcrumbs slug={slug} />
         {children}

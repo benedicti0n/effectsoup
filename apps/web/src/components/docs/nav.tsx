@@ -31,7 +31,7 @@ export function DocsPrevNext({ slug }: { slug: string }): JSX.Element {
             className="group flex flex-col gap-1 text-sm"
           >
             <span className="text-xs text-muted">Previous</span>
-            <span className="font-medium text-ink group-hover:text-accent transition-colors">
+            <span className="font-medium text-ink group-hover:text-action-blue transition-colors">
               ← {prev.title}
             </span>
           </Link>
@@ -44,7 +44,7 @@ export function DocsPrevNext({ slug }: { slug: string }): JSX.Element {
             className="group flex flex-col gap-1 text-sm"
           >
             <span className="text-xs text-muted">Next</span>
-            <span className="font-medium text-ink group-hover:text-accent transition-colors">
+            <span className="font-medium text-ink group-hover:text-action-blue transition-colors">
               {next.title} →
             </span>
           </Link>

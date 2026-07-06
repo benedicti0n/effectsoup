@@ -34,7 +34,7 @@ const content: Record<string, PageContent> = {
 
         <div className="my-8 grid gap-4 sm:grid-cols-2">
           <Link href="/playground" className="group rounded-sm border border-hairline p-6 hover:border-ink/20 transition-colors">
-            <h2 className="font-display text-lg font-medium text-ink-primary group-hover:text-accent transition-colors">
+            <h2 className="font-display text-lg font-medium text-ink-primary group-hover:text-action-blue transition-colors">
               Use the Playground →
             </h2>
             <p className="mt-1 text-sm text-body-muted">
@@ -42,7 +42,7 @@ const content: Record<string, PageContent> = {
             </p>
           </Link>
           <Link href="/docs/getting-started/packages" className="group rounded-sm border border-hairline p-6 hover:border-ink/20 transition-colors">
-            <h2 className="font-display text-lg font-medium text-ink-primary group-hover:text-accent transition-colors">
+            <h2 className="font-display text-lg font-medium text-ink-primary group-hover:text-action-blue transition-colors">
               Use the Packages →
             </h2>
             <p className="mt-1 text-sm text-body-muted">
@@ -142,12 +142,12 @@ const content: Record<string, PageContent> = {
           <div className="mt-4 rounded-sm border border-hairline bg-soft-stone/20 p-6 text-sm leading-relaxed">
             <h3 className="font-medium text-ink-primary mb-3">New to EffectSoup?</h3>
             <ol className="space-y-2 list-decimal list-inside text-body-muted">
-              <li>Open the <Link href="/playground" className="text-accent underline">Playground</Link> and upload an image.</li>
+              <li>Open the <Link href="/playground" className="text-action-blue underline">Playground</Link> and upload an image.</li>
               <li>Browse the preset library on the left sidebar. Pick one that catches your eye.</li>
               <li>Adjust the Intensity slider and explore the advanced controls.</li>
               <li>Try the crop and zoom options in the preview.</li>
               <li>Export your result as PNG, JPEG, or WebP.</li>
-              <li>Read the <Link href="/docs/effects" className="text-accent underline">Effects Catalog</Link> to learn what each preset does.</li>
+              <li>Read the <Link href="/docs/effects" className="text-action-blue underline">Effects Catalog</Link> to learn what each preset does.</li>
             </ol>
           </div>
         </section>
@@ -173,7 +173,7 @@ const content: Record<string, PageContent> = {
             Upload an Image
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
-            Open the <Link href="/playground" className="text-accent underline">Playground</Link> and upload a JPEG, PNG, or WebP image. Files up to 20 MB are accepted, with a 25-megapixel decoded-size limit. Once loaded, your image appears in the center preview with the effect library on the left and controls on the right.
+            Open the <Link href="/playground" className="text-action-blue underline">Playground</Link> and upload a JPEG, PNG, or WebP image. Files up to 20 MB are accepted, with a 25-megapixel decoded-size limit. Once loaded, your image appears in the center preview with the effect library on the left and controls on the right.
           </p>
           <Callout variant="note">
             Your image never leaves your device. All processing happens in-browser via a Web Worker.
@@ -620,7 +620,7 @@ ctx.putImageData(
                       className="group rounded-sm border border-hairline p-4 hover:border-ink/20 transition-colors"
                     >
                       <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-ink-primary group-hover:text-accent transition-colors">
+                        <h3 className="font-medium text-ink-primary group-hover:text-action-blue transition-colors">
                           {preset.name}
                         </h3>
                         <Badge variant="muted" className="text-[10px]">{catInfo.name}</Badge>
@@ -1705,7 +1705,7 @@ pnpm --filter web test`} language="bash" />
           <div>
             <dt className="font-medium text-ink-primary">How do I create an effect?</dt>
             <dd className="mt-1 text-body-muted leading-relaxed">
-              Effects are <InlineCode>EffectPreset</InlineCode> objects. See the <Link href="/docs/guides/creating-an-effect" className="text-accent underline">Creating an Effect</Link> guide for a walkthrough. Presets are defined in <InlineCode>packages/effectsPresets/src/presets/</InlineCode> and registered in the <InlineCode>allPresets</InlineCode> array.
+              Effects are <InlineCode>EffectPreset</InlineCode> objects. See the <Link href="/docs/guides/creating-an-effect" className="text-action-blue underline">Creating an Effect</Link> guide for a walkthrough. Presets are defined in <InlineCode>packages/effectsPresets/src/presets/</InlineCode> and registered in the <InlineCode>allPresets</InlineCode> array.
             </dd>
           </div>
 
