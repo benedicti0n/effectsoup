@@ -7,10 +7,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import {
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
-  SITE_LOCALE,
   SITE_NAME,
-  SITE_TAGLINE,
-  SITE_TYPE,
   canonical,
   getSiteOrigin
 } from "@/lib/seo";
@@ -20,8 +17,6 @@ const serifDisplay = Playfair_Display({
   display: "swap",
   variable: "--font-serif-display"
 });
-
-const ogImage = "/og-image.png";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -37,7 +32,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteOrigin()),
   title: {
-    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    default: "EffectSoup — Beautiful Image Effects",
     template: `%s | ${SITE_NAME}`
   },
   applicationName: SITE_NAME,
@@ -80,29 +75,19 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   openGraph: {
-    type: SITE_TYPE,
-    locale: SITE_LOCALE,
+    type: "website",
+    locale: "en_US",
     url: canonical("/"),
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    description: SITE_DESCRIPTION,
-    images: [
-      {
-        url: ogImage,
-        width: 1200,
-        height: 630,
-        alt: "EffectSoup — browser-based image effects studio",
-        type: "image/png"
-      }
-    ],
+    siteName: "EffectSoup",
+    title: "EffectSoup — Beautiful Image Effects",
+    description: SITE_DESCRIPTION
   },
   twitter: {
     card: "summary_large_image",
     site: "@benedicti0n",
     creator: "@benedicti0n",
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    description: SITE_DESCRIPTION,
-    images: [ogImage]
+    title: "EffectSoup — Beautiful Image Effects",
+    description: SITE_DESCRIPTION
   },
   appleWebApp: {
     capable: true,

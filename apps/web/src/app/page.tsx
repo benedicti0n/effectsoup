@@ -11,38 +11,28 @@ import {
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
   SITE_NAME,
-  SITE_TAGLINE,
   canonical
 } from "@/lib/seo";
 import { SoftwareApplicationJsonLd } from "@/components/seo/StructuredData";
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${SITE_NAME} — ${SITE_TAGLINE}`
+    absolute: "EffectSoup — Beautiful Image Effects"
   },
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,
   alternates: { canonical: "/" },
   openGraph: {
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    title: "EffectSoup — Beautiful Image Effects",
     description: SITE_DESCRIPTION,
     url: canonical("/"),
     type: "website",
-    siteName: SITE_NAME,
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "EffectSoup — browser-based image effects studio"
-      }
-    ]
+    siteName: SITE_NAME
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    description: SITE_DESCRIPTION,
-    images: ["/og-image.png"]
+    title: "EffectSoup — Beautiful Image Effects",
+    description: SITE_DESCRIPTION
   }
 };
 

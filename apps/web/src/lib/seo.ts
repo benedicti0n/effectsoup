@@ -8,10 +8,9 @@
  */
 
 export const SITE_NAME = "EffectSoup";
-export const SITE_TAGLINE =
-  "Beautiful image effects, made in your browser.";
+export const SITE_TAGLINE = "Beautiful Image Effects";
 export const SITE_DESCRIPTION =
-  "EffectSoup is a free, browser-based image effects studio. Apply pixel grids, halftones, ASCII art, glowing symbols, cinematic bloom, and graphic print looks — no uploads, no AI, no signup. Edit, preview, and export PNG, JPEG, or WebP in seconds.";
+  "Transform your images with beautiful browser-based effects. Explore dither, ASCII, halftone, glow, print, retro signal, and more.";
 export const SITE_KEYWORDS = [
   "image effects",
   "photo effects online",
@@ -38,18 +37,22 @@ export const SITE_TYPE = "website";
 
 /**
  * The absolute public origin. Override at deploy time via env.
- * Falls back to the production Vercel default and finally localhost.
+ * Priority: NEXT_PUBLIC_SITE_URL > NEXT_PUBLIC_APP_URL > VERCEL_URL > production fallback.
  */
 export function getSiteOrigin(): string {
-  const explicit = process.env.NEXT_PUBLIC_APP_URL;
-  if (explicit && explicit.length > 0) {
-    return explicit.replace(/\/+$/, "");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (siteUrl && siteUrl.length > 0) {
+    return siteUrl.replace(/\/+$/, "");
+  }
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (appUrl && appUrl.length > 0) {
+    return appUrl.replace(/\/+$/, "");
   }
   const vercel = process.env.VERCEL_URL;
   if (vercel) {
     return `https://${vercel}`;
   }
-  return "https://effectsoup-web.vercel.app";
+  return "https://www.effectsoup.com";
 }
 
 /**
