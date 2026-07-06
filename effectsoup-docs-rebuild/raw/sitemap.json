@@ -1,0 +1,26 @@
+{
+  "framework": "plain markdown",
+  "source": "local source (https://effectsoup.com returned HTTP 500)",
+  "pages_collected": 16,
+  "pages": [
+    {"path": "docs", "title": "What is EffectSoup?"},
+    {"path": "docs/getting-started/playground", "title": "Playground"},
+    {"path": "docs/getting-started/packages", "title": "Packages"},
+    {"path": "docs/playground", "title": "Editor Overview"},
+    {"path": "docs/playground/upload-and-crop", "title": "Upload & Crop"},
+    {"path": "docs/playground/controls", "title": "Effect Controls"},
+    {"path": "docs/playground/exporting", "title": "Exporting"},
+    {"path": "docs/effects", "title": "Effects Catalog"},
+    {"path": "docs/api/core", "title": "@effectsoup/core"},
+    {"path": "docs/api/presets", "title": "@effectsoup/presets"},
+    {"path": "docs/api/worker", "title": "@effectsoup/worker"},
+    {"path": "docs/api/meta-package", "title": "@effectsoup/effectsoup"},
+    {"path": "docs/guides/creating-an-effect", "title": "Creating an Effect"},
+    {"path": "docs/guides/testing-effects", "title": "Testing Effects"},
+    {"path": "docs/guides/architecture", "title": "Architecture"},
+    {"path": "docs/guides/performance", "title": "Performance"},
+    {"path": "docs/troubleshooting", "title": "Troubleshooting"},
+    {"path": "docs/faq", "title": "FAQ"}
+  ],
+  "crawl_errors": []
+}

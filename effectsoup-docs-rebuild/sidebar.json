@@ -1,0 +1,34 @@
+{
+  "docs": {
+    "Getting Started": [
+      "docs/getting-started/introduction",
+      "docs/getting-started/installation",
+      "docs/getting-started/quickstart"
+    ],
+    "Guides": [
+      "docs/guides/upload-and-crop",
+      "docs/guides/effect-controls",
+      "docs/guides/exporting",
+      "docs/guides/creating-an-effect",
+      "docs/guides/testing-effects",
+      "docs/guides/performance"
+    ],
+    "Reference": {
+      "API": [
+        "docs/reference/api/core",
+        "docs/reference/api/presets",
+        "docs/reference/api/worker",
+        "docs/reference/api/meta-package"
+      ],
+      "UI": [
+        "docs/reference/editor-overview",
+        "docs/reference/effects-catalog"
+      ]
+    },
+    "Concepts": [
+      "docs/concepts/architecture",
+      "docs/concepts/troubleshooting",
+      "docs/concepts/faq"
+    ]
+  }
+}

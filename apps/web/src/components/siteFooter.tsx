@@ -22,7 +22,7 @@ export function SiteFooter(): JSX.Element {
           <div>
             <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted">Product</h4>
             <ul className="space-y-3">
-              <li><Link href="/docs/effects" className="text-sm text-body-muted hover:text-ink transition-colors">Effects</Link></li>
+              <li><Link href="/docs/reference/effects-catalog" className="text-sm text-body-muted hover:text-ink transition-colors">Effects</Link></li>
               <li><Link href="/playground" className="text-sm text-body-muted hover:text-ink transition-colors">Playground</Link></li>
               <li><Link href="https://github.com/benedicti0n/effectsoup/releases" className="text-sm text-body-muted hover:text-ink transition-colors">Changelog</Link></li>
             </ul>

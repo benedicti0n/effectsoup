@@ -2,35 +2,24 @@ import type { DocsSection, DocsPage } from "./types";
 
 const sections: DocsSection[] = [
   {
-    id: "overview",
-    title: "Overview",
-    pages: [
-      { slug: "docs", title: "What is EffectSoup?", description: "Browser-based non-AI image effects studio" }
-    ]
-  },
-  {
     id: "getting-started",
     title: "Getting Started",
     pages: [
-      { slug: "docs/getting-started/playground", title: "Using the Playground", description: "Upload, apply effects, and export" },
-      { slug: "docs/getting-started/packages", title: "Installing the Packages", description: "npm packages for developers" }
+      { slug: "docs/getting-started/introduction", title: "What is EffectSoup?", description: "Browser-based non-AI image effects studio" },
+      { slug: "docs/getting-started/installation", title: "Installation", description: "npm packages, requirements, and setup" },
+      { slug: "docs/getting-started/quickstart", title: "Quickstart", description: "First 5 minutes in the playground" }
     ]
   },
   {
-    id: "playground",
-    title: "Playground Guide",
+    id: "guides",
+    title: "Guides",
     pages: [
-      { slug: "docs/playground", title: "Editor Overview", description: "Full walkthrough of the editor" },
-      { slug: "docs/playground/upload-and-crop", title: "Upload & Crop", description: "Image loading, cropping, and zoom" },
-      { slug: "docs/playground/controls", title: "Effect Controls", description: "Intensity slider and advanced controls" },
-      { slug: "docs/playground/exporting", title: "Exporting", description: "Format, quality, and resolution options" }
-    ]
-  },
-  {
-    id: "effects",
-    title: "Effects Catalog",
-    pages: [
-      { slug: "docs/effects", title: "All Effects", description: "Browse every preset effect" }
+      { slug: "docs/guides/upload-and-crop", title: "Upload & Crop", description: "Image loading, cropping, and zoom" },
+      { slug: "docs/guides/effect-controls", title: "Effect Controls", description: "Intensity slider and advanced controls" },
+      { slug: "docs/guides/exporting", title: "Exporting", description: "Format, quality, and resolution options" },
+      { slug: "docs/guides/creating-an-effect", title: "Creating an Effect", description: "Anatomy of an EffectPreset" },
+      { slug: "docs/guides/testing-effects", title: "Testing Effects", description: "Test conventions and best practices" },
+      { slug: "docs/guides/performance", title: "Performance", description: "Worker, preview, and optimization tips" }
     ]
   },
   {
@@ -44,19 +33,18 @@ const sections: DocsSection[] = [
     ]
   },
   {
-    id: "guides",
-    title: "Guides",
+    id: "reference",
+    title: "Reference",
     pages: [
-      { slug: "docs/guides/creating-an-effect", title: "Creating an Effect", description: "Anatomy of an EffectPreset" },
-      { slug: "docs/guides/testing-effects", title: "Testing Effects", description: "Test conventions and best practices" },
-      { slug: "docs/guides/architecture", title: "Architecture", description: "Monorepo structure and rendering flow" },
-      { slug: "docs/guides/performance", title: "Performance", description: "Worker, preview, and optimization tips" }
+      { slug: "docs/reference/editor-overview", title: "Editor Overview", description: "UI layout, history, undo, compare, mobile" },
+      { slug: "docs/reference/effects-catalog", title: "Effects Catalog", description: "All 25 presets across 7 categories" }
     ]
   },
   {
-    id: "support",
-    title: "Support",
+    id: "concepts",
+    title: "Concepts",
     pages: [
+      { slug: "docs/guides/architecture", title: "Architecture", description: "Monorepo structure and rendering flow" },
       { slug: "docs/troubleshooting", title: "Troubleshooting", description: "Common issues and solutions" },
       { slug: "docs/faq", title: "FAQ", description: "Frequently asked questions" }
     ]

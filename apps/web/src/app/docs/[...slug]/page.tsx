@@ -2,31 +2,16 @@ import type { JSX } from "react";
 import type { Metadata } from "next";
 import { DocsPageShell } from "@/components/docs/pageShell";
 import { getPageContent } from "@/lib/docs/content";
+import { getFlattenedPages } from "@/lib/docs/navigation";
 
 type Props = {
   params: Promise<{ slug?: string[] }>;
 };
 
 export async function generateStaticParams(): Promise<{ slug?: string[] }[]> {
-  return [
-    { slug: ["getting-started", "playground"] },
-    { slug: ["getting-started", "packages"] },
-    { slug: ["playground"] },
-    { slug: ["playground", "upload-and-crop"] },
-    { slug: ["playground", "controls"] },
-    { slug: ["playground", "exporting"] },
-    { slug: ["effects"] },
-    { slug: ["api", "core"] },
-    { slug: ["api", "presets"] },
-    { slug: ["api", "worker"] },
-    { slug: ["api", "meta-package"] },
-    { slug: ["guides", "creating-an-effect"] },
-    { slug: ["guides", "testing-effects"] },
-    { slug: ["guides", "architecture"] },
-    { slug: ["guides", "performance"] },
-    { slug: ["troubleshooting"] },
-    { slug: ["faq"] }
-  ];
+  return getFlattenedPages().map((p) => ({
+    slug: p.slug.replace("docs/", "").split("/")
+  }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

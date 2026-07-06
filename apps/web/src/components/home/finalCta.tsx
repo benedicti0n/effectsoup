@@ -31,7 +31,7 @@ export function FinalCta(): JSX.Element {
             className="border-on-primary/20 text-on-primary hover:bg-on-primary/10"
             asChild
           >
-            <Link href="/docs/effects">Explore Effects</Link>
+            <Link href="/docs/reference/effects-catalog">Explore Effects</Link>
           </Button>
         </div>
       </div>
