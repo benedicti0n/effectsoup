@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/ui/toast";
 import {
@@ -129,6 +130,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-canvas font-body text-ink-primary antialiased">
         <ClerkProvider>
           <ToastProvider>{children}</ToastProvider>
+          <Analytics />
         </ClerkProvider>
       </body>
     </html>
