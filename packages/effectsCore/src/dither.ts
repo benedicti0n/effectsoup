@@ -138,13 +138,19 @@ export function applyFloydSteinbergColorDither(
  * Cell-based ordered Bayer color dither.
  *
  * Downsamples the source into a cell grid (size = cellSize × cellSize),
- * averages each cell's color, applies a 4x4 Bayer threshold to decide
- * which cells are filled (colored / grayscale) vs empty (black), then
- * scales back up with nearest-neighbor for a clean pixel-print texture.
+ * averages each cell's color, applies a 4×4 Bayer threshold to decide
+ * which cells are *active* (rendered at full source colour / gray) vs
+ * *inactive* (rendered as a light neutral background).
  *
- * At cellSize=1 the grid equals the source resolution and the
- * algorithm degrades gracefully to per-pixel Bayer dither, matching
- * the behaviour of the old applyOrderedDitherColor.
+ * The result is scaled back up with nearest-neighbour, producing clean
+ * coloured square cells on a light grid — a colour halftone look
+ * without any black dots.
+ *
+ * Behaviour of inactive cells:
+ * - Default: light gray (200, 200, 200).
+ * - `coloredInactive`: source colour blended with light gray (50 / 50)
+ *   so every cell shows some colour but inactive ones are visibly
+ *   dimmer.
  */
 export function applyOrderedColorDither(
   source: PixelBuffer,
@@ -165,6 +171,8 @@ export function applyOrderedColorDither(
     [3, 11, 1, 9],
     [15, 7, 13, 5]
   ];
+
+  const LIGHT_GRAY = 200;
 
   const grid = createPixelBuffer(gridW, gridH);
 
@@ -218,19 +226,19 @@ export function applyOrderedColorDither(
         }
       } else if (coloredInactive) {
         if (monochrome) {
-          const gray = clampByte(Math.round(lum));
+          const gray = clampByte(Math.round(lum * 0.5 + LIGHT_GRAY * 0.5));
           grid.data[gridIdx] = gray;
           grid.data[gridIdx + 1] = gray;
           grid.data[gridIdx + 2] = gray;
         } else {
-          grid.data[gridIdx] = clampByte(Math.round(avgR * 0.35));
-          grid.data[gridIdx + 1] = clampByte(Math.round(avgG * 0.35));
-          grid.data[gridIdx + 2] = clampByte(Math.round(avgB * 0.35));
+          grid.data[gridIdx] = clampByte(Math.round((avgR + LIGHT_GRAY) / 2));
+          grid.data[gridIdx + 1] = clampByte(Math.round((avgG + LIGHT_GRAY) / 2));
+          grid.data[gridIdx + 2] = clampByte(Math.round((avgB + LIGHT_GRAY) / 2));
         }
       } else {
-        grid.data[gridIdx] = 0;
-        grid.data[gridIdx + 1] = 0;
-        grid.data[gridIdx + 2] = 0;
+        grid.data[gridIdx] = LIGHT_GRAY;
+        grid.data[gridIdx + 1] = LIGHT_GRAY;
+        grid.data[gridIdx + 2] = LIGHT_GRAY;
       }
       grid.data[gridIdx + 3] = 255;
     }

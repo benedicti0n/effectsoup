@@ -149,14 +149,37 @@ describe("applyOrderedColorDither", () => {
       cellSize: 4, threshold: 128, invert: false, monochrome: false, coloredInactive: true
     });
 
-    // Standard mode has some black cells (R=0 == G=0 == B=0).
-    let standardBlack = 0;
-    let coloredBlack = 0;
+    // Neither mode should have black cells (inactive fill is light gray,
+    // coloredInactive inactive fill is a gray-blended colour).
     for (let i = 0; i < standard.data.length; i += 4) {
-      if (standard.data[i] === 0 && standard.data[i + 1] === 0 && standard.data[i + 2] === 0) standardBlack++;
-      if (colored.data[i] === 0 && colored.data[i + 1] === 0 && colored.data[i + 2] === 0) coloredBlack++;
+      expect(standard.data[i]).not.toBe(0);
+      expect(standard.data[i + 1]).not.toBe(0);
+      expect(standard.data[i + 2]).not.toBe(0);
     }
-    expect(standardBlack).toBeGreaterThan(0);
-    expect(coloredBlack).toBe(0);
+    for (let i = 0; i < colored.data.length; i += 4) {
+      expect(colored.data[i]).not.toBe(0);
+      expect(colored.data[i + 1]).not.toBe(0);
+      expect(colored.data[i + 2]).not.toBe(0);
+    }
+
+    // Verify the difference: standard inactive cells are uniform light gray
+    // (200), whereas coloredInactive inactive cells contain source hue.
+    const standardGrayCount: number[] = [0, 0, 0];
+    const coloredGrayCount: number[] = [0, 0, 0];
+    for (let i = 0; i < standard.data.length; i += 4) {
+      if (standard.data[i] === 200 && standard.data[i + 1] === 200 && standard.data[i + 2] === 200) {
+        standardGrayCount[0]++;
+      }
+      if (standard.data[i] !== standard.data[i + 1] || standard.data[i + 1] !== standard.data[i + 2]) {
+        coloredGrayCount[0]++;
+      }
+    }
+    // Standard mode should have many light-gray pixels (inactive cells).
+    expect(standardGrayCount[0]).toBeGreaterThan(0);
+    // coloredInactive should have some pixels where R≠G≠B (hue preserved).
+    const coloredHasHue = colored.data.some((_, i) =>
+      i % 4 === 0 && colored.data[i] !== colored.data[i + 1]
+    );
+    expect(coloredHasHue).toBe(true);
   });
 });
