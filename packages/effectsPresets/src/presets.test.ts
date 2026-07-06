@@ -32,8 +32,8 @@ function avgLuminance(buf: PixelBuffer): number {
 }
 
 describe("presets", () => {
-  it("has 27 presets total", () => {
-    expect(allPresets.length).toBe(27);
+  it("has 25 presets total", () => {
+    expect(allPresets.length).toBe(25);
   });
 
   it("every preset resolves valid defaults", () => {
@@ -572,134 +572,7 @@ describe("presets", () => {
       expect(resolved.glowAmount).toBe(6);
     });
 
-    it("Color Dither produces a same-sized output at intensity 50", () => {
-      const preset = allPresets.find((p) => p.id === "colorDither");
-      expect(preset).toBeDefined();
-      const source = createPixelBuffer(40, 40, [200, 100, 50, 255]);
-      const resolved = preset!.intensityMapper(50, {});
-      const pipeline = preset!.createPipeline(resolved);
-      const output = pipeline(source, resolved);
-      expect(output.width).toBe(source.width);
-      expect(output.height).toBe(source.height);
-      // Ordered dither must change at least one pixel byte.
-      let changed = 0;
-      for (let i = 0; i < output.data.length; i++) {
-        if (output.data[i] !== source.data[i]) changed++;
-      }
-      expect(changed).toBeGreaterThan(0);
-    });
 
-    it("Color Dither preserves color (per-channel) rather than collapsing to gray", () => {
-      // An image whose channels differ significantly should not collapse
-      // to grayscale after dithering — that's the difference vs the
-      // applyOrderedDither mono path.
-      const source = createPixelBuffer(16, 16, [200, 60, 30, 255]);
-      const preset = allPresets.find((p) => p.id === "colorDither")!;
-      const resolved = preset.intensityMapper(50, {});
-      const pipeline = preset.createPipeline(resolved);
-      const output = pipeline(source, resolved);
-
-      let unequalRGB = 0;
-      for (let i = 0; i < output.data.length; i += 4) {
-        const r = output.data[i];
-        const g = output.data[i + 1];
-        const b = output.data[i + 2];
-        if (r !== g || g !== b) unequalRGB++;
-      }
-      // The bulk of dithered pixels should still have at least one
-      // channel diverging from the others.
-      expect(unequalRGB).toBeGreaterThan(0);
-    });
-
-    it("Color Dither at intensity 0 is an exact source clone", () => {
-      const preset = allPresets.find((p) => p.id === "colorDither")!;
-      const source = createPixelBuffer(20, 20, [80, 160, 240, 255]);
-      for (let i = 0; i < source.data.length; i += 8) {
-        source.data[i] = 200;
-      }
-      const original = new Uint8ClampedArray(source.data);
-      const resolved = preset.intensityMapper(0, {});
-      const pipeline = preset.createPipeline(resolved);
-      const output = pipeline(source, resolved);
-      expect(Array.from(output.data)).toEqual(Array.from(original));
-    });
-
-    it("Color Dither defaults to cellSize 2", () => {
-      const preset = allPresets.find((p) => p.id === "colorDither")!;
-      const resolved = preset.intensityMapper(50, {});
-      expect(resolved.cellSize).toBe(2);
-    });
-
-    it("Colored Cell Dither defaults to cellSize 2 and produces coloured output", () => {
-      const preset = allPresets.find((p) => p.id === "coloredCellDither")!;
-      expect(preset.defaultIntensity).toBe(60);
-      const resolved = preset.intensityMapper(50, {});
-      expect(resolved.cellSize).toBe(2);
-      // Pipeline produces output at source size.
-      const source = createPixelBuffer(24, 24, [80, 140, 200, 255]);
-      const pipeline = preset.createPipeline(resolved);
-      const output = pipeline(source, resolved);
-      expect(output.width).toBe(source.width);
-      expect(output.height).toBe(source.height);
-      // Output is coloured (not monochrome).
-      let hasColor = false;
-      for (let i = 0; i < output.data.length; i += 4) {
-        const r = output.data[i];
-        const g = output.data[i + 1];
-        const b = output.data[i + 2];
-        if (r !== g || g !== b) { hasColor = true; break; }
-      }
-      expect(hasColor).toBe(true);
-    });
-
-    it("Color Dither larger cellSize produces visibly larger output blocks", () => {
-      const preset = allPresets.find((p) => p.id === "colorDither")!;
-      // Left: high-chroma orange;  Right: low-chroma grayish-purple.
-      // After brightness/contrast adjustment at intensity 50, the two
-      // halves produce very different activation densities — the right
-      // side has many inactive (background) cells, creating many small
-      // colour transitions that are coarser at larger cellSize.
-      const source = createPixelBuffer(64, 64);
-      for (let y = 0; y < 64; y++) {
-        for (let x = 0; x < 64; x++) {
-          const idx = (y * 64 + x) * 4;
-          if (x < 32) {
-            source.data[idx] = 200; source.data[idx + 1] = 90;  source.data[idx + 2] = 50;
-          } else {
-            source.data[idx] = 100; source.data[idx + 1] = 96;  source.data[idx + 2] = 110;
-          }
-          source.data[idx + 3] = 255;
-        }
-      }
-
-      const small = preset.createPipeline(
-        preset.intensityMapper(50, { cellSize: 4 })
-      )(source, preset.intensityMapper(50, { cellSize: 4 }));
-      const large = preset.createPipeline(
-        preset.intensityMapper(50, { cellSize: 8 })
-      )(source, preset.intensityMapper(50, { cellSize: 8 }));
-
-      const runs = (buf: Uint8ClampedArray): number => {
-        let count = 1;
-        for (let x = 4; x < buf.length; x += 4) {
-          if (buf[x] !== buf[x - 4]) count++;
-        }
-        return count;
-      };
-      expect(runs(large.data.subarray(0, 64 * 4))).toBeLessThan(
-        runs(small.data.subarray(0, 64 * 4))
-      );
-    });
-
-    it("Color Dither is deterministic", () => {
-      const preset = allPresets.find((p) => p.id === "colorDither")!;
-      const source = createPixelBuffer(24, 24, [80, 140, 200, 255]);
-      const resolved = preset.intensityMapper(50, {});
-      const pipeline = preset.createPipeline(resolved);
-      const a = pipeline(source, resolved);
-      const b = pipeline(source, resolved);
-      expect(a.data).toEqual(b.data);
-    });
 
     it("Duotone defaults to black shadow", () => {
       const preset = allPresets.find((p) => p.id === "duotone");

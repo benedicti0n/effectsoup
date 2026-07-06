@@ -22,7 +22,7 @@ const UPLOADED_IMAGE_ID = -1;
 export const MINI_PLAYGROUND_PRESETS: readonly string[] = [
   "pixelGrid",
   "orderedDither",
-  "colorDither",
+
   "classicAscii",
   "cyberAscii",
   "symbolGlow",
