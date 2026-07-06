@@ -654,14 +654,19 @@ describe("presets", () => {
 
     it("Color Dither larger cellSize produces visibly larger output blocks", () => {
       const preset = allPresets.find((p) => p.id === "colorDither")!;
+      // Left: high-chroma orange;  Right: low-chroma grayish-purple.
+      // After brightness/contrast adjustment at intensity 50, the two
+      // halves produce very different activation densities — the right
+      // side has many inactive (background) cells, creating many small
+      // colour transitions that are coarser at larger cellSize.
       const source = createPixelBuffer(64, 64);
       for (let y = 0; y < 64; y++) {
         for (let x = 0; x < 64; x++) {
           const idx = (y * 64 + x) * 4;
           if (x < 32) {
-            source.data[idx] = 180; source.data[idx + 1] = 80; source.data[idx + 2] = 80;
+            source.data[idx] = 200; source.data[idx + 1] = 90;  source.data[idx + 2] = 50;
           } else {
-            source.data[idx] = 80; source.data[idx + 1] = 80; source.data[idx + 2] = 180;
+            source.data[idx] = 100; source.data[idx + 1] = 96;  source.data[idx + 2] = 110;
           }
           source.data[idx + 3] = 255;
         }

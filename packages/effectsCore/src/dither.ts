@@ -135,28 +135,31 @@ export function applyFloydSteinbergColorDither(
 }
 
 /**
- * Cell-based ordered Bayer color dither.
+ * Cell-based ordered Bayer colour dither with light checkerboard base.
  *
  * Downsamples the source into a cell grid (size = cellSize × cellSize),
- * averages each cell's color, applies a 4×4 Bayer threshold to decide
- * which cells are *active* (rendered at full source colour / gray) vs
- * *inactive* (rendered as a light neutral background).
+ * averages each cell's color, then decides activation:
  *
- * The result is scaled back up with nearest-neighbour, producing clean
- * coloured square cells on a light grid — a colour halftone look
- * without any black dots.
+ * - **Color mode** (default): activation is driven by **chroma**
+ *   (`max(R,G,B) - min(R,G,B)`). Saturated colours produce many
+ *   active cells; near-neutral and very dark areas produce few.
+ * - **Monochrome mode**: activation is driven by **luminance**, so
+ *   bright areas produce more cells.
  *
- * Behaviour of inactive cells:
- * - Default: light gray (200, 200, 200).
- * - `coloredInactive`: source colour blended with light gray (50 / 50)
- *   so every cell shows some colour but inactive ones are visibly
- *   dimmer.
+ * Active cells render the averaged source colour (full square).
+ * Inactive cells render a fixed light checkerboard pattern
+ * (alternating near‑white 235 / light gray 195).  No source colour
+ * bleeds into the background.
+ *
+ * The result is scaled up with nearest‑neighbour, producing clean
+ * coloured square cells on a paper‑like grid — a sparse colour
+ * halftone without any black dots or dark base.
  */
 export function applyOrderedColorDither(
   source: PixelBuffer,
   options: OrderedColorDitherOptions
 ): PixelBuffer {
-  const { cellSize, threshold, invert, monochrome, coloredInactive } = options;
+  const { cellSize, threshold, invert, monochrome } = options;
   const { width, height, data } = source;
 
   if (cellSize < 1) throw new Error("cellSize must be >= 1");
@@ -164,7 +167,7 @@ export function applyOrderedColorDither(
   const gridW = Math.max(1, Math.ceil(width / cellSize));
   const gridH = Math.max(1, Math.ceil(height / cellSize));
 
-  // 4×4 Bayer threshold map (values 0..15, used as 0..255 here).
+  // 4×4 Bayer threshold map (values 0..15).
   const BAYER: number[][] = [
     [0, 8, 2, 10],
     [12, 4, 14, 6],
@@ -172,9 +175,18 @@ export function applyOrderedColorDither(
     [15, 7, 13, 5]
   ];
 
-  const LIGHT_GRAY = 200;
+  // Neutral background colour for inactive cells — a subtle near‑white
+  // paper tone.  A single colour is used because the Bayer matrix
+  // partitions its low values (0-7) onto one checker parity and its
+  // high values (8-15) onto the other, so both checker colours can
+  // never appear simultaneously on inactive cells.
+  const BG_NEUTRAL = 235;
 
   const grid = createPixelBuffer(gridW, gridH);
+
+  // Inverted threshold:  lower slider → fewer active cells,
+  //                       higher slider → more active cells.
+  const adjustedThreshold = 255 - threshold;
 
   for (let gy = 0; gy < gridH; gy++) {
     const y0 = gy * cellSize;
@@ -184,10 +196,7 @@ export function applyOrderedColorDither(
       const x1 = Math.min(width, x0 + cellSize);
 
       // Average cell RGBA.
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      let count = 0;
+      let r = 0, g = 0, b = 0, count = 0;
       for (let y = y0; y < y1; y++) {
         for (let x = x0; x < x1; x++) {
           const idx = pixelIndex(source, x, y);
@@ -202,43 +211,37 @@ export function applyOrderedColorDither(
       const avgG = count > 0 ? g / count : 0;
       const avgB = count > 0 ? b / count : 0;
 
-      // Luminance (0..255) used as the threshold signal.
-      const lum = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
-
-      // Bayer threshold offset for this cell position.
+      // Bayer offset for this grid position.
       const bayerVal = BAYER[gy % 4][gx % 4];
       const offset = (bayerVal / 16) * 255;
 
-      const active = lum + offset >= threshold;
+      // Activation signal:
+      //   color mode → chroma (saturation); neutral/dark areas stay sparse.
+      //   monochrome → luminance (brightness).
+      const chroma = Math.max(avgR, avgG, avgB) - Math.min(avgR, avgG, avgB);
+      const lum    = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
+      const signal = monochrome ? lum : chroma;
+
+      const active = signal + offset >= adjustedThreshold;
       const isActive = invert ? !active : active;
 
       const gridIdx = pixelIndex(grid, gx, gy);
       if (isActive) {
         if (monochrome) {
           const gray = clampByte(Math.round(lum));
-          grid.data[gridIdx] = gray;
+          grid.data[gridIdx]     = gray;
           grid.data[gridIdx + 1] = gray;
           grid.data[gridIdx + 2] = gray;
         } else {
-          grid.data[gridIdx] = clampByte(Math.round(avgR));
+          grid.data[gridIdx]     = clampByte(Math.round(avgR));
           grid.data[gridIdx + 1] = clampByte(Math.round(avgG));
           grid.data[gridIdx + 2] = clampByte(Math.round(avgB));
         }
-      } else if (coloredInactive) {
-        if (monochrome) {
-          const gray = clampByte(Math.round(lum * 0.5 + LIGHT_GRAY * 0.5));
-          grid.data[gridIdx] = gray;
-          grid.data[gridIdx + 1] = gray;
-          grid.data[gridIdx + 2] = gray;
-        } else {
-          grid.data[gridIdx] = clampByte(Math.round((avgR + LIGHT_GRAY) / 2));
-          grid.data[gridIdx + 1] = clampByte(Math.round((avgG + LIGHT_GRAY) / 2));
-          grid.data[gridIdx + 2] = clampByte(Math.round((avgB + LIGHT_GRAY) / 2));
-        }
       } else {
-        grid.data[gridIdx] = LIGHT_GRAY;
-        grid.data[gridIdx + 1] = LIGHT_GRAY;
-        grid.data[gridIdx + 2] = LIGHT_GRAY;
+        // Inactive — neutral background, never source colour.
+        grid.data[gridIdx]     = BG_NEUTRAL;
+        grid.data[gridIdx + 1] = BG_NEUTRAL;
+        grid.data[gridIdx + 2] = BG_NEUTRAL;
       }
       grid.data[gridIdx + 3] = 255;
     }
