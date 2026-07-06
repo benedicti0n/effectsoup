@@ -128,6 +128,7 @@ export function MiniPlayground(): JSX.Element {
                     selectedDemo === num ? "border-ink-primary" : "border-hairline hover:border-muted"
                   )}
                   aria-label={`Select demo image ${num}`}
+                  title={`Demo photo ${num}`}
                 >
                   <NextImage
                     src={`/assets/showcase/img${num}.png`}

@@ -156,7 +156,7 @@ export const dreamGlowPreset: EffectPreset = {
   id: "dreamGlow",
   name: "Dream Glow",
   description:
-    "Multi-band selective highlight bloom with a saturated warm tint that preserves orange chroma in highlights. Color-enrich + selective saturation in lit areas. Tight halo on eye highlights, warm bloom on skin, atmospheric spread from large lit regions; deep cinematic indigo shadows.",
+    "Warm-tinted glow effect with highlight bloom and cinematic indigo shadows.",
   category: "atmosphereGlow",
   defaultIntensity: 50,
   advancedControlSchema: [

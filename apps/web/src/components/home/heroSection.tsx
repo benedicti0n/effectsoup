@@ -56,31 +56,37 @@ export function HeroSection(): JSX.Element {
       )}
       <div className="mx-auto max-w-container px-4 py-16 lg:px-8 lg:py-24">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Left: editorial copy as a bigger card */}
-          <div className="rounded-lg border border-hairline bg-canvas p-6 shadow-sm lg:p-8">
-            <h1 className="font-serif-display text-3xl leading-[1.2] tracking-tight text-ink-primary md:text-4xl lg:text-5xl">
-              Beautiful results <br />
-              <span className="italic text-accent">in a few clicks.</span>
-            </h1>
-            <p className="mt-4 text-base leading-relaxed text-body-muted md:text-lg">
-              Made for creators, developers, and curious visual people.
+          {/* Left: editorial copy */}
+          <div className="max-w-lg">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-accent">
+              Image Effects for Creators &amp; Developers
             </p>
-            <div className="mt-6 space-y-2">
-              {["No subscriptions", "No watermarks", "No hidden limits"].map(
-                (item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs text-accent">
-                      ✓
-                    </span>
-                    <span className="text-sm font-medium text-ink">{item}</span>
-                  </div>
-                )
-              )}
-            </div>
+            <h1 className="font-serif-display text-4xl leading-[1.15] tracking-tight text-ink-primary md:text-5xl lg:text-6xl">
+              Turn ordinary images into <br />
+              <span className="italic text-accent">beautiful</span> effects.
+            </h1>
+            <p className="mt-5 text-base leading-relaxed text-body-muted md:text-lg">
+              Upload a photo, pick a look, and export in seconds. No AI, no uploads
+              to a server — every pixel is processed right in your browser.
+            </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild>
                 <Link href="/playground">Try Playground</Link>
               </Button>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-5 text-sm text-muted">
+              <span className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                No credit card
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                Instant results
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                Export anywhere
+              </span>
             </div>
           </div>
 
@@ -177,6 +183,7 @@ export function HeroSection(): JSX.Element {
                       selectedDemo === num ? "border-accent" : "border-hairline hover:border-muted"
                     )}
                     aria-label={`Select demo image ${num}`}
+                    title={`Demo photo ${num}`}
                   >
                     <NextImage
                       src={`/assets/showcase/img${num}.png`}
