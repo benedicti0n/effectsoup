@@ -186,7 +186,7 @@ export function applyOrderedColorDither(
 
   // Inverted threshold:  lower slider → fewer active cells,
   //                       higher slider → more active cells.
-  const adjustedThreshold = 255 - threshold;
+  const adjustedThreshold = Math.max(0, 215 - threshold * 0.85);
 
   for (let gy = 0; gy < gridH; gy++) {
     const y0 = gy * cellSize;
@@ -216,11 +216,13 @@ export function applyOrderedColorDither(
       const offset = (bayerVal / 16) * 255;
 
       // Activation signal:
-      //   color mode → chroma (saturation); neutral/dark areas stay sparse.
-      //   monochrome → luminance (brightness).
+      //   color mode → chroma + luminance blend + baseline.
+      //   This prevents dark/chroma‑poor areas from collapsing to
+      //   all‑background while keeping saturated regions dominant.
+      //   monochrome → luminance only.
       const chroma = Math.max(avgR, avgG, avgB) - Math.min(avgR, avgG, avgB);
       const lum    = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
-      const signal = monochrome ? lum : chroma;
+      const signal = monochrome ? lum : (chroma + lum * 0.2 + 15);
 
       const active = signal + offset >= adjustedThreshold;
       const isActive = invert ? !active : active;
@@ -233,9 +235,12 @@ export function applyOrderedColorDither(
           grid.data[gridIdx + 1] = gray;
           grid.data[gridIdx + 2] = gray;
         } else {
-          grid.data[gridIdx]     = clampByte(Math.round(avgR));
-          grid.data[gridIdx + 1] = clampByte(Math.round(avgG));
-          grid.data[gridIdx + 2] = clampByte(Math.round(avgB));
+          // Slightly boost saturation so active cells pop against the
+          // neutral background.  Hue is preserved; only chroma increases.
+          const mid = (avgR + avgG + avgB) / 3;
+          grid.data[gridIdx]     = clampByte(Math.round(avgR + (avgR - mid) * 0.25));
+          grid.data[gridIdx + 1] = clampByte(Math.round(avgG + (avgG - mid) * 0.25));
+          grid.data[gridIdx + 2] = clampByte(Math.round(avgB + (avgB - mid) * 0.25));
         }
       } else {
         // Inactive — neutral background, never source colour.

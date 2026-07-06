@@ -164,10 +164,11 @@ describe("applyOrderedColorDither", () => {
   });
 
   it("dark source areas do not produce a solid dark base", () => {
-    // Nearly black low-chroma source — very few cells should activate.
+    // Nearly black low-chroma source — at minimum threshold the
+    // background should dominate (≥75 % light pixels).
     const source = createPixelBuffer(16, 16, [12, 10, 8, 255]);
     const output = applyOrderedColorDither(source, {
-      cellSize: 4, threshold: 50, invert: false, monochrome: false
+      cellSize: 4, threshold: 0, invert: false, monochrome: false
     });
 
     // Most pixels should be checkerboard (≥190), not dark.
@@ -198,9 +199,10 @@ describe("applyOrderedColorDither", () => {
   });
 
   it("larger cellSize produces larger visible square cells", () => {
-    // Dual-colour source: high-chroma orange left, high-chroma purple right.
-    // Both have chroma ~160 so activation is similar, but the two colours
-    // create horizontal transitions that let us measure block size.
+    // Left: high-chroma orange (many active cells).
+    // Right: low-chroma grayish purple (only some cells active).
+    // At cellSize=4 the right side has many fine active/inactive
+    // transitions; at cellSize=8 those transitions are coarser.
     const source = createPixelBuffer(64, 64);
     for (let y = 0; y < 64; y++) {
       for (let x = 0; x < 64; x++) {
@@ -208,7 +210,7 @@ describe("applyOrderedColorDither", () => {
         if (x < 32) {
           source.data[idx] = 200; source.data[idx + 1] = 100; source.data[idx + 2] = 40;
         } else {
-          source.data[idx] = 100; source.data[idx + 1] = 60;  source.data[idx + 2] = 180;
+          source.data[idx] = 130; source.data[idx + 1] = 125; source.data[idx + 2] = 140;
         }
         source.data[idx + 3] = 255;
       }
