@@ -10,7 +10,7 @@ import {
   Mail01Icon,
   UserIcon
 } from "@hugeicons/core-free-icons";
-import { authClient } from "@/lib/authClient";
+import { useSignIn, useSignUp } from "@clerk/nextjs/legacy";
 
 export function SignInDialog({
   onClose,
@@ -26,28 +26,45 @@ export function SignInDialog({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const { signIn, setActive: setSignInActive } = useSignIn();
+  const { signUp, setActive: setSignUpActive } = useSignUp();
+
   const submit = async () => {
     setLoading(true);
     setError(null);
 
     try {
       if (mode === "signup") {
-        const result = await authClient.signUp.email({
-          email,
+        if (!signUp) {
+          setError("Sign up is not available");
+          return;
+        }
+        const result = await signUp.create({
+          emailAddress: email,
           password,
-          name
+          firstName: name
         });
-        if (result.error) {
-          setError(result.error.message ?? "Sign up failed");
+
+        if (result.status === "complete") {
+          await setSignUpActive({ session: result.createdSessionId });
+        } else {
+          setError("Email verification required. Please check your inbox.");
           return;
         }
       } else {
-        const result = await authClient.signIn.email({
-          email,
+        if (!signIn) {
+          setError("Sign in is not available");
+          return;
+        }
+        const result = await signIn.create({
+          identifier: email,
           password
         });
-        if (result.error) {
-          setError(result.error.message ?? "Sign in failed");
+
+        if (result.status === "complete") {
+          await setSignInActive({ session: result.createdSessionId });
+        } else {
+          setError("Additional verification required.");
           return;
         }
       }
@@ -64,10 +81,15 @@ export function SignInDialog({
     setLoading(true);
     setError(null);
     try {
-      const result = await authClient.signIn.social({ provider: "google" });
-      if (result && "error" in result && result.error) {
-        setError(result.error.message ?? "Google sign in failed");
+      if (!signIn) {
+        setError("Sign in is not available");
+        return;
       }
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/"
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign in failed");
     } finally {

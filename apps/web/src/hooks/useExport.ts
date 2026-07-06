@@ -5,7 +5,7 @@ import { getPresetById } from "@effectsoup/presets";
 import { getCroppedOutputSize } from "@effectsoup/core";
 import { useEditorStore } from "@/store/editorStore";
 import { renderEffectSync } from "@/lib/renderEffect";
-import { authClient } from "@/lib/authClient";
+import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/components/ui/toast";
 import {
   loadImageSource,
@@ -26,12 +26,12 @@ export function useExport(onClose: () => void) {
   const [resolution, setResolution] = useState<ExportResolution>("1080");
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { data: session } = authClient.useSession();
+  const { isSignedIn } = useUser();
   const { showToast } = useToast();
 
   const exportImage = useCallback(async () => {
     if (!source) return;
-    if (!session) return;
+    if (!isSignedIn) return;
     setIsExporting(true);
     setError(null);
 
@@ -71,10 +71,10 @@ export function useExport(onClose: () => void) {
     } finally {
       setIsExporting(false);
     }
-  }, [source, crop, effect, format, quality, resolution, session, onClose, showToast]);
+  }, [source, crop, effect, format, quality, resolution, isSignedIn, onClose, showToast]);
 
   return {
-    session,
+    isSignedIn,
     format,
     setFormat,
     quality,

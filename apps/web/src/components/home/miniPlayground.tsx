@@ -11,7 +11,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { SignInDialog } from "@/components/auth/signInDialog";
-import { authClient } from "@/lib/authClient";
+import { useUser } from "@clerk/nextjs";
 import NextImage from "next/image";
 import { cn } from "@/lib/utils";
 import { useMiniPlayground } from "@/hooks/useMiniPlayground";
@@ -33,10 +33,10 @@ export function MiniPlayground(): JSX.Element {
     setSelectedDemo
   } = useMiniPlayground();
   const [showSignIn, setShowSignIn] = useState(false);
-  const { data: session } = authClient.useSession();
+  const { isSignedIn } = useUser();
 
   const onDownload = () => {
-    if (session) {
+    if (isSignedIn) {
       void handleDownload();
     } else {
       setShowSignIn(true);

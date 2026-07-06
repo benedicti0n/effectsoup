@@ -5,7 +5,7 @@ import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Logout01Icon, UserIcon } from "@hugeicons/core-free-icons";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/authClient";
+import { useUser, useAuth } from "@clerk/nextjs";
 import { SignInDialog } from "@/components/auth/signInDialog";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
@@ -13,30 +13,21 @@ import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 
 export default function AccountPage(): JSX.Element {
-  const sessionQuery = authClient.useSession();
-  const session = sessionQuery.data;
-  const isPending = sessionQuery.isPending;
-  const refetchSession = sessionQuery.refetch;
+  const { isLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useAuth();
   const [showSignIn, setShowSignIn] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const router = useRouter();
   const { showToast } = useToast();
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     if (signingOut) return;
     setSigningOut(true);
     try {
-      await authClient.signOut();
+      await signOut();
     } catch (err) {
       console.error("signOut request failed:", err);
     }
-
-    try {
-      await refetchSession();
-    } catch (err) {
-      console.error("session refetch after signOut failed:", err);
-    }
-
     setSigningOut(false);
     showToast("Signed out", "success");
     router.replace("/");
@@ -59,9 +50,9 @@ export default function AccountPage(): JSX.Element {
           </div>
 
           <div className="rounded-lg border border-hairline bg-canvas p-6 shadow-sm md:p-8">
-            {isPending ? (
+            {!isLoaded ? (
               <p className="text-sm text-muted">Loading…</p>
-            ) : session ? (
+            ) : isSignedIn && user ? (
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-soft-stone">
@@ -69,15 +60,15 @@ export default function AccountPage(): JSX.Element {
                   </div>
                   <div>
                     <p className="font-display text-base font-medium text-ink-primary">
-                      {session.user.name ?? "User"}
+                      {user.fullName ?? "User"}
                     </p>
-                    <p className="text-sm text-body-muted">{session.user.email}</p>
+                    <p className="text-sm text-body-muted">{user.emailAddresses?.[0]?.emailAddress}</p>
                   </div>
                 </div>
                 <div className="border-t border-hairline pt-4">
                   <Button
                     variant="outline"
-                    onClick={() => void signOut()}
+                    onClick={() => void handleSignOut()}
                     disabled={signingOut}
                   >
                     <HugeiconsIcon icon={Logout01Icon} className="h-4 w-4" />

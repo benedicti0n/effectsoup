@@ -16,7 +16,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { authClient } from "@/lib/authClient";
+import { useUser, UserButton, SignInButton } from "@clerk/nextjs";
 import { CanvasPreview } from "./canvasPreview";
 import { EffectControls } from "./effectControls";
 import { ExportDialog } from "./exportDialog";
@@ -51,7 +51,7 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
   const [showExport, setShowExport] = useState(false);
   const [showMobileLibrary, setShowMobileLibrary] = useState(false);
   const replaceInputRef = useRef<HTMLInputElement>(null);
-  const { data: session } = authClient.useSession();
+  const { user } = useUser();
 
   const handleReplaceFile = useCallback(
     async (file: File) => {
@@ -160,14 +160,23 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
           >
             <GitHubIcon />
           </a>
-          <Link
-            href="/account"
-            title={session?.user.email ?? "Account"}
-            aria-label="Account"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-hairline bg-canvas text-ink hover:bg-soft-stone"
-          >
-            <HugeiconsIcon icon={UserIcon} className="h-4 w-4" />
-          </Link>
+          {user ? (
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "h-8 w-8 rounded-lg border border-hairline",
+                  userButtonTrigger: "focus:shadow-none"
+                }
+              }}
+            />
+          ) : (
+            <SignInButton mode="modal">
+              <Button variant="primary" size="sm">
+                <HugeiconsIcon icon={UserIcon} className="h-4 w-4" />
+                Sign In
+              </Button>
+            </SignInButton>
+          )}
 
           <Button
             onClick={() => setShowExport(true)}
