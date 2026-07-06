@@ -2,6 +2,9 @@
 
 Pure TypeScript image-processing primitives. No DOM, no framework dependencies, no AI — just deterministic pixel math.
 
+**→ [API Reference](https://effectsoup-web.vercel.app/docs/api/core)**
+**→ [Full Docs](https://effectsoup-web.vercel.app/docs)**
+
 ## Install
 
 ```bash
@@ -45,13 +48,29 @@ ctx.putImageData(
 
 - `PixelBuffer` — portable raw RGBA buffer
 - `createPixelBuffer`, `clonePixelBuffer`, `fillPixelBuffer`
-- Color: `toGrayscale`, `adjustBrightnessContrast`, `adjustSaturation`, `applyDuotone`, `applyTint`
+- Color: `toGrayscale`, `adjustBrightnessContrast`, `adjustSaturation`, `applyDuotone`, `applyPosterize`, `reducePalette`, `applyTint`
 - Dither / halftone: `applyOrderedDither`, `applyFloydSteinbergDither`, `renderHalftoneData`
-- Effects: `applyNoise`, `applyGrain`, `applyVignette`, `applyRgbShift`, `applyScanlines`
-- ASCII rendering, glow/bloom, edge detection, glass/frost tiles, LED matrix, stippling, glitch, wave slice, and more
+- ASCII rendering, glow/bloom, edge detection, glass distortion, LED matrix, stippling, glitch, wave slice, manga scanlines, pencil grain, and more
+- Viewport transform: `applyViewportTransform`, `getCroppedOutputSize`
 
 All primitives are synchronous and operate on plain byte arrays, so they work in the browser, in a Web Worker, or in Node.js.
 
-## Repository
+## Development
 
-[https://github.com/benedicti0n/effectsoup](https://github.com/benedicti0n/effectsoup)
+```bash
+# Build
+pnpm build
+
+# Type check
+pnpm typecheck
+
+# Test
+pnpm test
+
+# Lint
+pnpm lint
+```
+
+## License
+
+MIT

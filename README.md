@@ -8,23 +8,26 @@ cinematic bloom, glitch, CRT, and graphic-print looks — then export to
 PNG, JPEG, or WebP. Every pixel is processed in a Web Worker on your
 device; no uploads, no AI, no signup required.
 
-Built with the Cohere design system and designed for instant
-interaction: crop, pan, and adjust the Intensity slider with live
-preview.
+**→ [Try the Playground](https://effectsoup-web.vercel.app/playground)**
+**→ [Read the Docs](https://effectsoup-web.vercel.app/docs)**
+
+## Packages
+
+| Package | Description |
+|---|---|
+| [`@effectsoup/core`](./packages/effectsCore) | Pure TypeScript image-processing primitives |
+| [`@effectsoup/presets`](./packages/effectsPresets) | Effect presets with Intensity mapping and advanced controls |
+| [`@effectsoup/worker`](./packages/effectsWorker) | Web Worker client for off-thread rendering |
+| [`@effectsoup/effectsoup`](./packages/effectsoup) | All-in-one meta-package |
 
 ## Tech Stack
 
 - **Monorepo:** pnpm workspaces + Turborepo
 - **App:** Next.js 15 App Router (RSC), React 19, TypeScript, Tailwind CSS
-- **Image Engine:**
-  - `@effectsoup/core` — pure TypeScript image-processing primitives
-  - `@effectsoup/presets` — product preset definitions and pipelines
-  - `@effectsoup/worker` — Web Worker communication layer
+- **Image Engine:** Pure TypeScript — no WebGL, no WASM, no AI
 - **Auth:** Better Auth (Google OAuth + email/password)
 - **Database:** Neon PostgreSQL + Drizzle ORM
 - **Cache/Rate Limits:** Upstash Redis
-- **SEO:** `app/robots.ts`, `app/sitemap.ts`, JSON-LD structured data,
-  OpenGraph + Twitter cards, per-page metadata, `manifest.webmanifest`
 - **Tests:** Vitest + Playwright
 
 ## Local Setup
@@ -40,9 +43,7 @@ preview.
 3. Build internal packages:
 
    ```bash
-   pnpm --filter @effectsoup/core build
-   pnpm --filter @effectsoup/presets build
-   pnpm --filter @effectsoup/worker build
+   pnpm build
    ```
 
 4. Run the development server:
@@ -55,26 +56,15 @@ preview.
 
 ## Environment Variables
 
-Required for local development:
-
 ```text
 DATABASE_URL=
 BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-```
-
-Optional depending on features:
-
-```text
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-SENTRY_DSN=
-NEXT_PUBLIC_POSTHOG_KEY=
-NEXT_PUBLIC_POSTHOG_HOST=
-BETTER_AUTH_TRUSTED_ORIGINS=
 ```
 
 ## Commands
@@ -86,7 +76,6 @@ pnpm typecheck    # Type check all packages
 pnpm lint         # Lint all packages
 pnpm test         # Run unit tests
 pnpm test:e2e     # Run Playwright tests (requires dev server)
-pnpm loadtest     # Run k6 backend load test (requires k6 and dev server)
 pnpm format       # Format with Prettier
 ```
 
@@ -94,13 +83,15 @@ pnpm format       # Format with Prettier
 
 - `/` — Marketing homepage with interactive mini-playground
 - `/playground` — Full image editor workspace
-- `/docs` — Documentation shell
+- `/docs` — Documentation hub
 - `/account` — User account
 
-## Architecture Summary
+## Architecture
 
-All image effects run in the user's browser. The backend handles auth
-only. See `architecture.md` for detailed diagrams and scaling notes.
+All image effects run in the user's browser via a Web Worker. The backend
+handles authentication only. See the [Architecture guide](https://effectsoup-web.vercel.app/docs/guides/architecture)
+for details.
 
-See `dream-glow.md` for an in-depth walk-through of the most cinematic
-preset — useful when feeding context to an LLM.
+## License
+
+MIT

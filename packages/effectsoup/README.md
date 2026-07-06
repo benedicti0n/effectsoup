@@ -2,6 +2,9 @@
 
 All-in-one EffectSoup image engine. Installs the core library, presets, and Web Worker client in one command.
 
+**→ [Full Docs](https://effectsoup-web.vercel.app/docs)**
+**→ [API Reference](https://effectsoup-web.vercel.app/docs/api/meta-package)**
+
 ## Install
 
 ```bash
@@ -41,6 +44,16 @@ If you only need part of the engine, install the sub-packages directly:
 npm install @effectsoup/core @effectsoup/presets @effectsoup/worker
 ```
 
-## Repository
+## Development
 
-[https://github.com/benedicti0n/effectsoup](https://github.com/benedicti0n/effectsoup)
+```bash
+# Build
+pnpm build
+
+# Type check
+pnpm typecheck
+```
+
+## License
+
+MIT

@@ -2,6 +2,10 @@
 
 Product-level image effect presets built on top of `@effectsoup/core`. Each preset exposes a single Intensity slider and optional advanced controls.
 
+**→ [API Reference](https://effectsoup-web.vercel.app/docs/api/presets)**
+**→ [Effects Catalog](https://effectsoup-web.vercel.app/docs/effects)**
+**→ [Full Docs](https://effectsoup-web.vercel.app/docs)**
+
 ## Install
 
 ```bash
@@ -51,12 +55,40 @@ const output = pipeline(source, params);
 
 ## API
 
-- `allPresets` — every preset
-- `getPresetById(id)` — look up a preset by ID
+- `allPresets` — every registered preset
+- `getPresetById(id)` — look up a preset by ID (supports legacy IDs)
 - `migratePresetId(id)` — map legacy preset IDs to current ones
 - `getPresetIds()` — list every preset id
 - `hasPresetId(id)` — check whether a preset (or migrated variant) exists
 
-## Repository
+## Categories
 
-[https://github.com/benedicti0n/effectsoup](https://github.com/benedicti0n/effectsoup)
+| Category | Description |
+|---|---|
+| `pixelDither` | Pixel grids, halftones, and structured dithering |
+| `asciiSymbols` | Luminance-to-glyph ASCII art rendering |
+| `printPaper` | Stipple, pencil, and risograph-inspired effects |
+| `distortionGlass` | Refractive geometric distortion effects |
+| `colorGlow` | Duotone, film grain, LED matrix, and color grading |
+| `atmosphereGlow` | Cinematic bloom and atmospheric lighting |
+| `retroSignal` | CRT, glitch, VHS, and analog broadcast effects |
+
+## Development
+
+```bash
+# Build
+pnpm build
+
+# Type check
+pnpm typecheck
+
+# Test
+pnpm test
+
+# Lint
+pnpm lint
+```
+
+## License
+
+MIT
