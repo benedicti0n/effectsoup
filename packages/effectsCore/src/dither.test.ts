@@ -4,8 +4,7 @@ import {
   applyOrderedColorDither,
   applyOrderedDither,
   createPixelBuffer,
-  toGrayscale,
-  type PixelBuffer
+  toGrayscale
 } from "./index.js";
 
 describe("dither", () => {
@@ -26,9 +25,8 @@ describe("dither", () => {
 
 describe("applyOrderedColorDither", () => {
   it("larger cellSize produces larger output cells", () => {
-    // Left half: high chroma orange, right half: medium chroma purple.
-    // Different chroma → different activation density → more horizontal
-    // transitions with smaller cells.
+    // Two distinct colour halves so Bayer‑driven luminance offsets
+    // produce different visible patterns at cellSize 4 vs 8.
     const source = createPixelBuffer(32, 32);
     for (let y = 0; y < 32; y++) {
       for (let x = 0; x < 32; x++) {
@@ -91,9 +89,9 @@ describe("applyOrderedColorDither", () => {
   });
 
   it("preserves recognizable image structure at default params", () => {
-    // 32×32 image: high-chroma red/orange top-left, low-chroma gray-blue
-    // elsewhere.  Chroma‑driven activation should produce far more colored
-    // cells in the top-left quadrant.
+    // 32×32 image: bright orange top‑left, dull gray‑blue elsewhere.
+    // Both halves get the same Bayer offset but the underlying colours
+    // are different, so the bright half has a higher R sum.
     const source = createPixelBuffer(32, 32);
     for (let y = 0; y < 32; y++) {
       for (let x = 0; x < 32; x++) {
@@ -125,7 +123,6 @@ describe("applyOrderedColorDither", () => {
         bottomRightSum += output.data[idx];
       }
     }
-    // Top-left has many more coloured active cells → higher R sum.
     expect(topLeftSum).toBeGreaterThan(bottomRightSum);
   });
 
@@ -140,55 +137,47 @@ describe("applyOrderedColorDither", () => {
     }
   });
 
-  it("inactive cells are neutral background (no source colour, no black)", () => {
-    // Low-chroma source so many cells stay inactive.
-    const source = createPixelBuffer(16, 16, [120, 118, 115, 255]);
+  it("every cell is source-derived (no fixed background colour)", () => {
+    const source = createPixelBuffer(16, 16, [160, 100, 60, 255]);
     const output = applyOrderedColorDither(source, {
-      cellSize: 4, threshold: 200, invert: false, monochrome: false
+      cellSize: 4, threshold: 128, invert: false, monochrome: false
     });
 
-    // No black pixels.
-    for (let i = 0; i < output.data.length; i += 4) {
-      expect(output.data[i]).not.toBe(0);
-    }
-
-    // Inactive cells are neutral (R=G=B=235).  Check for at least one.
-    let hasBg = false;
+    // No cell is 235,235,235 (the old neutral background value).
     for (let i = 0; i < output.data.length; i += 4) {
       const r = output.data[i];
       const g = output.data[i + 1];
       const b = output.data[i + 2];
-      if (r === 235 && g === 235 && b === 235) { hasBg = true; break; }
+      expect(r === 235 && g === 235 && b === 235).toBe(false);
     }
-    expect(hasBg).toBe(true);
+
+    // Every pixel carries source‑derived hue (R≠G for this warm source).
+    let hasHue = false;
+    for (let i = 0; i < output.data.length; i += 4) {
+      if (output.data[i] !== output.data[i + 1]) { hasHue = true; break; }
+    }
+    expect(hasHue).toBe(true);
   });
 
-  it("dark source areas do not produce a solid dark base", () => {
-    // Nearly black low-chroma source — at minimum threshold the
-    // background should dominate (≥75 % light pixels).
+  it("dark source produces dark cells (no light gaps)", () => {
     const source = createPixelBuffer(16, 16, [12, 10, 8, 255]);
     const output = applyOrderedColorDither(source, {
-      cellSize: 4, threshold: 0, invert: false, monochrome: false
+      cellSize: 4, threshold: 128, invert: false, monochrome: false
     });
 
-    // Most pixels should be checkerboard (≥190), not dark.
-    let lightCount = 0;
+    // Every cell should remain dark (nothing close to the old 235 bg).
     for (let i = 0; i < output.data.length; i += 4) {
-      if (output.data[i] >= 190) lightCount++;
+      expect(output.data[i]).toBeLessThan(60);
     }
-    const totalPixels = output.data.length / 4;
-    expect(lightCount).toBeGreaterThan(totalPixels * 0.75);
   });
 
   it("activated cells preserve source hue", () => {
-    // Very saturated source — chroma high, so many cells activate.
     const source = createPixelBuffer(16, 16, [200, 60, 30, 255]);
     const output = applyOrderedColorDither(source, {
       cellSize: 4, threshold: 128, invert: false, monochrome: false
     });
 
-    // Find at least one pixel that matches the source hue (R >> G, B).
-    const expectedHue = 200 - 60; // approximate red dominance
+    // Find at least one pixel with the source's warm hue (R >> G).
     let foundHue = false;
     for (let i = 0; i < output.data.length; i += 4) {
       const r = output.data[i];
@@ -199,10 +188,9 @@ describe("applyOrderedColorDither", () => {
   });
 
   it("larger cellSize produces larger visible square cells", () => {
-    // Left: high-chroma orange (many active cells).
-    // Right: low-chroma grayish purple (only some cells active).
-    // At cellSize=4 the right side has many fine active/inactive
-    // transitions; at cellSize=8 those transitions are coarser.
+    // Two distinct colour halves create horizontal colour transitions.
+    // The Bayer luminance offsets produce different patterns at
+    // cellSize 4 vs 8; the runs are coarser at larger cellSize.
     const source = createPixelBuffer(64, 64);
     for (let y = 0; y < 64; y++) {
       for (let x = 0; x < 64; x++) {
@@ -223,7 +211,6 @@ describe("applyOrderedColorDither", () => {
       cellSize: 8, threshold: 128, invert: false, monochrome: false
     });
 
-    // Count horizontal colour transitions along the first row.
     const runs = (buf: Uint8ClampedArray): number => {
       let count = 1;
       for (let x = 4; x < buf.length; x += 4) {
@@ -236,26 +223,25 @@ describe("applyOrderedColorDither", () => {
     );
   });
 
-  it("lower threshold produces fewer active cells", () => {
-    const source = createPixelBuffer(16, 16, [160, 80, 40, 255]);
-    const low  = applyOrderedColorDither(source, {
-      cellSize: 4, threshold: 30, invert: false, monochrome: false
-    });
-    const high = applyOrderedColorDither(source, {
-      cellSize: 4, threshold: 200, invert: false, monochrome: false
-    });
+  it("threshold controls dither amplitude (higher = more variation)", () => {
+    const source = createPixelBuffer(16, 16, [128, 128, 128, 255]);
 
-    // Count active (non-background) pixels.
-    const activeCount = (buf: PixelBuffer): number => {
-      let count = 0;
-      for (let i = 0; i < buf.data.length; i += 4) {
-        // Background is R=G=B=235; anything else is an active cell.
-        if (buf.data[i] !== 235 || buf.data[i + 1] !== 235 || buf.data[i + 2] !== 235) {
-          count++;
-        }
-      }
-      return count;
-    };
-    expect(activeCount(low)).toBeLessThan(activeCount(high));
+    // At threshold = 0 there is NO luminance offset → all cells identical.
+    const none = applyOrderedColorDither(source, {
+      cellSize: 4, threshold: 0, invert: false, monochrome: false
+    });
+    const firstVal = none.data[0];
+    for (let i = 4; i < none.data.length; i += 4) {
+      expect(none.data[i]).toBe(firstVal);
+    }
+
+    // At threshold = 255 the maximum dither offset (±30) creates
+    // many distinct luminance values across the 4×4 Bayer grid.
+    const max = applyOrderedColorDither(source, {
+      cellSize: 4, threshold: 255, invert: false, monochrome: false
+    });
+    const uniqueVals = new Set<number>();
+    for (let i = 0; i < max.data.length; i += 4) uniqueVals.add(max.data[i]);
+    expect(uniqueVals.size).toBeGreaterThan(8);
   });
 });

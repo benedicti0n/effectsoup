@@ -135,25 +135,17 @@ export function applyFloydSteinbergColorDither(
 }
 
 /**
- * Cell-based ordered Bayer colour dither with light checkerboard base.
+ * Cell-based ordered Bayer colour dither.
  *
- * Downsamples the source into a cell grid (size = cellSize × cellSize),
- * averages each cell's color, then decides activation:
+ * Every cell renders the averaged source colour (with a modest
+ * saturation boost).  The Bayer matrix drives a per‑cell luminance
+ * offset that creates a structured pixel‑print texture — no fixed
+ * background, no white gaps, no inactive‑cell placeholder.
  *
- * - **Color mode** (default): activation is driven by **chroma**
- *   (`max(R,G,B) - min(R,G,B)`). Saturated colours produce many
- *   active cells; near-neutral and very dark areas produce few.
- * - **Monochrome mode**: activation is driven by **luminance**, so
- *   bright areas produce more cells.
- *
- * Active cells render the averaged source colour (full square).
- * Inactive cells render a fixed light checkerboard pattern
- * (alternating near‑white 235 / light gray 195).  No source colour
- * bleeds into the background.
- *
- * The result is scaled up with nearest‑neighbour, producing clean
- * coloured square cells on a paper‑like grid — a sparse colour
- * halftone without any black dots or dark base.
+ * - **Threshold** controls the dither amplitude (0 = no variation,
+ *   255 = maximum structured texture).
+ * - **Invert** reverses the polarity of the Bayer offset.
+ * - **Monochrome** renders each cell as a gray level.
  */
 export function applyOrderedColorDither(
   source: PixelBuffer,
@@ -167,7 +159,7 @@ export function applyOrderedColorDither(
   const gridW = Math.max(1, Math.ceil(width / cellSize));
   const gridH = Math.max(1, Math.ceil(height / cellSize));
 
-  // 4×4 Bayer threshold map (values 0..15).
+  // 4×4 Bayer threshold map (raw matrix values 0..15).
   const BAYER: number[][] = [
     [0, 8, 2, 10],
     [12, 4, 14, 6],
@@ -175,18 +167,13 @@ export function applyOrderedColorDither(
     [15, 7, 13, 5]
   ];
 
-  // Neutral background colour for inactive cells — a subtle near‑white
-  // paper tone.  A single colour is used because the Bayer matrix
-  // partitions its low values (0-7) onto one checker parity and its
-  // high values (8-15) onto the other, so both checker colours can
-  // never appear simultaneously on inactive cells.
-  const BG_NEUTRAL = 235;
-
   const grid = createPixelBuffer(gridW, gridH);
 
-  // Inverted threshold:  lower slider → fewer active cells,
-  //                       higher slider → more active cells.
-  const adjustedThreshold = Math.max(0, 215 - threshold * 0.85);
+  // Threshold maps linearly to dither amplitude:
+  //   0   → no dither (all cells show the averaged colour)
+  //   255 → maximum luminance offset (±30)
+  const amplitude = threshold / 255;
+  const MAX_SHIFT = 60;
 
   for (let gy = 0; gy < gridH; gy++) {
     const y0 = gy * cellSize;
@@ -211,42 +198,31 @@ export function applyOrderedColorDither(
       const avgG = count > 0 ? g / count : 0;
       const avgB = count > 0 ? b / count : 0;
 
-      // Bayer offset for this grid position.
+      // Per‑cell saturation boost (preserves hue).
+      const mid = (avgR + avgG + avgB) / 3;
+      const boostR = avgR + (avgR - mid) * 0.25;
+      const boostG = avgG + (avgG - mid) * 0.25;
+      const boostB = avgB + (avgB - mid) * 0.25;
+
+      // Bayer offset in the range -0.5 … +0.5.
       const bayerVal = BAYER[gy % 4][gx % 4];
-      const offset = (bayerVal / 16) * 255;
+      const bayerNorm = (bayerVal / 16) - 0.5;
 
-      // Activation signal:
-      //   color mode → chroma + luminance blend + baseline.
-      //   This prevents dark/chroma‑poor areas from collapsing to
-      //   all‑background while keeping saturated regions dominant.
-      //   monochrome → luminance only.
-      const chroma = Math.max(avgR, avgG, avgB) - Math.min(avgR, avgG, avgB);
-      const lum    = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
-      const signal = monochrome ? lum : (chroma + lum * 0.2 + 15);
-
-      const active = signal + offset >= adjustedThreshold;
-      const isActive = invert ? !active : active;
+      // Luminance offset that creates the visible dither texture.
+      const sign = invert ? -1 : 1;
+      const ditherShift = bayerNorm * MAX_SHIFT * amplitude * sign;
 
       const gridIdx = pixelIndex(grid, gx, gy);
-      if (isActive) {
-        if (monochrome) {
-          const gray = clampByte(Math.round(lum));
-          grid.data[gridIdx]     = gray;
-          grid.data[gridIdx + 1] = gray;
-          grid.data[gridIdx + 2] = gray;
-        } else {
-          // Slightly boost saturation so active cells pop against the
-          // neutral background.  Hue is preserved; only chroma increases.
-          const mid = (avgR + avgG + avgB) / 3;
-          grid.data[gridIdx]     = clampByte(Math.round(avgR + (avgR - mid) * 0.25));
-          grid.data[gridIdx + 1] = clampByte(Math.round(avgG + (avgG - mid) * 0.25));
-          grid.data[gridIdx + 2] = clampByte(Math.round(avgB + (avgB - mid) * 0.25));
-        }
+      if (monochrome) {
+        const lum = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
+        const val = clampByte(Math.round(lum + ditherShift));
+        grid.data[gridIdx]     = val;
+        grid.data[gridIdx + 1] = val;
+        grid.data[gridIdx + 2] = val;
       } else {
-        // Inactive — neutral background, never source colour.
-        grid.data[gridIdx]     = BG_NEUTRAL;
-        grid.data[gridIdx + 1] = BG_NEUTRAL;
-        grid.data[gridIdx + 2] = BG_NEUTRAL;
+        grid.data[gridIdx]     = clampByte(Math.round(boostR + ditherShift));
+        grid.data[gridIdx + 1] = clampByte(Math.round(boostG + ditherShift));
+        grid.data[gridIdx + 2] = clampByte(Math.round(boostB + ditherShift));
       }
       grid.data[gridIdx + 3] = 255;
     }
