@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { useExport } from "@/hooks/useExport";
 import { SignInDialog } from "@/components/auth/signInDialog";
+import { cn } from "@/lib/utils";
 
 export function ExportDialog({ onClose }: { onClose: () => void }): JSX.Element {
   const {
@@ -30,37 +31,40 @@ export function ExportDialog({ onClose }: { onClose: () => void }): JSX.Element 
         />
       )}
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
-        <div className="w-full max-w-md rounded-sm border border-hairline bg-canvas p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-mono text-xl font-bold text-ink">Export</h2>
-            <button onClick={onClose} className="text-mute hover:text-ink" aria-label="Close">
+        <div className="w-full max-w-md rounded-lg border border-hairline bg-canvas p-6 shadow-sm">
+          <div className="mb-4 flex items-center justify-between border-b border-hairline pb-3">
+            <h2 className="font-serif-display text-xl tracking-tight text-ink-primary">
+              Export
+            </h2>
+            <button onClick={onClose} className="text-muted transition-colors hover:text-ink-primary" aria-label="Close">
               <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
             </button>
           </div>
 
           {session && (
-            <p className="mb-3 font-mono text-xs text-mute">Signed in as {session.user.email}</p>
+            <p className="mb-3 text-xs text-muted">Signed in as {session.user.email}</p>
           )}
 
           {!session && (
-            <div className="mb-4 rounded-sm border border-hairline bg-surface-soft p-3 font-mono text-sm text-body">
+            <div className="mb-4 rounded-lg border border-hairline bg-soft-stone/30 p-3 text-sm text-body-muted">
               Sign in to export your image.
             </div>
           )}
 
           <div className="mb-4 space-y-3">
             <div>
-              <label className="mb-1 block font-mono text-xs text-mute">Format</label>
+              <label className="mb-1 block text-xs font-medium text-muted">Format</label>
               <div className="flex gap-2">
                 {(["png", "jpeg", "webp"] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFormat(f)}
-                    className={`flex-1 rounded-sm border px-3 py-1.5 font-mono text-sm capitalize ${
+                    className={cn(
+                      "flex-1 rounded-lg border px-3 py-1.5 text-sm capitalize transition-colors",
                       format === f
-                        ? "border-ink bg-surface-soft text-ink"
-                        : "border-hairline text-mute hover:border-ink"
-                    }`}
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-hairline text-muted hover:border-muted hover:text-ink-primary"
+                    )}
                   >
                     {f}
                   </button>
@@ -69,30 +73,31 @@ export function ExportDialog({ onClose }: { onClose: () => void }): JSX.Element 
             </div>
 
             <div>
-              <label className="mb-1 block font-mono text-xs text-mute">Quality</label>
+              <label className="mb-1 block text-xs font-medium text-muted">Quality</label>
               <input
                 type="range"
                 min={50}
                 max={100}
                 value={quality}
                 onChange={(e) => setQuality(Number(e.target.value))}
-                className="w-full accent-ink"
+                className="w-full accent-accent"
               />
-              <div className="text-right font-mono text-xs text-mute">{quality}%</div>
+              <div className="text-right text-xs text-muted">{quality}%</div>
             </div>
 
             <div>
-              <label className="mb-1 block font-mono text-xs text-mute">Resolution</label>
+              <label className="mb-1 block text-xs font-medium text-muted">Resolution</label>
               <div className="flex gap-2">
                 {(["1080", "original", "4k"] as const).map((r) => (
                   <button
                     key={r}
                     onClick={() => setResolution(r)}
-                    className={`flex-1 rounded-sm border px-3 py-1.5 font-mono text-sm capitalize ${
+                    className={cn(
+                      "flex-1 rounded-lg border px-3 py-1.5 text-sm capitalize transition-colors",
                       resolution === r
-                        ? "border-ink bg-surface-soft text-ink"
-                        : "border-hairline text-mute hover:border-ink"
-                    }`}
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-hairline text-muted hover:border-muted hover:text-ink-primary"
+                    )}
                   >
                     {r === "4k" ? "4K" : r}
                   </button>
@@ -101,19 +106,19 @@ export function ExportDialog({ onClose }: { onClose: () => void }): JSX.Element 
             </div>
           </div>
 
-          {error && <p className="mb-3 font-mono text-sm text-danger">{error}</p>}
+          {error && <p className="mb-3 text-sm text-error">{error}</p>}
 
           <div className="flex justify-end gap-3">
             <button
               onClick={onClose}
-              className="rounded-sm border border-hairline bg-canvas px-4 py-2 font-mono text-sm text-ink hover:bg-surface-soft"
+              className="rounded-lg border border-hairline bg-canvas px-4 py-2 text-sm text-ink-primary transition-colors hover:bg-soft-stone"
             >
               Cancel
             </button>
             <button
               onClick={session ? exportImage : () => setShowSignIn(true)}
               disabled={isExporting}
-              className="rounded-sm bg-ink px-6 py-2 font-mono text-sm font-medium text-canvas hover:bg-ink-deep disabled:bg-surface-card disabled:text-ash"
+              className="rounded-lg bg-ink px-6 py-2 text-sm font-medium text-canvas transition-colors hover:bg-ink-deep disabled:bg-surface-card disabled:text-muted"
             >
               {isExporting ? "Exporting…" : session ? "Export" : "Sign in to Export"}
             </button>

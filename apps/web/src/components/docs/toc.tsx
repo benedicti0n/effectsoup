@@ -73,7 +73,7 @@ export function TableOfContents({ items }: { items: TocItem[] }): JSX.Element {
               } ${
                 activeId === item.id
                   ? "font-medium text-ink-primary"
-                  : "text-body-muted hover:text-ink"
+                  : "text-body-muted hover:text-ink-primary"
               }`}
             >
               {item.text}

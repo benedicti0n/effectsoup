@@ -31,6 +31,7 @@ const envSchema = z.object({
   ),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
+  BETTER_AUTH_API_KEY: z.string().optional(),
   BETTER_AUTH_TRUSTED_ORIGINS: z.preprocess(
     (val) => (val === "" || val === undefined || val === null ? undefined : val),
     z.string().optional()

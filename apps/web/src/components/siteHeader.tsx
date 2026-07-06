@@ -15,7 +15,6 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
   const { data: session } = authClient.useSession();
 
   const navLinks = [
-    { href: "/docs/effects", label: "Effects" },
     { href: "/playground", label: "Playground" },
     { href: "/docs", label: "Docs" }
   ];

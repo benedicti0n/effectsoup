@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, Menu01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 
-
 export function DocsSidebar({
   onSearchOpen
 }: {
@@ -22,7 +21,7 @@ export function DocsSidebar({
       <div className="mb-6 px-3">
         <button
           onClick={onSearchOpen}
-          className="flex w-full items-center gap-2 rounded-sm border border-hairline px-3 py-2 text-sm text-muted hover:border-ink/30 hover:text-ink transition-colors"
+          className="flex w-full items-center gap-2 rounded-lg border border-hairline px-3 py-2 text-sm text-muted hover:border-accent/30 hover:text-ink-primary transition-colors"
         >
           <HugeiconsIcon icon={Search01Icon} className="h-4 w-4" />
           <span>Search docs...</span>
@@ -48,7 +47,7 @@ export function DocsSidebar({
                       "block rounded-sm px-3 py-1.5 text-sm transition-colors",
                       isActive
                         ? "bg-soft-stone font-medium text-ink-primary"
-                        : "text-body-muted hover:bg-soft-stone hover:text-ink"
+                        : "text-body-muted hover:bg-soft-stone hover:text-ink-primary"
                     )}
                   >
                     {page.title}
@@ -81,14 +80,14 @@ export function DocsMobileNav({
       <div className="flex items-center gap-2 border-b border-hairline px-4 py-3 md:hidden">
         <button
           onClick={() => setOpen(true)}
-          className="rounded-sm p-1.5 text-ink hover:bg-soft-stone"
+          className="rounded-sm p-1.5 text-ink-primary hover:bg-soft-stone"
           aria-label="Open navigation menu"
         >
           <HugeiconsIcon icon={Menu01Icon} className="h-5 w-5" />
         </button>
         <button
           onClick={onSearchOpen}
-          className="rounded-sm p-1.5 text-ink hover:bg-soft-stone"
+          className="rounded-sm p-1.5 text-ink-primary hover:bg-soft-stone"
           aria-label="Search documentation"
         >
           <HugeiconsIcon icon={Search01Icon} className="h-5 w-5" />
@@ -98,10 +97,10 @@ export function DocsMobileNav({
       {open && (
         <div className="fixed inset-0 z-50 bg-canvas md:hidden">
           <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-            <span className="font-display text-base font-medium text-ink">Docs</span>
+            <span className="font-serif-display text-base text-ink-primary">Docs</span>
             <button
               onClick={() => setOpen(false)}
-              className="rounded-sm p-1.5 text-ink"
+              className="rounded-sm p-1.5 text-ink-primary"
               aria-label="Close navigation menu"
             >
               <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
@@ -122,7 +121,7 @@ export function DocsMobileNav({
                           "block rounded-sm px-3 py-2 text-sm",
                           pathname === `/${page.slug}`
                             ? "bg-soft-stone font-medium text-ink-primary"
-                            : "text-body-muted hover:bg-soft-stone hover:text-ink"
+                            : "text-body-muted hover:bg-soft-stone hover:text-ink-primary"
                         )}
                       >
                         {page.title}

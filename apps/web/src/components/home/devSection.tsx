@@ -1,10 +1,25 @@
-import type { JSX } from "react";
+"use client";
+
+import { useState, type JSX } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
+
+type PkgManager = "npm" | "pnpm" | "yarn";
+
+const commands: Record<PkgManager, string> = {
+  npm: "npm install @effectsoup/effectsoup",
+  pnpm: "pnpm add @effectsoup/effectsoup",
+  yarn: "yarn add @effectsoup/effectsoup"
+};
 
 export function DevSection(): JSX.Element {
+  const [pkg, setPkg] = useState<PkgManager>("npm");
+
   return (
-    <section className="bg-soft-stone/40 border-y border-hairline">
+    <section className="border-y border-hairline bg-soft-stone/40">
       <div className="mx-auto max-w-container px-4 py-16 lg:px-8 lg:py-24">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="max-w-lg">
@@ -21,7 +36,7 @@ export function DevSection(): JSX.Element {
               or automation workflow.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button variant="outline" asChild>
+              <Button asChild>
                 <Link
                   href="https://www.npmjs.com/package/@effectsoup/effectsoup"
                   target="_blank"
@@ -30,8 +45,11 @@ export function DevSection(): JSX.Element {
                   View on npm
                 </Link>
               </Button>
-              <Button variant="outline" asChild>
-                <Link href="/docs">Read the docs</Link>
+              <Button asChild>
+                <Link href="/docs">
+                  Read the docs
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>
@@ -39,20 +57,28 @@ export function DevSection(): JSX.Element {
           <div className="rounded-lg border border-hairline bg-canvas p-5 shadow-sm">
             {/* Tab bar */}
             <div className="mb-3 flex items-center gap-3 border-b border-hairline pb-3">
-              <span className="rounded-sm bg-ink-primary px-2.5 py-1 text-[11px] font-medium text-on-primary">
-                TypeScript
-              </span>
-              <span className="text-[11px] text-muted">npm</span>
-              <span className="text-[11px] text-muted">pnpm</span>
+              {(["npm", "pnpm", "yarn"] as const).map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => setPkg(name)}
+                  className={cn(
+                    "rounded-sm px-2.5 py-1 text-[11px] font-medium transition-colors",
+                    pkg === name
+                      ? "bg-ink-primary text-on-primary"
+                      : "text-muted hover:text-ink-primary"
+                  )}
+                >
+                  {name}
+                </button>
+              ))}
             </div>
             <pre className="overflow-x-auto text-sm leading-relaxed text-ink-primary">
-              <code>{`import { applyHalftone } from "@effectsoup/core";
-
-const result = applyHalftone(image, {
-  dotSize: 8,
-  colorMode: "duotone"
-});`}</code>
+              <code>{commands[pkg]}</code>
             </pre>
+            <p className="mt-3 text-xs text-muted">
+              Then import any effect and apply it to your images.
+            </p>
           </div>
         </div>
       </div>

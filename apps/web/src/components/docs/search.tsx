@@ -55,7 +55,7 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-ink/60 pt-[20vh]" onClick={onClose}>
       <div
-        className="w-full max-w-lg rounded-sm border border-hairline bg-canvas shadow-lg"
+        className="w-full max-w-lg rounded-lg border border-hairline bg-canvas shadow-sm"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label="Search documentation"
@@ -71,9 +71,9 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search docs, effects, API..."
-            className="flex-1 bg-transparent px-3 py-3.5 text-sm text-ink placeholder-muted outline-none"
+            className="flex-1 bg-transparent px-3 py-3.5 text-sm text-ink-primary placeholder-muted outline-none"
           />
-          <kbd className="hidden shrink-0 rounded-sm border border-hairline px-1.5 py-0.5 text-[11px] text-muted sm:inline">
+          <kbd className="hidden shrink-0 rounded-lg border border-hairline px-1.5 py-0.5 text-[11px] text-muted sm:inline">
             ESC
           </kbd>
         </div>
@@ -86,15 +86,15 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
                   href={`/${result.slug}`}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm transition-colors",
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                     i === selected ? "bg-soft-stone" : "hover:bg-soft-stone"
                   )}
                 >
-                  <span className="shrink-0 rounded-sm border border-hairline px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">
+                  <span className="shrink-0 rounded-lg border border-hairline px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">
                     {typeLabel(result.type)}
                   </span>
                   <div className="min-w-0">
-                    <div className="truncate font-medium text-ink">{result.title}</div>
+                    <div className="truncate font-medium text-ink-primary">{result.title}</div>
                     <div className="truncate text-xs text-body-muted">{result.description}</div>
                   </div>
                 </Link>

@@ -76,12 +76,12 @@ export function UploadPanel(): JSX.Element {
     <div
       onDrop={onDrop}
       onDragOver={(e) => e.preventDefault()}
-      className="flex flex-1 flex-col items-center justify-center rounded-sm border border-dashed border-hairline bg-soft-stone/30 p-8 text-center transition-colors hover:border-muted md:p-12"
+      className="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-hairline bg-soft-stone/30 p-8 text-center transition-colors hover:border-muted md:p-12"
     >
       <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-soft-stone">
         <HugeiconsIcon icon={Upload01Icon} className="h-7 w-7 text-ink-primary" />
       </div>
-      <h2 className="mb-2 font-display text-xl font-medium text-ink-primary">
+      <h2 className="mb-2 font-serif-display text-xl tracking-tight text-ink-primary">
         Drop an image here
       </h2>
       <p className="mb-6 max-w-xs text-sm text-body-muted">

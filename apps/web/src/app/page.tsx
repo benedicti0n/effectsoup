@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { SiteHeader } from "@/components/siteHeader";
 import { SiteFooter } from "@/components/siteFooter";
 import { HeroSection } from "@/components/home/heroSection";
-import { EffectsShowcase } from "@/components/home/effectsShowcase";
 import { DevSection } from "@/components/home/devSection";
 import { ValueSection } from "@/components/home/valueSection";
 import { ResourcesStrip } from "@/components/home/resourcesStrip";
@@ -53,7 +52,6 @@ export default function HomePage(): JSX.Element {
       <SiteHeader />
       <main className="flex-1">
         <HeroSection />
-        <EffectsShowcase />
         <DevSection />
         <ValueSection />
         <ResourcesStrip />

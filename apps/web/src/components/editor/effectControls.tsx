@@ -18,7 +18,7 @@ export function EffectControls(): JSX.Element {
     <div className="space-y-6">
       <div className="flex items-start justify-between border-b border-hairline pb-3">
         <div>
-          <h3 className="font-display text-lg font-medium text-ink-primary">{presetName}</h3>
+          <h3 className="font-serif-display text-lg tracking-tight text-ink-primary">{presetName}</h3>
         </div>
         <Button variant="secondary" onClick={resetEffect}>
           Reset

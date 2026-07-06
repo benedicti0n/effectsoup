@@ -53,36 +53,54 @@ function collectTrustedOrigins(): string[] {
   return Array.from(set);
 }
 
-export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: "pg",
-    schema: { user, session, account, verification }
-  }),
-  secret: env.BETTER_AUTH_SECRET,
-  baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: collectTrustedOrigins(),
-  socialProviders,
-  emailAndPassword: {
-    enabled: true,
-    minPasswordLength: 12,
-    maxPasswordLength: 128,
-    requireEmailVerification: false,
-    autoSignIn: true
-  },
-  advanced: {
-    useSecureCookies: env.BETTER_AUTH_URL.startsWith("https://"),
-    defaultCookieAttributes: {
-      sameSite: "lax",
-      secure: env.BETTER_AUTH_URL.startsWith("https://"),
-      httpOnly: true
-    }
-  },
-  rateLimit: {
-    enabled: true,
-    window: 60,
-    max: 30
-  },
-  emailNormalization: {
-    email: (email: string) => email.toLowerCase().trim()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let cachedAuth: any = null;
+
+export async function getAuth() {
+  if (cachedAuth) return cachedAuth;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const plugins: any[] = [];
+
+  if (env.BETTER_AUTH_API_KEY) {
+    const { dash } = await import("@better-auth/infra");
+    plugins.push(dash({ apiKey: env.BETTER_AUTH_API_KEY }));
   }
-});
+
+  cachedAuth = betterAuth({
+    database: drizzleAdapter(db, {
+      provider: "pg",
+      schema: { user, session, account, verification }
+    }),
+    secret: env.BETTER_AUTH_SECRET,
+    baseURL: env.BETTER_AUTH_URL,
+    trustedOrigins: collectTrustedOrigins(),
+    plugins,
+    socialProviders,
+    emailAndPassword: {
+      enabled: true,
+      minPasswordLength: 12,
+      maxPasswordLength: 128,
+      requireEmailVerification: false,
+      autoSignIn: true
+    },
+    advanced: {
+      useSecureCookies: env.BETTER_AUTH_URL.startsWith("https://"),
+      defaultCookieAttributes: {
+        sameSite: "lax",
+        secure: env.BETTER_AUTH_URL.startsWith("https://"),
+        httpOnly: true
+      }
+    },
+    rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 30
+    },
+    emailNormalization: {
+      email: (email: string) => email.toLowerCase().trim()
+    }
+  });
+
+  return cachedAuth;
+}

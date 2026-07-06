@@ -64,7 +64,7 @@ export function PresetGrid(): JSX.Element {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="mb-3 font-display text-lg font-medium text-ink-primary">Effects</h2>
+        <h2 className="mb-3 font-serif-display text-lg tracking-tight text-ink-primary">Effects</h2>
         <Input
           placeholder="Search presets…"
           value={search}

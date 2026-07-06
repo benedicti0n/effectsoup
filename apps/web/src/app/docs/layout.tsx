@@ -29,18 +29,18 @@ export default function DocsLayout({
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-canvas">
+    <div className="flex min-h-screen flex-col bg-canvas text-ink-primary">
       <header className="sticky top-0 z-30 border-b border-hairline bg-canvas/95 backdrop-blur">
         <div className="mx-auto flex h-12 max-w-container items-center gap-3 px-4 lg:px-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-ink hover:text-muted transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-primary transition-colors hover:text-muted"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4" />
-            EffectSoup
+            <span className="font-serif-display">EffectSoup</span>
           </Link>
           <span className="text-sm text-muted">/</span>
-          <Link href="/docs" className="text-sm font-medium text-ink">
+          <Link href="/docs" className="font-serif-display text-sm text-ink-primary">
             Docs
           </Link>
         </div>

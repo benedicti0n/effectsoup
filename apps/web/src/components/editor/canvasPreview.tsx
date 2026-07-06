@@ -273,7 +273,7 @@ export function CanvasPreview(): JSX.Element {
 
   if (!source) {
     return (
-      <div className="flex h-full items-center justify-center rounded-sm border border-hairline bg-surface-soft p-8 font-mono text-mute">
+      <div className="flex h-full items-center justify-center rounded-lg border border-hairline bg-soft-stone/30 p-8 text-sm text-muted">
         Upload an image to start editing.
       </div>
     );
@@ -283,7 +283,7 @@ export function CanvasPreview(): JSX.Element {
 
   return (
     <div
-      className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-sm border border-hairline bg-surface-soft"
+      className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg border border-hairline bg-soft-stone/30"
       onWheel={handleWheel}
     >
       <div className="flex items-center justify-center">
@@ -321,13 +321,13 @@ export function CanvasPreview(): JSX.Element {
         </div>
       </div>
 
-      <div className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-full border border-hairline bg-canvas/90 px-1.5 py-1 text-ink shadow-sm backdrop-blur">
+      <div className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-lg border border-hairline bg-canvas/90 px-1.5 py-1 text-ink-primary shadow-sm backdrop-blur">
         <button
           type="button"
-          onClick={() => setZoom((z) => Math.max(0.25, z / 1.25))}
+          onClick={() => setZoom((z) => z / 1.25)}
           aria-label="Zoom out"
           title="Zoom out"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-soft-stone"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-lg hover:bg-soft-stone"
         >
           −
         </button>
@@ -336,7 +336,7 @@ export function CanvasPreview(): JSX.Element {
           onClick={() => setZoom(1)}
           aria-label="Reset zoom"
           title="Reset zoom"
-          className="inline-flex h-7 min-w-[3rem] items-center justify-center rounded-full px-2 text-xs font-mono hover:bg-soft-stone"
+          className="inline-flex h-7 min-w-[3rem] items-center justify-center rounded-lg px-2 text-xs hover:bg-soft-stone"
         >
           {Math.round(zoom * 100)}%
         </button>
@@ -345,7 +345,7 @@ export function CanvasPreview(): JSX.Element {
           onClick={() => setZoom((z) => Math.min(8, z * 1.25))}
           aria-label="Zoom in"
           title="Zoom in"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-soft-stone"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-lg hover:bg-soft-stone"
         >
           +
         </button>
@@ -361,8 +361,8 @@ export function CanvasPreview(): JSX.Element {
           aria-pressed={showingOriginal}
           title={showingOriginal ? "Showing original — release to compare" : "Click to toggle, hold to compare"}
           className={cn(
-            "ml-1 inline-flex h-7 w-7 select-none items-center justify-center rounded-full hover:bg-soft-stone",
-            showingOriginal && "text-on-primary"
+            "ml-1 inline-flex h-7 w-7 select-none items-center justify-center rounded-lg hover:bg-soft-stone",
+            showingOriginal && "bg-accent text-canvas"
           )}
         >
           <HugeiconsIcon icon={EyeIcon} className="h-4 w-4" />
@@ -370,7 +370,7 @@ export function CanvasPreview(): JSX.Element {
       </div>
 
       {showingOriginal && (
-        <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-sm border border-hairline bg-canvas/90 px-2.5 py-1 text-xs font-medium text-ink shadow-sm backdrop-blur">
+        <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-lg border border-hairline bg-canvas/90 px-2.5 py-1 text-xs font-medium text-ink-primary shadow-sm backdrop-blur">
           Original
         </span>
       )}

@@ -1,4 +1,11 @@
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
 
-export const GET = auth.handler;
-export const POST = auth.handler;
+export async function GET(request: Request): Promise<Response> {
+  const auth = await getAuth();
+  return auth.handler(request);
+}
+
+export async function POST(request: Request): Promise<Response> {
+  const auth = await getAuth();
+  return auth.handler(request);
+}

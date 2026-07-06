@@ -10,11 +10,11 @@ export function DocsBreadcrumbs({ slug }: { slug: string }): JSX.Element {
 
   return (
     <nav className="mb-4 flex items-center gap-2 text-xs text-muted" aria-label="Breadcrumb">
-      <Link href="/docs" className="hover:text-ink transition-colors">
+      <Link href="/docs" className="hover:text-ink-primary transition-colors">
         Docs
       </Link>
       <span aria-hidden="true">/</span>
-      <span className="text-ink-primary font-medium">{sectionInfo.section.title}</span>
+      <span className="font-medium text-ink-primary">{sectionInfo.section.title}</span>
     </nav>
   );
 }
@@ -31,7 +31,7 @@ export function DocsPrevNext({ slug }: { slug: string }): JSX.Element {
             className="group flex flex-col gap-1 text-sm"
           >
             <span className="text-xs text-muted">Previous</span>
-            <span className="font-medium text-ink group-hover:text-action-blue transition-colors">
+            <span className="font-medium text-ink-primary transition-colors group-hover:text-accent">
               ← {prev.title}
             </span>
           </Link>
@@ -44,7 +44,7 @@ export function DocsPrevNext({ slug }: { slug: string }): JSX.Element {
             className="group flex flex-col gap-1 text-sm"
           >
             <span className="text-xs text-muted">Next</span>
-            <span className="font-medium text-ink group-hover:text-action-blue transition-colors">
+            <span className="font-medium text-ink-primary transition-colors group-hover:text-accent">
               {next.title} →
             </span>
           </Link>

@@ -1,4 +1,4 @@
-import { EditorShell } from "@/components/editor/editorShell";
+import { PlaygroundEditor } from "@/components/editor/playgroundEditor";
 import type { JSX } from "react";
 import type { Metadata } from "next";
 import {
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
 
 export default function PlaygroundPage(): JSX.Element {
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      <EditorShell className="flex-1 overflow-hidden" />
+    <div className="flex h-screen flex-col bg-canvas">
+      <PlaygroundEditor className="flex-1 overflow-hidden" />
     </div>
   );
 }
