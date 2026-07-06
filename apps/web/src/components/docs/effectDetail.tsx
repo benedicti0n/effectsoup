@@ -101,14 +101,14 @@ export function EffectDetailPage({
         {premium && <Badge variant="coral">Premium</Badge>}
       </div>
 
-      <p className="mb-8 text-sm leading-relaxed text-body-muted">{effect.description}</p>
+      <p className="mb-10 text-sm leading-relaxed text-body-muted">{effect.description}</p>
 
       <Callout variant="info">
         <strong>Open this effect in the playground</strong> — <Link href={`/playground?preset=${effect.id}`} className="underline">try {effect.name}</Link>
       </Callout>
 
       <section className="mb-10">
-        <h2 id="controls" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mb-4">
+        <h2 id="controls" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
           Controls
         </h2>
 
@@ -138,7 +138,7 @@ export function EffectDetailPage({
       </section>
 
       <section className="mb-10">
-        <h2 id="usage" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mb-4">
+        <h2 id="usage" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
           Usage Tips
         </h2>
         <div className="space-y-3 text-sm leading-relaxed text-body-muted">
@@ -153,7 +153,7 @@ export function EffectDetailPage({
 
       {relatedEffects.length > 0 && (
         <section className="mb-10">
-          <h2 id="related" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mb-4">
+          <h2 id="related" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Related Effects
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">

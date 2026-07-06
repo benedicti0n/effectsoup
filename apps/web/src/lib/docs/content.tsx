@@ -32,7 +32,7 @@ const content: Record<string, PageContent> = {
           No AI generation. No cloud uploads. No signup required to edit. Every effect is a deterministic, mathematical image pipeline — the same photo with the same settings always produces the same result.
         </p>
 
-        <div className="my-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-8 mb-10 grid gap-4 sm:grid-cols-2">
           <Link href="/playground" className="group rounded-sm border border-hairline p-6 hover:border-ink/20 transition-colors">
             <h2 className="font-display text-lg font-medium text-ink-primary group-hover:text-action-blue transition-colors">
               Use the Playground →
@@ -51,8 +51,8 @@ const content: Record<string, PageContent> = {
           </Link>
         </div>
 
-        <section className="my-10">
-          <h2 id="how-rendering-works" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="how-rendering-works" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             How Rendering Works
           </h2>
           <div className="mt-4 rounded-sm border border-hairline bg-soft-stone/30 p-6 text-sm leading-relaxed text-body-muted">
@@ -80,14 +80,14 @@ const content: Record<string, PageContent> = {
           </div>
         </section>
 
-        <section className="my-10">
-          <h2 id="packages" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="packages" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Packages
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
             The EffectSoup engine is split into four npm packages, all published under the <InlineCode>@effectsoup</InlineCode> scope.
           </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <Card>
               <CardTitle><InlineCode>@effectsoup/core</InlineCode></CardTitle>
               <CardDescription>
@@ -135,8 +135,8 @@ const content: Record<string, PageContent> = {
           </div>
         </section>
 
-        <section className="my-10">
-          <h2 id="start-here" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="start-here" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Start Here
           </h2>
           <div className="mt-4 rounded-sm border border-hairline bg-soft-stone/20 p-6 text-sm leading-relaxed">
@@ -168,8 +168,8 @@ const content: Record<string, PageContent> = {
           The playground is the quickest way to use EffectSoup. No signup required — just open it and start editing.
         </p>
 
-        <section className="my-8">
-          <h2 id="upload" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="upload" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Upload an Image
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -180,8 +180,8 @@ const content: Record<string, PageContent> = {
           </Callout>
         </section>
 
-        <section className="my-8">
-          <h2 id="choose-effect" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="choose-effect" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Choose an Effect
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -195,8 +195,8 @@ const content: Record<string, PageContent> = {
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="controls" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="controls" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Effect Controls
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -213,8 +213,8 @@ const content: Record<string, PageContent> = {
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="crop" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="crop" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Crop, Zoom &amp; Offset
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -230,8 +230,8 @@ const content: Record<string, PageContent> = {
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="export" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="export" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Export
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -263,8 +263,8 @@ const content: Record<string, PageContent> = {
           The EffectSoup engine is available as TypeScript packages on npm. Install everything with the meta-package, or pick only what you need.
         </p>
 
-        <section className="my-8">
-          <h2 id="meta-package" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="meta-package" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Meta-package (all-in-one)
           </h2>
           <CodeBlock code={`pnpm add @effectsoup/effectsoup`} language="bash" />
@@ -275,8 +275,8 @@ const content: Record<string, PageContent> = {
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="individual" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="individual" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Individual Packages
           </h2>
           <CodeBlock code={`pnpm add @effectsoup/core @effectsoup/presets @effectsoup/worker`} language="bash" />
@@ -303,8 +303,8 @@ const content: Record<string, PageContent> = {
           </div>
         </section>
 
-        <section className="my-8">
-          <h2 id="browser-requirement" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="browser-requirement" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Browser Environment
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -312,8 +312,8 @@ const content: Record<string, PageContent> = {
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="minimal-example" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="minimal-example" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Minimal Example
           </h2>
           <CodeBlock code={`import { createPixelBuffer, toGrayscale } from "@effectsoup/core";
@@ -353,8 +353,8 @@ ctx.putImageData(
           The editor is EffectSoup&apos;s full-screen workspace for applying effects to your photos. Here is how it is laid out.
         </p>
 
-        <section className="my-8">
-          <h2 id="layout" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="layout" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Layout
           </h2>
           <div className="rounded-sm border border-hairline bg-soft-stone/20 p-4 text-sm leading-relaxed text-body-muted">
@@ -379,8 +379,8 @@ ctx.putImageData(
           </div>
         </section>
 
-        <section className="my-8">
-          <h2 id="state-management" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="state-management" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             History &amp; Undo
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -388,8 +388,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="compare" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="compare" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Compare
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -397,8 +397,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="mobile" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="mobile" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Mobile Layout
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -418,8 +418,8 @@ ctx.putImageData(
           Upload &amp; Crop
         </h1>
 
-        <section className="my-8">
-          <h2 id="upload-flow" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="upload-flow" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Upload Flow
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -430,8 +430,8 @@ ctx.putImageData(
           </Callout>
         </section>
 
-        <section className="my-8">
-          <h2 id="replace-remove" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="replace-remove" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Replace &amp; Remove
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -439,8 +439,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="crop-controls" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="crop-controls" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Crop Controls
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -456,8 +456,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="free-crop" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="free-crop" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Free Crop Behavior
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -477,8 +477,8 @@ ctx.putImageData(
           Effect Controls
         </h1>
 
-        <section className="my-8">
-          <h2 id="intensity" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="intensity" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Intensity Slider
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -489,8 +489,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="advanced-controls" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="advanced-controls" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Advanced Controls
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -505,8 +505,8 @@ ctx.putImageData(
           </ul>
         </section>
 
-        <section className="my-8">
-          <h2 id="reset" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="reset" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Resetting Controls
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -526,8 +526,8 @@ ctx.putImageData(
           Exporting
         </h1>
 
-        <section className="my-8">
-          <h2 id="export-dialog" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="export-dialog" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Export Dialog
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -535,8 +535,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="format" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="format" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Format
           </h2>
           <ul className="mt-2 space-y-1 text-sm text-body-muted list-disc list-inside">
@@ -546,8 +546,8 @@ ctx.putImageData(
           </ul>
         </section>
 
-        <section className="my-8">
-          <h2 id="quality" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="quality" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Quality
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -555,8 +555,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="resolution" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="resolution" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Resolution
           </h2>
           <ul className="mt-2 space-y-1 text-sm text-body-muted list-disc list-inside">
@@ -569,8 +569,8 @@ ctx.putImageData(
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="how-export-works" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="how-export-works" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             How Export Works
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-body-muted">
@@ -605,7 +605,7 @@ ctx.putImageData(
               <section key={catId} className="my-10">
                 <div className="mb-4">
                   <Badge variant="muted" className="mb-2">{catInfo.name}</Badge>
-                  <h2 id={catId} className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary">
+                  <h2 id={catId} className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
                     {catInfo.name}
                   </h2>
                   <p className="mt-1 text-sm text-body-muted">{catInfo.description}</p>
@@ -620,7 +620,7 @@ ctx.putImageData(
                       className="group rounded-sm border border-hairline p-4 hover:border-ink/20 transition-colors"
                     >
                       <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-ink-primary group-hover:text-action-blue transition-colors">
+                        <h3 className="text-lg font-medium text-ink-primary group-hover:text-action-blue transition-colors">
                           {preset.name}
                         </h3>
                         <Badge variant="muted" className="text-[10px]">{catInfo.name}</Badge>
@@ -656,8 +656,8 @@ ctx.putImageData(
           Pure TypeScript image-processing primitives. No DOM dependencies — safe to run in browsers and Node.js.
         </p>
 
-        <section className="my-8">
-          <h2 id="pixelbuffer" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="pixelbuffer" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             PixelBuffer
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -672,8 +672,8 @@ ctx.putImageData(
           ]} />
         </section>
 
-        <section className="my-8">
-          <h2 id="buffer-utils" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="buffer-utils" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Buffer Utilities
           </h2>
 
@@ -693,8 +693,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Clamp a number to 0–255, rounding. Returns 0 for NaN/Infinity.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="color-transforms" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="color-transforms" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Color Transforms
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -726,8 +726,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Compute the average RGBA color of a buffer.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="viewport" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="viewport" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Viewport Transform
           </h2>
 
@@ -741,8 +741,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Parse a CropConfig aspect ratio to a numeric W/H value. Returns null for &quot;original&quot;.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="dithering" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="dithering" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Dithering
           </h2>
 
@@ -756,8 +756,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Cell-based ordered color dither with Bayer luminance offsets.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="halftone" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="halftone" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Halftone
           </h2>
 
@@ -765,8 +765,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Render a colored dot halftone with configurable dot spacing, size, shape, palette, and color mode.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="ascii" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="ascii" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             ASCII Rendering
           </h2>
 
@@ -777,8 +777,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Validate and normalize a custom character set for ASCII rendering.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="glow-blend" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="glow-blend" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Glow &amp; Bloom
           </h2>
 
@@ -795,8 +795,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Apply a box blur in-place.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="stipple" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="stipple" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Stipple
           </h2>
 
@@ -804,8 +804,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Render a hand-drawn stipple illustration using dot density to model tone.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="distortion" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="distortion" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Distortion &amp; Glass
           </h2>
 
@@ -822,8 +822,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Apply a sinusoidal wave distortion effect.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="bitmap" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="bitmap" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Bitmap Pixelation
           </h2>
 
@@ -831,8 +831,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Heavy pixelation with palette reduction and optional ordered dither.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="other" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="other" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Other Primitives
           </h2>
 
@@ -876,8 +876,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Bilinear resize. Returns a new buffer.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="types" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="types" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Shared Types
           </h2>
 
@@ -904,8 +904,8 @@ ctx.putImageData(
           Effect presets that bundle core primitives into tunable pipelines. Each preset exposes an Intensity slider and optional advanced controls.
         </p>
 
-        <section className="my-8">
-          <h2 id="effectpreset" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="effectpreset" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             EffectPreset
           </h2>
           <ApiSignature signature={`type EffectPreset = {\n  id: string;\n  name: string;\n  description: string;\n  category: PresetCategory;\n  defaultIntensity: number;\n  usesIntensity?: boolean;\n  intensityMapper: IntensityMapper;\n  advancedControlSchema: AdvancedControlDefinition[];\n  createPipeline: (params: ResolvedPresetParameters) => EffectPipeline;\n};`} />
@@ -923,22 +923,22 @@ ctx.putImageData(
           ]} />
         </section>
 
-        <section className="my-8">
-          <h2 id="preset-category" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preset-category" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             PresetCategory
           </h2>
           <ApiSignature signature={`type PresetCategory =\n  | "pixelDither"\n  | "asciiSymbols"\n  | "printPaper"\n  | "distortionGlass"\n  | "colorGlow"\n  | "atmosphereGlow"\n  | "retroSignal";`} />
         </section>
 
-        <section className="my-8">
-          <h2 id="advanced-control" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="advanced-control" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             AdvancedControlDefinition
           </h2>
           <ApiSignature signature={`type AdvancedControlDefinition = {\n  id: string;\n  name: string;\n  type: "range" | "select" | "color" | "boolean" | "text";\n  min?: number;\n  max?: number;\n  step?: number;\n  options?: string[];\n  defaultValue: number | string | boolean;\n};`} />
         </section>
 
-        <section className="my-8">
-          <h2 id="preset-lookup" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preset-lookup" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Preset Lookup
           </h2>
 
@@ -958,8 +958,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">Map legacy IDs to modern replacements. Returns the input if no migration is needed.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="pipeline" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="pipeline" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Pipeline Types
           </h2>
 
@@ -973,8 +973,8 @@ ctx.putImageData(
           <p className="mt-1 text-sm leading-relaxed text-body-muted">A function that takes a source buffer and resolved parameters, returns the output buffer.</p>
         </section>
 
-        <section className="my-8">
-          <h2 id="usage" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="usage" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Usage
           </h2>
           <CodeBlock code={`import { getPresetById } from "@effectsoup/presets";
@@ -990,8 +990,8 @@ const pipeline = preset.createPipeline(params);
 const output: PixelBuffer = pipeline(source, params);`} language="typescript" />
         </section>
 
-        <section className="my-8">
-          <h2 id="advanced-override" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="advanced-override" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Overriding Advanced Controls
           </h2>
           <CodeBlock code={`const preset = getPresetById("dotHalftone")!;
@@ -1020,22 +1020,22 @@ const output = preset.createPipeline(params)(source, params);`} language="typesc
           Web Worker client that runs heavy rendering off the main thread. Handles job versioning, cancellation of stale renders, and buffer transfer.
         </p>
 
-        <section className="my-8">
-          <h2 id="effects-worker-client" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="effects-worker-client" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             EffectsWorkerClient
           </h2>
           <ApiSignature signature={`class EffectsWorkerClient {\n  constructor(workerScriptUrl: string | URL);\n  render(options: RenderOptions): Promise<PixelBuffer>;\n  cancelObsolete(version: number): void;\n  terminate(): void;\n}`} />
         </section>
 
-        <section className="my-8">
-          <h2 id="render-options" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="render-options" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             RenderOptions
           </h2>
           <ApiSignature signature={`type RenderOptions = {\n  presetId: string;\n  resolvedParameters: ResolvedPresetParameters;\n  source: PixelBuffer;\n  crop: CropConfig;\n  targetWidth: number;\n  targetHeight: number;\n};`} />
         </section>
 
-        <section className="my-8">
-          <h2 id="usage" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="usage" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Usage
           </h2>
           <CodeBlock code={`import { EffectsWorkerClient } from "@effectsoup/worker";
@@ -1067,8 +1067,8 @@ client.terminate();`} language="typescript" />
           </Callout>
         </section>
 
-        <section className="my-8">
-          <h2 id="versioning" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="versioning" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Job Versioning &amp; Cancellation
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1076,8 +1076,8 @@ client.terminate();`} language="typescript" />
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="buffer-transfer" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="buffer-transfer" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Buffer Transfer
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1100,8 +1100,8 @@ client.terminate();`} language="typescript" />
           The meta-package re-exports everything from <InlineCode>@effectsoup/core</InlineCode>, <InlineCode>@effectsoup/presets</InlineCode>, and <InlineCode>@effectsoup/worker</InlineCode>.
         </p>
 
-        <section className="my-8">
-          <h2 id="install" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="install" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Installation
           </h2>
           <CodeBlock code={`pnpm add @effectsoup/effectsoup`} language="bash" />
@@ -1110,8 +1110,8 @@ client.terminate();`} language="typescript" />
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="usage" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="usage" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Usage
           </h2>
           <CodeBlock code={`// All exports available from one package.
@@ -1121,8 +1121,8 @@ import { EffectsWorkerClient } from "@effectsoup/effectsoup";
 import type { PixelBuffer, EffectPreset } from "@effectsoup/effectsoup";`} language="typescript" />
         </section>
 
-        <section className="my-8">
-          <h2 id="when-to-use" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="when-to-use" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             When to Use
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1146,8 +1146,8 @@ import type { PixelBuffer, EffectPreset } from "@effectsoup/effectsoup";`} langu
           Every effect in EffectSoup is an <InlineCode>EffectPreset</InlineCode> object. This guide walks through the anatomy of a preset and shows how to add a new one.
         </p>
 
-        <section className="my-8">
-          <h2 id="preset-structure" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preset-structure" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Preset Structure
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1166,8 +1166,8 @@ import type { PixelBuffer, EffectPreset } from "@effectsoup/effectsoup";`} langu
           </ul>
         </section>
 
-        <section className="my-8">
-          <h2 id="minimal-example" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="minimal-example" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Minimal Preset Example
           </h2>
           <CodeBlock code={`import {
@@ -1207,8 +1207,8 @@ export const myPreset: EffectPreset = {
 };`} language="typescript" />
         </section>
 
-        <section className="my-8">
-          <h2 id="registration" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="registration" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Registration
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1226,8 +1226,8 @@ export const allPresets: EffectPreset[] = [
           </Callout>
         </section>
 
-        <section className="my-8">
-          <h2 id="best-practices" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="best-practices" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Best Practices
           </h2>
           <ul className="mt-2 space-y-1 text-sm text-body-muted list-disc list-inside">
@@ -1240,8 +1240,8 @@ export const allPresets: EffectPreset[] = [
           </ul>
         </section>
 
-        <section className="my-8">
-          <h2 id="pipeline-conventions" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="pipeline-conventions" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Pipeline Conventions
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1267,8 +1267,8 @@ export const allPresets: EffectPreset[] = [
           EffectSoup uses Vitest (core) and the built-in test suite (presets) with deterministic rendering tests.
         </p>
 
-        <section className="my-8">
-          <h2 id="preset-tests" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preset-tests" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Preset Tests
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1281,8 +1281,8 @@ export const allPresets: EffectPreset[] = [
           </ul>
         </section>
 
-        <section className="my-8">
-          <h2 id="core-tests" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="core-tests" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Core Tests
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1290,8 +1290,8 @@ export const allPresets: EffectPreset[] = [
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="test-pattern" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="test-pattern" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Test Pattern
           </h2>
           <CodeBlock code={`import { describe, it, expect } from "vitest";
@@ -1318,8 +1318,8 @@ describe("myPreset", () => {
 });`} language="typescript" />
         </section>
 
-        <section className="my-8">
-          <h2 id="running-tests" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="running-tests" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Running Tests
           </h2>
           <CodeBlock code={`# Run all tests
@@ -1351,8 +1351,8 @@ pnpm --filter web test`} language="bash" />
           Architecture
         </h1>
 
-        <section className="my-8">
-          <h2 id="monorepo" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="monorepo" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Monorepo Structure
           </h2>
           <div className="rounded-sm border border-hairline bg-soft-stone/20 p-4 font-mono text-sm leading-relaxed text-body-muted">
@@ -1367,8 +1367,8 @@ pnpm --filter web test`} language="bash" />
           </div>
         </section>
 
-        <section className="my-8">
-          <h2 id="render-flow" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="render-flow" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Render Flow
           </h2>
           <ol className="mt-2 space-y-2 text-sm text-body-muted list-decimal list-inside">
@@ -1382,8 +1382,8 @@ pnpm --filter web test`} language="bash" />
           </ol>
         </section>
 
-        <section className="my-8">
-          <h2 id="preset-lifecycle" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preset-lifecycle" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Preset Lifecycle
           </h2>
           <div className="rounded-sm border border-hairline bg-soft-stone/20 p-4 text-sm leading-relaxed text-body-muted">
@@ -1393,8 +1393,8 @@ pnpm --filter web test`} language="bash" />
           </div>
         </section>
 
-        <section className="my-8">
-          <h2 id="worker-lifecycle" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="worker-lifecycle" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Worker Lifecycle
           </h2>
           <ul className="mt-2 space-y-1 text-sm text-body-muted list-disc list-inside">
@@ -1407,8 +1407,8 @@ pnpm --filter web test`} language="bash" />
           </ul>
         </section>
 
-        <section className="my-8">
-          <h2 id="app-boundaries" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="app-boundaries" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             App-to-Package Boundaries
           </h2>
           <ul className="mt-2 space-y-1 text-sm text-body-muted list-disc list-inside">
@@ -1432,8 +1432,8 @@ pnpm --filter web test`} language="bash" />
           Performance
         </h1>
 
-        <section className="my-8">
-          <h2 id="workers" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="workers" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Web Workers
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1441,8 +1441,8 @@ pnpm --filter web test`} language="bash" />
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="preview-resolution" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preview-resolution" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Preview Resolution
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1450,8 +1450,8 @@ pnpm --filter web test`} language="bash" />
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="working-resolution" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="working-resolution" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Working Resolution
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1459,8 +1459,8 @@ pnpm --filter web test`} language="bash" />
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="buffer-allocation" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="buffer-allocation" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Buffer Allocation
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-body-muted">
@@ -1468,8 +1468,8 @@ pnpm --filter web test`} language="bash" />
           </p>
         </section>
 
-        <section className="my-8">
-          <h2 id="tips" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="tips" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Optimization Tips
           </h2>
           <ul className="mt-2 space-y-1 text-sm text-body-muted list-disc list-inside">
@@ -1494,8 +1494,8 @@ pnpm --filter web test`} language="bash" />
           Troubleshooting
         </h1>
 
-        <section className="my-8">
-          <h2 id="effect-weak" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="effect-weak" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Effect appears weak or too strong
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
@@ -1514,8 +1514,8 @@ pnpm --filter web test`} language="bash" />
           </dl>
         </section>
 
-        <section className="my-8">
-          <h2 id="preview-differs" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preview-differs" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Preview differs from exported result
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
@@ -1534,8 +1534,8 @@ pnpm --filter web test`} language="bash" />
           </dl>
         </section>
 
-        <section className="my-8">
-          <h2 id="upload-fail" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="upload-fail" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Image upload fails
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
@@ -1554,8 +1554,8 @@ pnpm --filter web test`} language="bash" />
           </dl>
         </section>
 
-        <section className="my-8">
-          <h2 id="slow-performance" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="slow-performance" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Slow performance on large images
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
@@ -1574,8 +1574,8 @@ pnpm --filter web test`} language="bash" />
           </dl>
         </section>
 
-        <section className="my-8">
-          <h2 id="export-fails" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="export-fails" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Export fails
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
@@ -1594,8 +1594,8 @@ pnpm --filter web test`} language="bash" />
           </dl>
         </section>
 
-        <section className="my-8">
-          <h2 id="worker-fallback" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="worker-fallback" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Worker not available
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
@@ -1614,8 +1614,8 @@ pnpm --filter web test`} language="bash" />
           </dl>
         </section>
 
-        <section className="my-8">
-          <h2 id="package-import" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="package-import" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Package import errors
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
@@ -1634,8 +1634,8 @@ pnpm --filter web test`} language="bash" />
           </dl>
         </section>
 
-        <section className="my-8">
-          <h2 id="preset-not-found" className="scroll-mt-20 font-display text-lg font-medium tracking-tight text-ink-primary">
+        <section className="mb-10">
+          <h2 id="preset-not-found" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4">
             Preset not found
           </h2>
           <dl className="mt-2 space-y-4 text-sm">
