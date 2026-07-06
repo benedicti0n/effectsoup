@@ -80,14 +80,23 @@ export const metadata: Metadata = {
     url: canonical("/"),
     siteName: "EffectSoup",
     title: "EffectSoup — Beautiful Image Effects",
-    description: SITE_DESCRIPTION
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: "/effectsoupbanner.png?v=1",
+        width: 1200,
+        height: 630,
+        alt: "EffectSoup — Beautiful Image Effects"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     site: "@benedicti0n",
     creator: "@benedicti0n",
     title: "EffectSoup — Beautiful Image Effects",
-    description: SITE_DESCRIPTION
+    description: SITE_DESCRIPTION,
+    images: ["/effectsoupbanner.png?v=1"]
   },
   appleWebApp: {
     capable: true,
