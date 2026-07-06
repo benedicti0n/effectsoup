@@ -28,7 +28,7 @@ export function ValueSection(): JSX.Element {
     <section className="bg-canvas">
       <div className="mx-auto max-w-container px-4 py-16 lg:px-8 lg:py-24">
         <div className="mb-12 max-w-2xl">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-accent">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-accent md:text-xs">
             Why EffectSoup
           </p>
           <h2 className="font-serif-display text-3xl leading-[1.2] tracking-tight text-ink-primary md:text-4xl">

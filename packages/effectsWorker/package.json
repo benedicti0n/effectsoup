@@ -1,6 +1,6 @@
 {
   "name": "@effectsoup/worker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Browser Web Worker communication layer for image effects",
   "license": "MIT",

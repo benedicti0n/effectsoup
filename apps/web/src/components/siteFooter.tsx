@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import NextImage from "next/image";
 import type { JSX } from "react";
 
 export function SiteFooter(): JSX.Element {
@@ -10,8 +11,17 @@ export function SiteFooter(): JSX.Element {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="font-display text-lg font-medium tracking-tight text-ink-primary">
-              EffectSoup
+            <Link href="/" className="flex items-center gap-2">
+              <NextImage
+                src="/icon.png"
+                alt="EffectSoup"
+                width={28}
+                height={28}
+                className="h-7 w-7 shrink-0"
+              />
+              <span className="font-serif-display text-lg tracking-tight text-ink-primary">
+                EffectSoup
+              </span>
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-body-muted">
               A browser-based image effects studio. No AI, no uploads, no limits.

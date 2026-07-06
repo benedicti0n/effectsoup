@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import NextImage from "next/image";
 import { useState, type JSX } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { LockIcon, Menu01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
@@ -20,8 +21,17 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
   return (
     <header className="sticky top-0 z-50 border-b border-hairline bg-canvas/95 backdrop-blur">
       <div className={cn("mx-auto flex h-16 max-w-container items-center justify-between", !noPadding && "px-4 lg:px-8")}>
-        <Link href="/" className="font-display text-lg font-medium tracking-tight text-ink-primary">
-          EffectSoup
+        <Link href="/" className="flex items-center gap-2">
+          <NextImage
+            src="/icon.png"
+            alt="EffectSoup"
+            width={32}
+            height={32}
+            className="h-8 w-8 shrink-0"
+          />
+          <span className="font-serif-display text-lg tracking-tight text-ink-primary">
+            EffectSoup
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -59,14 +69,33 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
           </Button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMenuOpen((s) => !s)}
-          className="flex h-10 w-10 items-center justify-center rounded-sm md:hidden"
-          aria-label="Toggle menu"
-        >
-          <HugeiconsIcon icon={menuOpen ? Cancel01Icon : Menu01Icon} className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          {isSignedIn ? (
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "h-8 w-8 rounded-lg border border-hairline",
+                  userButtonTrigger: "focus:shadow-none"
+                }
+              }}
+            />
+          ) : (
+            <SignInButton mode="modal">
+              <Button variant="primary" size="sm">
+                <HugeiconsIcon icon={LockIcon} className="h-4 w-4" />
+                Sign In
+              </Button>
+            </SignInButton>
+          )}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((s) => !s)}
+            className="flex h-10 w-10 items-center justify-center rounded-sm"
+            aria-label="Toggle menu"
+          >
+            <HugeiconsIcon icon={menuOpen ? Cancel01Icon : Menu01Icon} className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {menuOpen && (
@@ -83,14 +112,6 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-2">
-              {!isSignedIn && (
-                <SignInButton mode="modal">
-                  <Button variant="primary" className="w-full justify-center">
-                    <HugeiconsIcon icon={LockIcon} className="h-6 w-6" />
-                    Sign In
-                  </Button>
-                </SignInButton>
-              )}
               <Button className="w-full justify-center" asChild>
                 <Link href="/playground" onClick={() => setMenuOpen(false)}>
                   Try Playground

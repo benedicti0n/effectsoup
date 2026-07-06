@@ -47,18 +47,18 @@ export function HeroSection(): JSX.Element {
   const activePreset = preset;
 
   return (
-    <section className="bg-soft-stone/40">
+    <section className="overflow-hidden bg-soft-stone/40">
       {showSignIn && (
         <SignInDialog
           onClose={() => setShowSignIn(false)}
           onSuccess={() => setShowSignIn(false)}
         />
       )}
-      <div className="mx-auto max-w-container px-4 py-16 lg:px-8 lg:py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div className="mx-auto max-w-container px-4 py-10 lg:px-8 lg:py-24">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           {/* Left: editorial copy */}
           <div className="max-w-lg">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-accent">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-accent md:text-xs">
               Image Effects for Creators &amp; Developers
             </p>
             <h1 className="font-serif-display text-4xl leading-[1.15] tracking-tight text-ink-primary md:text-5xl lg:text-6xl">
@@ -91,7 +91,7 @@ export function HeroSection(): JSX.Element {
           </div>
 
           {/* Right: live interactive preview */}
-          <div className="rounded-lg border border-hairline bg-canvas p-4 shadow-sm lg:p-6">
+          <div className="min-w-0 rounded-lg border border-hairline bg-canvas p-3 shadow-sm lg:p-6">
             {/* Toolbar */}
             <div className="mb-4 flex items-center gap-2 border-b border-hairline pb-3">
               <span className="h-3 w-3 rounded-full bg-accent/60" />
@@ -139,7 +139,7 @@ export function HeroSection(): JSX.Element {
                       type="button"
                       onClick={() => setPresetId(id)}
                       className={cn(
-                        "rounded-pill border px-2.5 py-1 text-[11px] font-medium transition-colors",
+                        "rounded-pill border px-2 py-0.5 text-[10px] font-medium transition-colors md:px-2.5 md:py-1 md:text-[11px]",
                         isActive
                           ? "border-accent bg-accent/10 text-accent"
                           : "border-hairline text-muted hover:border-muted hover:text-ink"
@@ -153,7 +153,7 @@ export function HeroSection(): JSX.Element {
             </div>
 
             {/* Controls row: intensity + demo photos */}
-            <div className="flex items-center gap-4 border-t border-hairline pt-3">
+            <div className="flex items-center gap-3 border-t border-hairline pt-2 lg:pt-3">
               <div className="flex-1">
                 <div className="mb-1 flex items-center justify-between">
                   <span className="text-[11px] font-medium text-muted">Intensity</span>
@@ -170,9 +170,9 @@ export function HeroSection(): JSX.Element {
             </div>
 
             {/* Demo photo thumbnails */}
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex items-start gap-2">
               <span className="shrink-0 text-[11px] font-medium text-muted">Photo</span>
-              <div className="flex gap-1.5 overflow-x-auto">
+              <div className="flex flex-wrap gap-1.5">
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
                   <button
                     key={num}
@@ -199,7 +199,7 @@ export function HeroSection(): JSX.Element {
             </div>
 
             {/* Action buttons */}
-            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-hairline pt-3">
+            <div className="mt-3 flex flex-col gap-2 border-t border-hairline pt-2 md:flex-row md:items-center lg:pt-3">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -207,27 +207,35 @@ export function HeroSection(): JSX.Element {
                 className="hidden"
                 onChange={onFileChange}
               />
-              <Button
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <HugeiconsIcon icon={Upload01Icon} className="h-3.5 w-3.5" />
-                Upload
-              </Button>
-              <Button
-                size="sm"
-                onClick={onDownload}
-                disabled={isRendering}
-              >
-                <HugeiconsIcon icon={Download01Icon} className="h-3.5 w-3.5" />
-                Download
-              </Button>
-              <Button variant="outline" size="sm" className="ml-auto" asChild>
-                <Link href="/playground">
-                  Open Playground
-                  <HugeiconsIcon icon={ArrowRight01Icon} className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-1"
+                >
+                  <HugeiconsIcon icon={Upload01Icon} className="h-3.5 w-3.5" />
+                  Upload
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onDownload}
+                  disabled={isRendering}
+                  className="flex-1"
+                >
+                  <HugeiconsIcon icon={Download01Icon} className="h-3.5 w-3.5" />
+                  Download
+                </Button>
+              </div>
+              <div className="w-full md:w-auto">
+                <Button size="sm" asChild className="w-full">
+                  <Link href="/playground">
+                    Open Playground
+                    <HugeiconsIcon icon={ArrowRight01Icon} className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

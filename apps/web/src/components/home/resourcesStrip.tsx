@@ -24,7 +24,7 @@ export function ResourcesStrip(): JSX.Element {
     <section className="bg-soft-stone/20 border-b border-hairline">
       <div className="mx-auto max-w-container px-4 py-14 lg:px-8 lg:py-20">
         <div className="mb-8">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-accent">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-accent md:text-xs">
             Built to be documented
           </p>
           <h2 className="font-serif-display text-2xl leading-[1.2] tracking-tight text-ink-primary md:text-3xl">

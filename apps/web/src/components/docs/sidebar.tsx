@@ -77,7 +77,7 @@ export function DocsMobileNav({
 
   return (
     <>
-      <div className="flex items-center gap-2 border-b border-hairline px-4 py-3 md:hidden">
+      <div className="flex items-center gap-2 border-b border-hairline bg-white px-4 py-3 md:hidden">
         <button
           onClick={() => setOpen(true)}
           className="rounded-sm p-1.5 text-ink-primary hover:bg-soft-stone"
@@ -95,7 +95,7 @@ export function DocsMobileNav({
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-canvas md:hidden">
+        <div className="fixed inset-0 z-50 bg-white md:hidden">
           <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
             <span className="font-serif-display text-base text-ink-primary">Docs</span>
             <button
@@ -106,7 +106,7 @@ export function DocsMobileNav({
               <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
             </button>
           </div>
-          <nav className="overflow-y-auto px-4 py-6">
+          <nav className="overflow-y-auto bg-white px-4 py-6">
             {sections.map((section) => (
               <div key={section.id} className="mb-6">
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">

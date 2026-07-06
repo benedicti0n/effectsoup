@@ -296,26 +296,24 @@ export function CanvasPreview(): JSX.Element {
         >
           <canvas
             ref={processedRef}
-            className="object-contain"
+            className="max-h-full max-w-full object-contain"
             aria-hidden={!processedVisible}
             style={{
               visibility: processedVisible ? "visible" : "hidden",
-              maxWidth: "none",
-              maxHeight: "none",
-              width: source ? source.width : "auto",
-              height: source ? source.height : "auto"
+              width: "auto",
+              height: "auto"
             }}
           />
           <canvas
             ref={originalRef}
             aria-hidden={showingOriginal}
-            className="object-contain"
+            className="max-h-full max-w-full object-contain"
             style={{
               visibility: showingOriginal ? "visible" : "hidden",
               position: "absolute",
               inset: 0,
-              width: source ? source.width : "auto",
-              height: source ? source.height : "auto"
+              width: "auto",
+              height: "auto"
             }}
           />
         </div>

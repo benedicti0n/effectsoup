@@ -11,7 +11,8 @@
   "theme_color": "#0a0a0a",
   "categories": ["photo", "design", "productivity"],
   "icons": [
-    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" },
+    { "src": "/icon.png", "type": "image/png", "sizes": "any", "purpose": "any maskable" },
+    { "src": "/apple-touch-icon.png", "type": "image/png", "sizes": "180x180" },
     { "src": "/favicon.ico", "sizes": "any" }
   ]
 }

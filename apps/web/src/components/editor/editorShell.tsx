@@ -50,6 +50,7 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
   const removeSource = useEditorStore((state) => state.removeSource);
   const [showExport, setShowExport] = useState(false);
   const [showMobileLibrary, setShowMobileLibrary] = useState(false);
+  const [showMobileControls, setShowMobileControls] = useState(false);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const { user } = useUser();
 
@@ -212,18 +213,28 @@ export function EditorShell({ className }: { className?: string } = {}): JSX.Ele
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setShowMobileLibrary((s) => !s)}
+          onClick={() => { setShowMobileLibrary((s) => !s); setShowMobileControls(false); }}
         >
           {showMobileLibrary ? "Hide library" : "Show library"}
         </Button>
-        <Button variant="outline" size="sm" onClick={() => setShowExport(true)} disabled={!source}>
-          Export
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => { setShowMobileControls((s) => !s); setShowMobileLibrary(false); }}
+        >
+          {showMobileControls ? "Hide controls" : "Show controls"}
         </Button>
       </div>
 
       {showMobileLibrary && (
-        <div className="border-t border-hairline bg-soft-stone/20 p-4 md:hidden">
+        <div className="max-h-[50dvh] overflow-y-auto border-t border-hairline bg-soft-stone/20 p-4 md:hidden">
           <PresetGrid />
+        </div>
+      )}
+
+      {showMobileControls && (
+        <div className="max-h-[50dvh] overflow-y-auto border-t border-hairline bg-canvas p-4 md:hidden">
+          <EffectControls />
         </div>
       )}
 

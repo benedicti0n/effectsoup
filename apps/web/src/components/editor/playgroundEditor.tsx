@@ -44,6 +44,7 @@ export function PlaygroundEditor({ className }: { className?: string } = {}): JS
   const removeSource = useEditorStore((state) => state.removeSource);
   const [showExport, setShowExport] = useState(false);
   const [showMobileLibrary, setShowMobileLibrary] = useState(false);
+  const [showMobileControls, setShowMobileControls] = useState(false);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const { user } = useUser();
 
@@ -123,8 +124,8 @@ export function PlaygroundEditor({ className }: { className?: string } = {}): JS
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Editor tools — hidden on smallest screens */}
-          <div className="hidden items-center gap-1 sm:flex">
+          {/* Desktop editor tools */}
+          <div className="hidden items-center gap-1 md:flex">
             <button
               type="button"
               onClick={undo}
@@ -154,11 +155,11 @@ export function PlaygroundEditor({ className }: { className?: string } = {}): JS
             </button>
           </div>
 
-          <div className="h-6 w-px bg-hairline" />
+          <div className="hidden h-6 w-px bg-hairline md:block" />
 
           {source && (
             <>
-              <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-hairline bg-canvas px-3 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone">
+              <label className="hidden md:inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-hairline bg-canvas px-3 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone">
                 <HugeiconsIcon icon={Upload01Icon} className="h-4 w-4" />
                 <span className="hidden sm:inline">Replace</span>
                 <input
@@ -172,7 +173,7 @@ export function PlaygroundEditor({ className }: { className?: string } = {}): JS
               <button
                 type="button"
                 onClick={removeSource}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-soft-stone hover:text-ink-primary"
+                className="hidden md:inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-soft-stone hover:text-ink-primary"
                 aria-label="Remove image"
                 title="Remove image"
               >
@@ -209,16 +210,88 @@ export function PlaygroundEditor({ className }: { className?: string } = {}): JS
             </SignInButton>
           )}
 
+          {/* Desktop Export */}
           <Button
             onClick={() => setShowExport(true)}
             disabled={!source}
             size="sm"
+            className="hidden md:inline-flex"
           >
             <HugeiconsIcon icon={Download01Icon} className="h-4 w-4" />
             Export
           </Button>
         </div>
       </header>
+
+      {/* Mobile: control slab — 2 rows of 3 */}
+      <div className="flex flex-col gap-1.5 border-b border-hairline px-4 py-2 md:hidden">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={undo}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-hairline bg-canvas px-2.5 py-1.5 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone"
+            aria-label="Undo"
+            title="Undo"
+          >
+            <HugeiconsIcon icon={UndoIcon} className="h-4 w-4" />
+            <span>Undo</span>
+          </button>
+          <button
+            type="button"
+            onClick={redo}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-hairline bg-canvas px-2.5 py-1.5 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone"
+            aria-label="Redo"
+            title="Redo"
+          >
+            <HugeiconsIcon icon={RedoIcon} className="h-4 w-4" />
+            <span>Redo</span>
+          </button>
+          <button
+            type="button"
+            onClick={resetAll}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-hairline bg-canvas px-2.5 py-1.5 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone"
+            aria-label="Reset"
+            title="Reset"
+          >
+            <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4" />
+            <span>Reset</span>
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="inline-flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-hairline bg-canvas px-2.5 py-1.5 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone disabled:cursor-not-allowed disabled:opacity-40">
+            <HugeiconsIcon icon={Upload01Icon} className="h-4 w-4" />
+            <span>Replace</span>
+            <input
+              ref={replaceInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={onReplaceChange}
+              disabled={!source}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={removeSource}
+            disabled={!source}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-hairline bg-canvas px-2.5 py-1.5 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label="Remove image"
+            title="Remove image"
+          >
+            <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4" />
+            <span>Remove</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowExport(true)}
+            disabled={!source}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-hairline bg-canvas px-2.5 py-1.5 text-sm font-medium text-ink-primary transition-colors hover:bg-soft-stone disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <HugeiconsIcon icon={Download01Icon} className="h-4 w-4" />
+            <span>Export</span>
+          </button>
+        </div>
+      </div>
 
       {/* Main editor area */}
       <div className="flex flex-1 overflow-hidden">
@@ -240,23 +313,33 @@ export function PlaygroundEditor({ className }: { className?: string } = {}): JS
         </aside>
       </div>
 
-      {/* Mobile toolbar */}
+      {/* Mobile toolbar — 2 buttons */}
       <div className="flex items-center justify-between border-t border-hairline p-3 md:hidden">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setShowMobileLibrary((s) => !s)}
+          onClick={() => { setShowMobileLibrary((s) => !s); setShowMobileControls(false); }}
         >
           {showMobileLibrary ? "Hide library" : "Show library"}
         </Button>
-        <Button variant="outline" size="sm" onClick={() => setShowExport(true)} disabled={!source}>
-          Export
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => { setShowMobileControls((s) => !s); setShowMobileLibrary(false); }}
+        >
+          {showMobileControls ? "Hide controls" : "Show controls"}
         </Button>
       </div>
 
       {showMobileLibrary && (
-        <div className="border-t border-hairline bg-soft-stone/20 p-4 md:hidden">
+        <div className="max-h-[50dvh] overflow-y-auto border-t border-hairline bg-soft-stone/20 p-4 md:hidden">
           <PresetGrid />
+        </div>
+      )}
+
+      {showMobileControls && (
+        <div className="max-h-[50dvh] overflow-y-auto border-t border-hairline bg-canvas p-4 md:hidden">
+          <EffectControls />
         </div>
       )}
 

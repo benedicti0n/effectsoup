@@ -23,7 +23,7 @@ export function DevSection(): JSX.Element {
       <div className="mx-auto max-w-container px-4 py-16 lg:px-8 lg:py-24">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="max-w-lg">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-accent">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-accent md:text-xs">
               For developers
             </p>
             <h2 className="font-serif-display text-3xl leading-[1.2] tracking-tight text-ink-primary md:text-4xl">
