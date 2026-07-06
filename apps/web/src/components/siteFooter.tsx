@@ -4,33 +4,52 @@ import Link from "next/link";
 import type { JSX } from "react";
 
 export function SiteFooter(): JSX.Element {
-  const links = [
-    { href: "/playground", label: "Playground" },
-    { href: "/docs", label: "Docs" },
-    { href: "/account", label: "Account" },
-    { href: "https://github.com/benedicti0n/effectsoup", label: "GitHub" }
-  ];
-
   return (
     <footer className="border-t border-hairline bg-canvas">
-      <div className="mx-auto max-w-container px-4 py-12 lg:px-8">
-        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
-          <Link href="/" className="font-display text-lg font-medium tracking-tight text-ink-primary">
-            EffectSoup
-          </Link>
-          <nav className="flex flex-wrap gap-6">
-            {links.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-sm text-body-muted hover:text-ink transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+      <div className="mx-auto max-w-container px-4 py-14 lg:px-8 lg:py-20">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Link href="/" className="font-display text-lg font-medium tracking-tight text-ink-primary">
+              EffectSoup
+            </Link>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-body-muted">
+              A browser-based image effects studio. No AI, no uploads, no limits.
+            </p>
+          </div>
+
+          {/* Product */}
+          <div>
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted">Product</h4>
+            <ul className="space-y-3">
+              <li><Link href="/docs/effects" className="text-sm text-body-muted hover:text-ink transition-colors">Effects</Link></li>
+              <li><Link href="/playground" className="text-sm text-body-muted hover:text-ink transition-colors">Playground</Link></li>
+              <li><Link href="https://github.com/benedicti0n/effectsoup/releases" className="text-sm text-body-muted hover:text-ink transition-colors">Changelog</Link></li>
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted">Resources</h4>
+            <ul className="space-y-3">
+              <li><Link href="/docs" className="text-sm text-body-muted hover:text-ink transition-colors">Docs</Link></li>
+              <li><Link href="/docs/api/core" className="text-sm text-body-muted hover:text-ink transition-colors">API Reference</Link></li>
+              <li><Link href="/docs/guides/creating-an-effect" className="text-sm text-body-muted hover:text-ink transition-colors">Examples</Link></li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted">Connect</h4>
+            <ul className="space-y-3">
+              <li><Link href="https://github.com/benedicti0n/effectsoup" target="_blank" rel="noopener noreferrer" className="text-sm text-body-muted hover:text-ink transition-colors">GitHub</Link></li>
+              <li><Link href="/docs" className="text-sm text-body-muted hover:text-ink transition-colors">Contact</Link></li>
+              <li><Link href="/docs" className="text-sm text-body-muted hover:text-ink transition-colors">Privacy</Link></li>
+            </ul>
+          </div>
         </div>
-        <div className="mt-8 border-t border-hairline pt-8 text-sm text-muted">
+
+        <div className="mt-12 border-t border-hairline pt-8 text-sm text-muted">
           &copy; {new Date().getFullYear()} EffectSoup. Beautiful image effects, made in the browser.
         </div>
       </div>

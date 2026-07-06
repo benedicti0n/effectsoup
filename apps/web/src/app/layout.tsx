@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import {
@@ -11,6 +12,12 @@ import {
   canonical,
   getSiteOrigin
 } from "@/lib/seo";
+
+const serifDisplay = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-serif-display"
+});
 
 const ogImage = "/og-image.png";
 
@@ -112,7 +119,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" dir="ltr">
+    <html lang="en" dir="ltr" className={`${serifDisplay.variable}`}>
       <head>
         <meta name="theme-color" content="#0a0a0a" />
         <link rel="canonical" href={canonical("/")} />

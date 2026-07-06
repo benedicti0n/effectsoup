@@ -15,6 +15,7 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
   const { data: session } = authClient.useSession();
 
   const navLinks = [
+    { href: "/docs/effects", label: "Effects" },
     { href: "/playground", label: "Playground" },
     { href: "/docs", label: "Docs" }
   ];
@@ -24,7 +25,7 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
       {showSignIn && <SignInDialog onClose={() => setShowSignIn(false)} />}
       <header className="sticky top-0 z-50 border-b border-hairline bg-canvas/95 backdrop-blur">
         <div className={cn("mx-auto flex h-16 max-w-container items-center justify-between", !noPadding && "px-4 lg:px-8")}>
-          <Link href="/" className="font-display text-xl font-medium tracking-tight text-ink-primary">
+          <Link href="/" className="font-display text-lg font-medium tracking-tight text-ink-primary">
             EffectSoup
           </Link>
 
@@ -33,7 +34,7 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-ink hover:text-muted transition-colors"
+                className="text-sm text-ink hover:text-muted transition-colors"
               >
                 {link.label}
               </Link>
@@ -41,26 +42,14 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
           </nav>
 
           <div className="hidden items-center gap-4 md:flex">
-            <Link
-              href="https://github.com/benedicti0n/effectsoup"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-ink hover:text-muted transition-colors"
-            >
-              GitHub
-            </Link>
-            {session ? (
-              <Button variant="secondary" asChild>
-                <Link href="/account">Account</Link>
+            {!session && (
+              <Button variant="ghost" onClick={() => setShowSignIn(true)}>
+                Sign in
               </Button>
-            ) : (
-              <>
-                <Button variant="ghost" onClick={() => setShowSignIn(true)}>
-                  Log In
-                </Button>
-                <Button onClick={() => setShowSignIn(true)}>Sign Up</Button>
-              </>
             )}
+            <Button asChild>
+              <Link href="/playground">Try Playground</Link>
+            </Button>
           </div>
 
           <button
@@ -81,23 +70,26 @@ export function SiteHeader({ noPadding = false }: { noPadding?: boolean } = {}):
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block rounded-sm px-3 py-2.5 text-base font-medium text-ink hover:bg-soft-stone"
+                  className="block rounded-sm px-3 py-2.5 text-base text-ink hover:bg-soft-stone"
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-2">
-                {session ? (
-                  <Button className="w-full" variant="secondary" asChild>
-                    <Link href="/account" onClick={() => setMenuOpen(false)}>
-                      Account
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button className="w-full" onClick={() => { setMenuOpen(false); setShowSignIn(true); }}>
-                    Sign Up / Log In
+              <div className="flex flex-col gap-2 pt-2">
+                {!session && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-center"
+                    onClick={() => { setMenuOpen(false); setShowSignIn(true); }}
+                  >
+                    Sign in
                   </Button>
                 )}
+                <Button className="w-full justify-center" asChild>
+                  <Link href="/playground" onClick={() => setMenuOpen(false)}>
+                    Try Playground
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>

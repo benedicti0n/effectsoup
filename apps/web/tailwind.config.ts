@@ -43,7 +43,8 @@ const config: Config = {
       fontFamily: {
         display: ["Space Grotesk", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         body: ["Inter", "Arial", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"]
+        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        "serif-display": ["var(--font-serif-display)", "Georgia", "serif"]
       },
       borderRadius: {
         xs: "4px",
