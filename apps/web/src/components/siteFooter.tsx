@@ -54,7 +54,7 @@ export function SiteFooter(): JSX.Element {
             <ul className="space-y-3">
               <li><Link href="https://github.com/benedicti0n/effectsoup" target="_blank" rel="noopener noreferrer" className="text-sm text-body-muted hover:text-ink transition-colors">GitHub</Link></li>
               <li><Link href="/docs" className="text-sm text-body-muted hover:text-ink transition-colors">Contact</Link></li>
-              <li><Link href="/docs" className="text-sm text-body-muted hover:text-ink transition-colors">Privacy</Link></li>
+              <li><Link href="/privacy" className="text-sm text-body-muted hover:text-ink transition-colors">Privacy</Link></li>
             </ul>
           </div>
         </div>
