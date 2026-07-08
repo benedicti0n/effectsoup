@@ -38,7 +38,10 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,
-  authors: [{ name: "benedicti0n", url: "https://github.com/benedicti0n" }],
+  authors: [
+    { name: "asheshtwt", url: "https://x.com/asheshtwt" },
+    { name: "benedicti0n", url: "https://github.com/benedicti0n" }
+  ],
   creator: "benedicti0n",
   publisher: SITE_NAME,
   category: "Photo & Video",
@@ -92,8 +95,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@benedicti0n",
-    creator: "@benedicti0n",
+    site: "@asheshtwt",
+    creator: "@asheshtwt",
     title: "EffectSoup — Beautiful Image Effects",
     description: SITE_DESCRIPTION,
     images: ["/effectsoupbanner.png?v=1"]
