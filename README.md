@@ -1,93 +1,94 @@
-# EffectSoup
+# EffectSoup 🥣
 
 > Beautiful image effects, made in your browser.
 
-EffectSoup is a free, browser-based image effects studio. Pick from 25+
-curated presets — pixel grids, halftones, ASCII art, glowing symbols,
-cinematic bloom, glitch, CRT, and graphic-print looks — then export to
-PNG, JPEG, or WebP. Every pixel is processed in a Web Worker on your
-device; no uploads, no AI, no signup required.
+EffectSoup is a browser-based image effects engine. Upload a photo, pick from 25+ deterministic presets, and export — every pixel is processed in a Web Worker on your device. No AI, no uploads to a server, no sign-up required to edit.
 
-**→ [Try the Playground](https://effectsoup-web.vercel.app/playground)**
-**→ [Read the Docs](https://effectsoup-web.vercel.app/docs)**
+**→ [Try the Playground](https://effectsoup.com/playground)**  
+**→ [Read the Docs](https://effectsoup.com/docs)**  
+**→ [X / Twitter](https://x.com/asheshtwt)**
+
+---
+
+## Features
+
+### 25+ Presets
+
+Pixel grid, halftone, ASCII art, duotone, CRT glitch, dream glow, stipple print, error diffusion dither, ordered dither, LED matrix, noir grain, pencil grain, blocks ASCII, dense ASCII, classic ASCII, dot halftone, and more. Each one is a deterministic mathematical pipeline — same input, same settings, same output.
+
+### Privacy First
+
+Your image never leaves your device. The flow is: file → canvas → Web Worker → export. Zero image data is sent to any server.
+
+### Real-time Preview
+
+Adjust intensity and parameters while seeing results instantly. The editor renders at preview resolution during tweaks and switches to full-resolution only on export.
+
+### Export Everywhere
+
+PNG, JPEG, or WebP up to 4K resolution. Crop before applying effects. Full-resolution rendering on export keeps the preview fast.
+
+### npm Packages
+
+The same core pipeline is available as pure TypeScript with zero browser dependencies:
+
+```bash
+pnpm add @effectsoup/core
+```
+
+Or use all presets:
+
+```bash
+pnpm add @effectsoup/presets
+```
+
+Works in Node, Deno, React, Next.js, or plain HTML.
+
+---
 
 ## Packages
 
 | Package | Description |
 |---|---|
 | [`@effectsoup/core`](./packages/effectsCore) | Pure TypeScript image-processing primitives |
-| [`@effectsoup/presets`](./packages/effectsPresets) | Effect presets with Intensity mapping and advanced controls |
+| [`@effectsoup/presets`](./packages/effectsPresets) | Effect presets with intensity mapping and advanced controls |
 | [`@effectsoup/worker`](./packages/effectsWorker) | Web Worker client for off-thread rendering |
 | [`@effectsoup/effectsoup`](./packages/effectsoup) | All-in-one meta-package |
 
 ## Tech Stack
 
 - **Monorepo:** pnpm workspaces + Turborepo
-- **App:** Next.js 15 App Router (RSC), React 19, TypeScript, Tailwind CSS
+- **App:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS
 - **Image Engine:** Pure TypeScript — no WebGL, no WASM, no AI
-- **Auth:** Better Auth (Google OAuth + email/password)
-- **Database:** Neon PostgreSQL + Drizzle ORM
-- **Cache/Rate Limits:** Upstash Redis
+- **Auth:** Clerk
+- **Hosting:** Vercel
 - **Tests:** Vitest + Playwright
 
 ## Local Setup
 
-1. Install dependencies:
-
-   ```bash
-   pnpm install
-   ```
-
-2. Copy `.env.example` to `.env.local` and fill in the required values.
-
-3. Build internal packages:
-
-   ```bash
-   pnpm build
-   ```
-
-4. Run the development server:
-
-   ```bash
-   pnpm dev
-   ```
-
-5. Open [http://localhost:3000](http://localhost:3000).
-
-## Environment Variables
-
-```text
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+```bash
+pnpm install
+pnpm build
+pnpm dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ## Commands
 
-```bash
-pnpm dev          # Start dev server
-pnpm build        # Production build
-pnpm typecheck    # Type check all packages
-pnpm lint         # Lint all packages
-pnpm test         # Run unit tests
-pnpm test:e2e     # Run Playwright tests (requires dev server)
-pnpm format       # Format with Prettier
-```
-
-## Key Routes
-
-- `/` — Marketing homepage with interactive mini-playground
-- `/playground` — Full image editor workspace
-- `/docs` — Documentation hub
-- `/account` — User account
+| Command | Description |
+|---|---|
+| `pnpm dev` | Start dev server |
+| `pnpm build` | Production build |
+| `pnpm typecheck` | Type check all packages |
+| `pnpm lint` | Lint all packages |
+| `pnpm test` | Run unit tests |
+| `pnpm test:e2e` | Run Playwright tests |
+| `pnpm format` | Format with Prettier |
 
 ## Architecture
 
-All image effects run in the user's browser via a Web Worker. The backend
-handles authentication only. See the [Architecture guide](https://effectsoup-web.vercel.app/docs/guides/architecture)
-for details.
+All image effects run in a Web Worker in the browser. The backend handles authentication only. See the [Architecture guide](https://effectsoup.com/docs/guides/architecture) for details.
 
 ## License
 
