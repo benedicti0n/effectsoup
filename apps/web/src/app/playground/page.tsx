@@ -10,7 +10,7 @@ import {
 export const metadata: Metadata = {
   title: "Image Effects Playground",
   description:
-    "Open the EffectSoup playground: upload an image, crop, pick from 25+ aesthetic presets, and export to PNG, JPEG, or WebP. Runs entirely in your browser — no upload, no AI, no signup.",
+    "Open the EffectSoup playground: upload an image, crop, pick from 25+ aesthetic presets, and export to PNG, JPEG, or WebP. Runs entirely in your browser — no upload, no AI.",
   alternates: { canonical: "/playground" },
   openGraph: {
     title: `Image Effects Playground | ${SITE_NAME}`,

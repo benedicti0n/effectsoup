@@ -4,7 +4,7 @@ const values = [
   {
     title: "Instant browser-based effects",
     description:
-      "No software to install, no account required. Upload, tweak, and export — all in your browser."
+      "No software to install. Upload, tweak, and export — all in your browser."
   },
   {
     title: "Fine-tune every detail",

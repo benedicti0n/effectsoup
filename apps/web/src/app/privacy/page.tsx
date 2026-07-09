@@ -29,8 +29,7 @@ export default function PrivacyPage(): JSX.Element {
             sent to any server.
           </p>
           <p>
-            The editor and all effects work without an account. Authentication is
-            optional and is only needed if you choose to sign in.
+            Authentication is optional and is only needed if you choose to sign in.
           </p>
         </section>
 

@@ -14,7 +14,7 @@ const content: Record<string, PageContent> = {
     description: "Browser-based non-AI image effects studio",
     component: () => (
       <>
-        <p className="mt-1 text-sm leading-relaxed text-body-muted" dangerouslySetInnerHTML={{ __html: "EffectSoup is a browser-based, non-AI image transformation engine. Upload a photo, choose an effect, adjust controls, and export — every pixel is processed in a Web Worker on your device. No uploads to a server, no AI generation, no signup required to edit." }} />
+        <p className="mt-1 text-sm leading-relaxed text-body-muted" dangerouslySetInnerHTML={{ __html: "EffectSoup is a browser-based, non-AI image transformation engine. Upload a photo, choose an effect, adjust controls, and export — every pixel is processed in a Web Worker on your device. No uploads to a server, no AI generation." }} />
 
 <p className="mt-1 text-sm leading-relaxed text-body-muted" dangerouslySetInnerHTML={{ __html: "Every effect is a deterministic, mathematical image pipeline. The same photo with the same settings always produces the same pixel output." }} />
 
@@ -1867,7 +1867,7 @@ const content: Record<string, PageContent> = {
 
 <h2 id="do-i-need-an-account" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4" dangerouslySetInnerHTML={{ __html: "Do I need an account?" }} />
 
-<p className="mt-1 text-sm leading-relaxed text-body-muted" dangerouslySetInnerHTML={{ __html: "The editor and mini-playground work without an account. An account is optional and currently required to export images." }} />
+<p className="mt-1 text-sm leading-relaxed text-body-muted" dangerouslySetInnerHTML={{ __html: "An account is currently required to export images." }} />
 
 <h2 id="is-effectsoup-free" className="scroll-mt-20 font-display text-xl font-medium tracking-tight text-ink-primary mt-10 mb-4" dangerouslySetInnerHTML={{ __html: "Is EffectSoup free?" }} />
 

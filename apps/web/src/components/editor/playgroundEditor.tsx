@@ -3,6 +3,7 @@
 import type { JSX } from "react";
 import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
+import NextImage from "next/image";
 import { useEditorStore } from "@/store/editorStore";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -106,11 +107,17 @@ export function PlaygroundEditor({ className }: { className?: string } = {}): JS
       {/* Header — editorial style matching SiteHeader */}
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-hairline bg-canvas px-4 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="font-serif-display text-lg tracking-tight text-ink-primary transition-colors hover:text-muted"
-          >
-            EffectSoup
+          <Link href="/" className="flex items-center gap-2">
+            <NextImage
+              src="/icon.png"
+              alt="EffectSoup"
+              width={32}
+              height={32}
+              className="h-8 w-8 shrink-0"
+            />
+            <span className="font-serif-display text-lg tracking-tight text-ink-primary">
+              EffectSoup
+            </span>
           </Link>
           <span className="hidden text-sm text-muted md:inline">/</span>
           <span className="hidden text-sm font-medium text-ink-primary md:inline">

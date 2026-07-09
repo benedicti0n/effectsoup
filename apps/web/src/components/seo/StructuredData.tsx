@@ -31,7 +31,6 @@ export function SoftwareApplicationJsonLd(): JSX.Element {
       "Pixel grid, halftone, ASCII art, glitch, CRT, bloom, and more",
       "Crop, zoom, and pan before applying effects",
       "Export to PNG, JPEG, and WebP up to 4K",
-      "No account required for the editor",
       "No images uploaded to any server"
     ],
     browserRequirements:
